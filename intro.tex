@@ -1,0 +1,115 @@
+\chapter{Introduction}
+\label{ch:introduction}
+%
+Hash functions are used as cryptographic primitives in many applications and protocols.
+They take an arbitrary input message, considered as byte string, and compute a hash value.
+The hash value is of fixed length and satisfies several properties which make them useful
+to enable data and origin integrity.
+
+\section{Hash Function Properties}
+\label{ch:hf-properties}
+%
+\index{Hash value}
+\index{Preimage}
+\index{Hash function}
+\begin{defi}[Hash function]
+  A \emph{hash function} is a mapping $h: X \to Y$ with $X = \left\{0,1\right\}^*$ and
+  $Y = \left\{0,1\right\}^n$ for $n \in \mathbb N_{\geq 1}$.
+
+  \begin{itemize}\itemsep0pt
+    \item Let $x \in X$. $h(x)$ is called \emph{hash value of $x$}.
+    \item Let $h(x) = y \in Y$. $y$ is called \emph{preimage of $y$}.
+  \end{itemize}
+\end{defi}
+
+One example showing the use of hash functions as primitives is PKCS~\#5
+specified in RFC~2898~\cite{rfc2898}. Section~5.2 specifies PBKDF1 and PBKDF2 using
+hash algorithms as pseudorandom functions to derive password-based keys.
+Given a minimum iteration count of $1000$ as defined in section~4.2,
+it suggested to allow fast computations of hash value for given $x \in X$.
+
+\index{Preimage resistance}
+\begin{defi}[Preimage resistance]
+  Given $y \in Y$.
+  A hash function $h$ is preimage resistant iff it is computationally infeasible
+  to find $x \in X$ such that $h(x) = y$.
+\end{defi}
+
+\index{Second-preimage resistance}
+\begin{defi}[Second-preimage resistance]
+  Given $x \in X$.
+  A hash function $h$ is second-preimage resistant iff it is computationally infeasible
+  to find $x_2 \in X$ with $x \neq x_2$ such that $h(x) = h(x_2)$.
+  $x_2$ is called \emph{second preimage}.
+\end{defi}
+
+\index{Collision resistance}
+\begin{defi}[Collision resistance]
+  A hash function $h$ is collision resistant iff it is computationally infeasible to
+  find any two $x \in X$ and $x_2 \in X$ with $x \neq x_2$ such that $h(x) = h(x_2)$.
+\end{defi}
+
+As far as hash functions accept input strings of arbitrary length, but return a fixed
+size output string, existence of preimages and collisions is unavoidable~\cite{schlaffer}.
+However, good hash functions make it very difficult to determine collisions or preimages.
+
+\section{Cryptanalysis of Hash Functions}
+\label{ch:cryptanalysis}
+%
+In August 2004, Wang et al. published results at Crypto'04~\cite{wang2004} which revealed
+that MD4, MD5, HAVAL-128 and RIPEMD can be broken practically using differential cryptanalysis.
+On an IBM~P690 machine, an MD5 collision can be computed in about one hour using this approach.
+Collisions for HAVAL-128, MD4 and RIPEMD were found as well.
+
+TODO: discuss their approach in more detail, introduce diff cryptanalysis
+
+\section{Boolean functions}
+\label{ch:bool-functions}
+%
+TODO: and, or, not
+
+\index{Boolean function}
+\begin{defi}
+  A \emph{boolean function} is a mapping $h: X \to Y$ with $X = \left\{0,1\right\}^n$
+  for $n \in \mathbb N_{\geq 1}$ and $Y = \left\{0,1\right\}$.
+\end{defi}
+
+\index{Algorithm}
+\begin{defi}
+  An \emph{algorithm} is a step-wise set of instructions to solve a problem.
+\end{defi}
+
+\section{Satisfiability}
+\label{ch:sat}
+%
+TODO
+
+\index{Satisfiability}
+\begin{defi}
+  A boolean function is \emph{satisfiable} iff there exists at least one
+  input $x \in X$ such that $h(x) = 1$.
+\end{defi}
+
+\begin{theorem}
+  Every algorithm can be represented as boolean function.
+\end{theorem}
+
+\section{Thesis Outline}
+%
+This thesis is organized as follows.
+
+\begin{description}
+\item[In Chapter~\ref{ch:introduction}] we discussed the basic properties and fundamentals
+of the tools in discussion including hash functions and SAT solvers.
+
+\item[In Chapter~\ref{ch:diff-crypt}] we introduce the MD4 hash function and
+discuss possible approaches in differential cryptanalysis.
+
+\item[In Chapter~\ref{ch:sat-solving}] we discuss SAT solving and potential
+approaches to speed up SAT solvers for cryptographic problems.
+
+\item[In Chapter~\ref{ch:results}] we show results of our work
+and discuss its implications.
+\end{description}
+
+%Some basic background, especially related work and approaches
