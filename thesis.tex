@@ -5,6 +5,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage[toc,page]{appendix}
 \usepackage[autostyle=true]{csquotes}
 \usepackage{polyglossia} \setmainlanguage{english} % before biblatex
 \usepackage[backend=bibtex,natbib=true]{biblatex}
@@ -17,6 +18,7 @@
 \usepackage{import}
 \usepackage{microtype}
 %\usepackage[oldstyle]{libertine} % (or 'lining')  % alternatives: Garamond, Caladea
+\usepackage{subfig}
 \usepackage{titling}
 \usepackage{pxfonts}
 \usepackage{xcolor}
@@ -26,12 +28,33 @@
 \parskip2pt
 
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
+\setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
+\setmonofont{Inconsolata}
+
+\makeindex
 
 \captionsetup[figure]{labelfont=bf}
 
 \definecolor{linkcolor}{cmyk}{0.68,0.00,0.71,0.39}
 \definecolor{citecolor}{cmyk}{0.60,0.00,0.75,0.51}
 \definecolor{urlcolor}{cmyk}{0.59,0.00,0.76,0.44}
+
+\definecolor{gray}{rgb}{0.7,0.7,0.7}
+\newcommand{\dnW}[1][A]{\texttt{#1}}
+\newcommand{\dnI}[1]{\texttt{#1}}
+\newcommand{\dnCx}{\texttt{\color{red}{x}}}
+\newcommand{\dnCu}{\texttt{\color{red}{u}}}
+\newcommand{\dnCn}{\texttt{\color{red}{n}}}
+\newcommand{\dnCz}{\texttt{\color{black}{0}}}
+\newcommand{\dnCo}{\texttt{\color{black}{1}}}
+\newcommand{\dnCq}{\texttt{\color{black}{?}}}
+\newcommand{\dnCa}{\texttt{\color{black}{A}}}
+\newcommand{\dnCb}{\texttt{\color{black}{B}}}
+\newcommand{\dnCc}{\texttt{\color{black}{C}}}
+\newcommand{\dnCd}{\texttt{\color{black}{D}}}
+\newcommand{\dnCh}{\texttt{\color{black}{-}}}
+
+\newcommand\boolf[1]{\texttt{#1}}
 
 \hypersetup{
   pdfpagemode={UseOutlines},
@@ -217,5 +240,8 @@ This document was printed with \LuaLaTeX and Linux Libertine Font.
 \input{sat}
 \input{results}
 \input{appendix}
+
+\printindex
+\printbibliography
 
 \end{document}
