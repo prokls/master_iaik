@@ -31,6 +31,29 @@
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
 \setmonofont{Inconsolata}
 
+\makeatletter
+\def\@makechapterhead#1{%
+  \ifx\chappic\@empty
+  \vspace*{50\p@}%
+\else
+  \vspace*{5\p@}%
+    \noindent\def\svgwidth{100pt}\import*{img/}{\chappic} \\[10pt]
+\fi
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+      \if@mainmatter
+        \huge\bfseries \@chapapp\space \thechapter
+        \par\nobreak
+        \vskip 20\p@
+      \fi
+    \fi
+    \interlinepenalty\@M
+    \Huge \bfseries #1\par\nobreak
+    \vskip 40\p@
+  }}
+\makeatother
+\newcommand*\chappic{}
+
 \makeindex
 
 \captionsetup[figure]{labelfont=bf}
@@ -54,6 +77,7 @@
 \newcommand{\dnCd}{\texttt{\color{black}{D}}}
 \newcommand{\dnCh}{\texttt{\color{black}{-}}}
 
+\newcommand\set[1]{\left\{#1\right\}}
 \newcommand\boolf[1]{\texttt{#1}}
 
 \hypersetup{
