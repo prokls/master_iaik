@@ -2,9 +2,6 @@
 \chapter{Differential cryptanalysis}
 \label{ch:diff-crypt}
 %
-% TODO: preimage resistance
-% TODO: collision
-
 \section{MD4}
 \label{ch:md4}
 %
@@ -22,7 +19,6 @@ is available at github~\cite{md4-py3k}.
       block size           & 512 bits       & namely variable \texttt{block} in RFC~1320~\cite{rfc1320} \\
       digest size          & 128 bits       & as per section~3.5 in RFC~1320~\cite{rfc1320} \\
       internal state size  & 128 bits       & namely variables $A$, $B$, $C$ and $D$ \\
-      %length size          & 64 bits       & \\
       word size            & 32 bits        & as per section~2 in RFC~1320~\cite{rfc1320} \\
     \end{tabular}
     \caption{MD4 hash algorithm properties}
@@ -46,6 +42,8 @@ To process one block, three auxiliary functions are defined:
   G(X,Y,Z) &= (X \land Y) \lor (X \land Z) \lor (Y \land Z) \\
   H(X,Y,Z) &= X \oplus Y \oplus Z
 \end{align}
+
+TODO: round function visualization
 
 \section{Differential notation}
 \section{Addition example}
