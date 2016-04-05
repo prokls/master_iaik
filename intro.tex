@@ -65,9 +65,9 @@ Collisions for HAVAL-128, MD4 and RIPEMD were found as well. Patrick Stach's \te
 program~\cite{md4coll} implements Wang's approach and can find MD4 collisions in few seconds
 on my Thinkpad x220 machine powering a .
 
-Due to the birthday paradox, a collision attack has a general complexity of $2^{n/2}$.
+Due to the birthday paradox, a collision attack has a generic complexity of $2^{\frac n2}$ whereas pre-image and second pre-image attacks have a generic complexity of $2^n$.
 
-TODO: discuss their approach in more detail, introduce diff cryptanalysis
+TODO: discuss their approach in more detail, introduce basics of diff cryptanalysis (w/o notation)
 
 \section{Boolean functions}
 \label{ch:bool-functions}
@@ -78,27 +78,21 @@ TODO: discuss their approach in more detail, introduce diff cryptanalysis
   for $n \in \mathbb N_{\geq 1}$ and $Y = \left\{0,1\right\}$.
 \end{defi}
 
-The following definitions illustrate three essential boolean functions:
+The following definition gives three basic boolean functions:
 
 \index{AND}
 \begin{defi}
   \emph{AND} is a boolean function mapping $X = \left\{0,1\right\}^2$
-  to $1$ if all values of $X$ are $1$. It returns $0$ otherwise.
-\end{defi}
-
-\index{OR}
-\begin{defi}
+  to $1$ if all values of $X$ are $1$.
   \emph{OR} is a boolean function mapping $X = \left\{0,1\right\}^2$
-  to $1$ if any value of $X$ is $1$. It returns $1$ otherwise.
-\end{defi}
-
-\index{NOT}
-\begin{defi}
+  to $1$ if any value of $X$ is $1$.
   \emph{NOT} is a boolean function mapping $X = \left\{0,1\right\}^1$
-  to $1$ if the single value of $X$ is $0$. It returns $0$ otherwise.
+  to $1$ if the single value of $X$ is $0$.
+  All functions return $0$ in the other case.
 \end{defi}
 
-In the following also a
+In the following we discuss tools and how boolean functions related
+to general computations:
 
 \index{Truth table}
 \begin{defi}
@@ -142,8 +136,8 @@ In the following also a
       $0$ & $1$
     \end{tabular}
   }%
-  \label{tab:andornot-truthtables}
   \caption{Truth tables for \boolf{AND}, \boolf{OR} and \boolf{NOT}}
+  \label{tab:andornot-truthtables}
 \end{figure}
 
 \index{Algorithm}
