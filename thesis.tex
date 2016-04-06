@@ -17,6 +17,7 @@
 \usepackage{hyperref} % dep: after biblatex
 \usepackage{import}
 \usepackage{microtype}
+\usepackage{mdframed}
 %\usepackage[oldstyle]{libertine} % (or 'lining')  % alternatives: Garamond, Caladea
 \usepackage{subfig}
 \usepackage{titling}
@@ -24,6 +25,11 @@
 \usepackage{xcolor}
 \usepackage{xltxtra}
 \usepackage{xunicode}
+
+\newmdtheoremenv[%
+  backgroundcolor=white,
+  linecolor=white!60!black,
+  linewidth=3pt]{todo}{Todo}
 
 \parskip2pt
 

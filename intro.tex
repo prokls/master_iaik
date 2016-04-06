@@ -8,9 +8,13 @@ are considered as byte strings in a particular encoding.
 The hash value is of fixed length and satisfies several properties which make them useful
 to enable data and origin integrity.
 
-\section{Hash Function Properties}
-\label{ch:hf-properties}
-%
+\begin{todo}
+  explain our attack approach using terminology used in the following
+\end{todo}
+
+\section{Preliminaries}
+\label{sec:intro-prelim}
+
 \index{Hash value}
 \index{Preimage}
 \index{Hash function}
@@ -30,6 +34,8 @@ Hash algorithms can be used as those pseudorandom functions.
 Given a minimum iteration count of $1000$, as defined in section~4.2,
 yields the additional requirement that fast computation of hash values
 for given $x \in X$ is desirable.
+
+A hash function has to satisfy the following security requirements:
 
 \index{Preimage resistance}
 \begin{defi}[Preimage resistance]
@@ -57,7 +63,7 @@ size output string, existence of preimages and collisions is unavoidable~\cite{s
 However, good hash functions make it very difficult to determine collisions or preimages.
 
 \section{Cryptanalysis of Hash Functions}
-\label{ch:cryptanalysis}
+\label{sec:intro-cryptanalysis}
 %
 In August 2004, Wang et al. published results at Crypto'04~\cite{wang2004} which revealed
 that MD4, MD5, HAVAL-128 and RIPEMD can be broken practically using differential cryptanalysis.
@@ -68,10 +74,12 @@ on my Thinkpad x220 machine powering a .
 
 Due to the birthday paradox, a collision attack has a generic complexity of $2^{\frac n2}$ whereas pre-image and second pre-image attacks have a generic complexity of $2^n$.
 
-TODO: discuss their approach in more detail, introduce basics of diff cryptanalysis (w/o notation)
+\begin{todo}
+  discuss their approach in more detail, introduce basics of diff cryptanalysis (w/o notation)
+\end{todo}
 
-\section{Boolean functions}
-\label{ch:bool-functions}
+\section{Satisfiability}
+\label{sec:intro-sat}
 %
 \index{Boolean function}
 \begin{defi}
@@ -149,20 +157,27 @@ to general computations:
   to be equivalent to Lambda Calculus.
 \end{defi}
 
-TODO
+\begin{todo}
+  go on
+\end{todo}
 
 \begin{theorem}
   Every algorithm can be represented as boolean function.
 \end{theorem}
 
-TODO
+\begin{todo}
+  go on
+\end{todo}
 
 
 
 \section{Satisfiability}
-\label{ch:sat}
+\label{sec:into-sat}
 %
-TODO
+\begin{todo}
+  intro
+\end{todo}
+
 
 \index{Satisfiability}
 \begin{defi}
