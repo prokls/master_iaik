@@ -1,9 +1,10 @@
-\renewcommand*\chappic{diff-crypt.pdf_tex}
+\renewcommand*\chappic{img/diff-crypt.pdf}
+\renewcommand*\chapquote{}
 \chapter{Differential cryptanalysis}
-\label{ch:diff-crypt}
+\label{ch:dc}
 %
 \section{MD4}
-\label{ch:md4}
+\label{sec:dc-md4}
 %
 MD4 is a cryptographic hash function originally described in RFC~1186~\cite{rfc1186},
 updated in RFC~1320~\cite{rfc1320} and obsoleted by RFC~6150~\cite{rfc6150}. It was
@@ -26,17 +27,24 @@ is available at github~\cite{md4-py3k}.
   \end{center}
 \end{table}
 
-A short summary of MD4's design is given:
-Once padding and length extension has been applied, the message is split into 512-bit blocks
-(i.e. 16 32-bit words). Four state variables $A$, $B$, $C$ and $D$ are initialized
-with hexadecimal values:
+In the following a quick overview over MD4's design is given.
+
+First of all, padding is applied. A single bit 1 is appended to the
+input. As long as the input does not reach a length congruent 448 modulo 512,
+bit 0 is appended.
+Followingly, length appending takes place. Represent the length of the input
+(without the modifications of the previous step) in binary and take its first
+64 bits. Append those 64 bits to the input.
+
+The message is split into 512-bit blocks (i.e. 16 32-bit words).
+Four state variables $A$, $B$, $C$ and $D$ are initialized with hexadecimal values:
 \[
   \mathbf{[A]}\; \mathtt{01234567} \quad
   \mathbf{[B]}\; \mathtt{89abcdef} \quad
   \mathbf{[C]}\; \mathtt{fedcba98} \quad
   \mathbf{[D]}\; \mathtt{76543210}
 \]
-To process one block, three auxiliary functions are defined:
+To process one block, three auxiliary boolean functions are defined:
 \begin{align}
   F(X,Y,Z) &= (X \land Y) \lor (\neg X \land Z) \\
   G(X,Y,Z) &= (X \land Y) \lor (X \land Z) \lor (Y \land Z) \\
@@ -48,6 +56,19 @@ To process one block, three auxiliary functions are defined:
     \includegraphics{img/md4.pdf}
     \caption{MD4 round function}
     \label{fig:md4-round-function}
+  \end{center}
+\end{figure}
+
+\section{SHA-256}
+\label{sec:dc-sha-256}
+
+% Merkle–Damgård construction
+
+\begin{figure}[t]
+  \begin{center}
+    \includegraphics{img/sha256.pdf}
+    \caption{SHA-256 round function}
+    \label{fig:sha256-round-function}
   \end{center}
 \end{figure}
 

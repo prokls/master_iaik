@@ -1,29 +1,42 @@
-\renewcommand*\chappic{intro.pdf_tex}
+\renewcommand*\chappic{img/intro.pdf}
+\renewcommand*\chapquote{}
 \chapter{Introduction}
-\label{ch:introduction}
+\label{ch:intro}
 %
 Hash functions are used as cryptographic primitives in many applications and protocols.
-They take an arbitrary input message and compute a hash value. Input message and hash value
+They take an arbitrary input message and provide a hash value. Input message and hash value
 are considered as byte strings in a particular encoding.
 The hash value is of fixed length and satisfies several properties which make them useful
 to enable data and origin integrity.
 
-\begin{todo}
-  explain our attack approach using terminology used in the following
-\end{todo}
+In this thesis we will consider the hash algorithms MD4 and SHA-256 and represent
+differential characteristics of hash collisions as SAT problem. If and only if
+satisfiability is given, the particular differential state is achievable
+using two different inputs leading to the same output. As far as SAT solvers
+return an actual model satisfying that state, we get a complete hash collision
+which can be verified and visualized.
+If the internal state of the hash algorithm is too large, the attack can be easily
+computationally simplified by modelling only a subset of steps of the hash algorithm
+or changing the modelled differential path.
 
+Gaining experience with these kind of problems with previous non-SAT-based tools
+we try to apply best practices to a satisfiability setting.
+We will discuss which SAT techniques lead to best performance characteristics
+for our MD4 and SHA-256 testcases.
+
+\newpage  % FIX manual pagebreak
 \section{Preliminaries}
 \label{sec:intro-prelim}
-
+%
 \index{Hash value}
 \index{Preimage}
 \index{Hash function}
 \begin{defi}[Hash function]
   A \emph{hash function} is a mapping $h: X \to Y$ with $X = \left\{0,1\right\}^*$ and
-  $Y = \left\{0,1\right\}^n$ for $n \in \mathbb N_{\geq 1}$.
+  $Y = \left\{0,1\right\}^n$ for some fixed $n \in \mathbb N_{\geq 1}$.
   \begin{itemize}\itemsep0pt
-    \item Let $x \in X$. $h(x)$ is called \emph{hash value of $x$}.
-    \item Let $h(x) = y \in Y$. $y$ is called \emph{preimage of $y$}.
+    \item Let $x \in X$, then $h(x)$ is called \emph{hash value of $x$}.
+    \item Let $h(x) = y \in Y$, then $y$ is called \emph{preimage of $y$}.
   \end{itemize}
 \end{defi}
 
@@ -39,22 +52,22 @@ A hash function has to satisfy the following security requirements:
 
 \index{Preimage resistance}
 \begin{defi}[Preimage resistance]
-  Given $y \in Y$.
-  A hash function $h$ is preimage resistant iff it is computationally infeasible
+  Given $y \in Y$,
+  a hash function $h$ is \emph{preimage resistant} iff it is computationally infeasible
   to find $x \in X$ such that $h(x) = y$.
 \end{defi}
 
 \index{Second-preimage resistance}
 \begin{defi}[Second-preimage resistance]
-  Given $x \in X$.
-  A hash function $h$ is second-preimage resistant iff it is computationally infeasible
+  Given $x \in X$,
+  a hash function $h$ is \emph{second-preimage resistant} iff it is computationally infeasible
   to find $x_2 \in X$ with $x \neq x_2$ such that $h(x) = h(x_2)$.
   $x_2$ is called \emph{second preimage}.
 \end{defi}
 
 \index{Collision resistance}
 \begin{defi}[Collision resistance]
-  A hash function $h$ is collision resistant iff it is computationally infeasible to
+  A hash function $h$ is \emph{collision resistant} iff it is computationally infeasible to
   find any two $x \in X$ and $x_2 \in X$ with $x \neq x_2$ such that $h(x) = h(x_2)$.
 \end{defi}
 
@@ -62,21 +75,88 @@ As far as hash functions accept input strings of arbitrary length, but return a 
 size output string, existence of preimages and collisions is unavoidable~\cite{schlaffer}.
 However, good hash functions make it very difficult to determine collisions or preimages.
 
+Most hash functions apply padding to their input to normalize the input size to a multiple
+of its block size before running a round function. In the following we always consider
+input of block size meaning the round function is run only for one block and padding is
+always considered part of this input message. Padding is negligible, because given two
+colliding blocks, we can add another incomplete block. Padding will occur only in the
+second block and with the same values in the second blocks it yield the same padded value.
+This results in a length extension attack, making input padding negligible for cryptanalysis.
+
 \section{Cryptanalysis of Hash Functions}
 \label{sec:intro-cryptanalysis}
 %
 In August 2004, Wang et al. published results at Crypto'04~\cite{wang2004} which revealed
 that MD4, MD5, HAVAL-128 and RIPEMD can be broken practically using differential cryptanalysis.
+Their work is based on preliminary work by Hans Dobbertin~\cite{Dobbertin1998}.
 On an IBM~P690 machine, an MD5 collision can be computed in about one hour using this approach.
 Collisions for HAVAL-128, MD4 and RIPEMD were found as well. Patrick Stach's \texttt{md4coll.c}
 program~\cite{md4coll} implements Wang's approach and can find MD4 collisions in few seconds
-on my Thinkpad x220 machine powering a .
+on my Thinkpad~x220 setup specified in \hyperref[app:setup]{Appendix~\ref{app:setup}}.
 
-Due to the birthday paradox, a collision attack has a generic complexity of $2^{\frac n2}$ whereas pre-image and second pre-image attacks have a generic complexity of $2^n$.
+Let $n$ denote the digest size, hence the size of the hash value $h(x)$ as number of bits.
+Due to the birthday paradox, a collision attack has a generic complexity of $2^{n/2}$
+whereas pre-image and second pre-image attacks have generic complexities of $2^n$.
 
-\begin{todo}
-  discuss their approach in more detail, introduce basics of diff cryptanalysis (w/o notation)
-\end{todo}
+Following results by Wang et al., differential cryptanalysis was discovered as
+powerful tool for cryptanalysis of hash algorithms. This thesis applies those
+ideas to satisfiability approaches.
+
+\begin{table}[bt]
+  \begin{center}
+    \begin{tabular}{cccc}
+      \hline \hline
+      \multicolumn{4}{c}{Message 1} \\
+      \hline
+      4d7a9c83 & \textbf{d6cb927a} & \textbf{29d5a578} & 57a7a5ee \\
+      de748a3c & dcc366b3 & b683a020 & 3b2a5d9f \\
+      c69d71b3 & f9e99198 & d79f805e & a63bb2e8 \\
+      \textbf{45dc8e31} & 97e31fe5 & 2794bf08 & b9e8c3e9 \\
+      \hline
+      \multicolumn{4}{c}{Message 2} \\
+      \hline
+      4d7a9c83 & \textbf{56cb927a} & \textbf{b9d5a578} & 57a7a5ee \\
+      de748a3c & dcc366b3 & b683a020 & 3b2a5d9f \\
+      c69d71b3 & f9e99198 & d79f805e & a63bb2e8 \\
+      \textbf{45dd8e31} & 97e31fe5 & 2794bf08 & b9e8c3e9 \\
+      \hline
+      \multicolumn{4}{c}{Hash value of Message 1 and Message 2} \\
+      \hline
+      5f5c1a0d & 71b36046 & 1b5435da & 9b0d807a \\
+      \hline \hline
+    \end{tabular}
+    \caption[Hexadecimal values of one MD4 collisions given in paper~\cite{wang2004}]{
+      One of two MD4 hash collisions provided in~\cite{wang2004}.
+      Values are given in hexadecimal, message words are enumerated from
+      left to right, top to bottom. Differences are highlighted with
+      bold font for illustration purposes. For comparison the first bits
+      of Message 1 are \texttt{11000001\dots} and the last bits are
+      \texttt{\dots10011101}.
+      A message represents one block of 512~bits.
+      %The hash value consists of 128~bits.
+    }
+    \label{tab:wang-md4-collision1}
+  \end{center}
+\end{table}
+
+\section{Differential cryptanalysis}
+\label{sec:intro-diff-cryptanalysis}
+%
+\index{Hash collision}
+\begin{defi}[Hash collisoin]
+  Given a hash function $h$,
+  a hash collision is a pair $(x, x_2)$ with $x \neq x_2$ such that
+  $h(x) = h(x_2)$.
+\end{defi}
+
+Differential cryptanalysis is based on the idea to consider two execution states
+of hash algorithms for slightly different input messages. We trace those difference
+to learn about the propagation of message differences.
+
+Considering some hash function $f$, we look for two input messages $x$ and $x_2$
+such that the output values $h(x)$ and $h(x_2)$ correspond yielding a hash collision.
+
+
 
 \section{Satisfiability}
 \label{sec:intro-sat}
@@ -134,6 +214,7 @@ The following definition gives three basic boolean functions:
     \end{tabular}
   }
   ~
+  \raisebox{16pt}{%
   \subfloat[\boolf{NOT}]{%
     \begin{tabular}{c|c}
       $v$ & $f(v)$ \\
@@ -142,67 +223,75 @@ The following definition gives three basic boolean functions:
       $0$ & $1$
     \end{tabular}
   }%
+  }%
   \caption{Truth tables for \boolf{AND}, \boolf{OR} and \boolf{NOT}}
   \label{tab:andornot-truthtables}
 \end{figure}
 
 In the following we discuss how boolean functions are related
-to general computations:
+to computation in general and hash algorithms specifically.
 
 \index{Algorithm}
 \begin{defi}
   An \emph{algorithm} is a step-wise set of instructions to solve a problem.
-  An algorithm transforms a given input to some output.
-  Turing machines can be utilized as computational model which is conjectured
-  to be equivalent to Lambda Calculus.
 \end{defi}
 
-\begin{todo}
-  go on
-\end{todo}
+One specific set of algorithms transform a given input to some output according
+to some rules. Such algorithms are said to satisfy the \emph{I/O property}.
+Hash algorithms satisfy the I/O property.
 
 \begin{theorem}
   Every algorithm can be represented as boolean function.
 \end{theorem}
 
-\begin{todo}
-  go on
-\end{todo}
-
-
-
-\section{Satisfiability}
-\label{sec:into-sat}
-%
-\begin{todo}
-  intro
-\end{todo}
-
+This is trivial to see considering that computers are built from logic gates.
+However, in practice physical properties are used to employ storage of values,
+which does not exist in the model of boolean algebra. This can be mapped to
+our boolean model by constants for stored values and assuming an infinite memory.
 
 \index{Satisfiability}
+\index{Assignment}
+\index{Model}
 \begin{defi}
   A boolean function is \emph{satisfiable} iff there exists at least one
   input $x \in X$ such that $h(x) = 1$.
+  Every input $x \in X$ satisfying this property is called \emph{model}.
+  Every element of $X$ is called \emph{assignment}.
 \end{defi}
 
+In the following we will establish some theory to reach
+the following property:
 
+\begin{defi}
+  A boolean function is \emph{satisfiable} iff a certain state in two hash
+  algorithm instances is achievable.
+\end{defi}
+
+The generic complexity of SAT determination is given by $2^n$ for $n$ boolean variables.
+%This is closely related to the \cP $\overset{?}{\neq}$ \cNP question.
+The corresponding tool to determine satisfiability is defined in the following.
+
+\index{SAT solver}
+\begin{defi}
+  A \emph{SAT solver} is a tool to determine satisfiability of a boolean function.
+  If satisfiability is given, it returns some model.
+\end{defi}
 
 \section{Thesis Outline}
+\label{sec:intro-outline}
 %
 This thesis is organized as follows:
 
 \begin{description}
-\item[In Chapter~\ref{ch:introduction}] we discussed the basic properties and fundamentals
+\item[In Chapter~\ref{ch:intro}] we discussed the basic properties and fundamentals
 of the tools in discussion including hash functions and SAT solvers.
 
-\item[In Chapter~\ref{ch:diff-crypt}] we introduce the MD4 hash function and
+\item[In Chapter~\ref{ch:dc}] we introduce the MD4 and SHA-256 hash functions and
 discuss possible approaches in differential cryptanalysis.
 
-\item[In Chapter~\ref{ch:sat-solving}] we discuss SAT solving and potential
+\item[In Chapter~\ref{ch:sat}] we discuss SAT solving and potential
 approaches to speed up SAT solvers for cryptographic problems.
 
 \item[In Chapter~\ref{ch:results}] we show results of our work
 and discuss its implications.
 \end{description}
-
-%Some basic background, especially related work and approaches

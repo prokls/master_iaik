@@ -1,14 +1,130 @@
-\renewcommand*\chappic{satisfiability.pdf_tex}
+\renewcommand*\chappic{img/satisfiability.pdf}
+\renewcommand*\chapquote{What idiot called them logic errors rather than bool shit?}
 \chapter{Satisfiability}
-\label{ch:sat-solving}
+\label{ch:sat}
 \vspace{50pt}
 %\begin{center}
 %  \def\svgwidth{100pt}
 %  \import*{img/}{satisfiability.pdf_tex}
 %\end{center}
 
-\enquote{What idiot called them logic errors rather than bool shit?}
+\section{SAT features and CNF analysis}
+\label{sec:sat-features}
+%
+% TODO: more citations needed
+At the very beginning I was very intrigued with the question
+\enquote{What is an \enquote{average} SAT problem?}. Answers to this
+question can help to optimize SAT solver memory layouts.
+But originally I was wondering whether our differential cryptanalysis
+SAT problems distinguish from \enquote{average} SAT problems.
+First of all, we need to elaborate on the question itself.
+
+\index{SAT feature}
+\index{Feature value}
+\begin{defi}[SAT feature]
+  Given a SAT problem, a \emph{SAT feature} is a statistical value
+  (named \emph{feature value}) which can be retrieved from the given
+  problem in polynomial time.
+
+  A SAT feature is called \emph{dynamic} if new clauses need to be formulated
+  to evaluate a SAT feature value. Other SAT features are called \emph{static}.
+  A SAT feature is called \emph{performance-driven} if the runtime of any
+  computation contributes to the feature value.
+\end{defi}
+
+The most basic example of a SAT feature is the number of variables and clauses
+of a given SAT problem. This SAT feature is stored in the CNF header of a SAT
+problem encoded in the DIMACS format.
+
+It should be computationally easy to evaluate SAT features of a given SAT problem.
+The general goal is to write a tool which evaluates several SAT features at the same
+time and prints them for comparison with other problems. A SAT feature
+is expected to be computable in linear time and memory with the number of variables
+and number of clauses. But a hard limit is only given with polynomial complexity
+for evaluation algorithms. This implies that evaluation of satisfiability
+must not be necessary to evaluate a SAT feature under the assumption that \cP $\neq$ \cNP.
+Hence the number of valid models is not a SAT feature as far as satisfiability
+needs to be determined.
+
+The most similar resource I found looking at SAT features was the
+SATzilla project~\ref{sec:sat-features} in 2012. The authors systematically defined
+138 SAT~features categorized in 12 groups.
+
+Many SAT solvers collect feature values to improve algorithm selection,
+restart strategies and estimate problem sizes. Recent trends to apply Machine
+Learning to SAT solving imply feature evaluation. SAT features and the resulting
+satisfiability runtime are used as training data for Machine Learning. One example
+using SAT features for algorithm selection is ASlib~\cite{aslib}.
+
+However, most of these SAT features are performance-driven.
+Examples for performance-driven SAT features include the number of
+restarts within a certain time frame or evaluation of local minima.
+
+In the following section we want to evaluate SAT features and
+compare test cases.
+
+\section{SAT features in comparison}
+
+\begin{prop}
+  The set of public benchmarks in SAT competitions between 2008 and 2015
+  represent average SAT problems
+\end{prop}
+
+Define a large set of SAT features.
+Present data.
+Categorize data.
+
+%\newcommand\satf{\begingroup\catcode`_=12\xxx}
+%\newcommand\xxx[1]{\texttt{#1}\endgroup}
+\newcommand{\satf}{\begingroup \catcode`_=12 \dosatf}
+\newcommand{\dosatf}[1]{\texttt{#1}\endgroup}
+\newcommand\sath[1]{\hline \multicolumn{2}{|c|}{#1} \\ \hline}
+\begin{table}[!ht]
+  \begin{tabular}{rl}
+    \sath{Given a set of clauses, return a subset of clauses satisfying given criterion}
+    \satf{clauses_allLitsNeg}     & all literals are negative \\
+    \satf{clauses_oneLitNeg}      & exactly one literal is negative \\
+    \satf{clauses_geqOneLitNeg}   & more than one literal is negative \\
+    \satf{clauses_allLitsPos}     & all literals are positive \\
+    \satf{clauses_oneLitPos}      & exactly one literal is positive \\
+    \satf{clauses_geqOneLitPos}   & more than one literal is positive \\
+    \satf{clauses_length1}        & clause contains exactly one literal (\enquote{unit clause}) \\
+    \satf{clauses_length2}        & clause contains exactly two literals \\
+    \satf{clauses_unique}         & clause did not yet occur \\
+    \satf{clauses_tautological}   & clause contains some literal and its negation \\
+    \sath{Given a set of literals/variables, return boolean property}
+    \satf{literals_existential}   & literal does not occur negated \\
+    \satf{literals_unit}          & literal occurs in clause of length 1 \\
+    \satf{literals_contradiction} & literal occurs with its negation on one clause \\
+    \satf{literals_1occ}          & literal occurs only in one clause once \\
+    \satf{literals_2occs}         & literal occurs two times in clauses \\
+    \satf{literals_3occs}         & literal occurs three times in clauses \\
+    \satf{variables_unit}         & variable occurs in clause of length 1 \\
+    \sath{Given a set of clauses, return real number based on this clause}
+    \satf{clauses_mapLength}      & number of literals in clause \\
+    \satf{clauses_mapRatioPosNeg} & number of positive literals divided by total number of literal \\
+    \satf{clauses_mapNumPos}      & number of positive literals in clause \\
+    \sath{Given one clause, return boolean property}
+    \satf{clauselits_someEx}      & any is literal existential \\
+    \satf{clauselits_allEx}       & all literals are existential \\
+    \satf{clauselits_someUnit}    & contains unit variable \\
+    \satf{clauselits_someContra}  & contains contradiction variable \\
+    \satf{clauselits_all1occ}     & all variables occur only once in all clauses \\
+    \satf{clauselits_all12occ}    & all variables occur only once or twice in all clauses \\
+    \sath{Given all clauses, return the following property} \\
+    \satf{concomp_variable}       & number of connected components where \\
+                                  & two variables are in the same component \\
+                                  & iff they occur in at least one clause together \\
+    \satf{concomp_literal}        & number of connected components where \\
+                                  & two literals are in the same component \\
+                                  & iff they occur in at least one clause together \\
+    \satf{xor2_count}             & Number of clause pairs ($a \lor b$, $\neg a \lor b$) \\
+                                  & for two variables $a$ and $b$ \\
+  \end{tabular}
+\end{table}
+
 
 \section{Basic SAT solving techniques}
 \section{SAT solvers in use}
 \section{Encodings}
+\subsection{STP approach}

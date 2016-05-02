@@ -2,9 +2,8 @@
 \usepackage{luatextra}
 \usepackage[utf8x]{luainputenc}
 
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{amsthm}
+\usepackage{amsmath} % dep: after unicode-math
+\usepackage{unicode-math}
 \usepackage[toc,page]{appendix}
 \usepackage[autostyle=true]{csquotes}
 \usepackage{polyglossia} \setmainlanguage{english} % before biblatex
@@ -16,14 +15,17 @@
 \usepackage[makeindex]{imakeidx}  % dep: before hyperref
 \usepackage{hyperref} % dep: after biblatex
 \usepackage{import}
+\usepackage{luatexja-fontspec}
+\usepackage{parcolumns}
 \usepackage{microtype}
 \usepackage{mdframed}
+\usepackage{ntheorem}
 %\usepackage[oldstyle]{libertine} % (or 'lining')  % alternatives: Garamond, Caladea
 \usepackage{subfig}
+\usepackage{thmtools}
 \usepackage{titling}
 \usepackage{pxfonts}
 \usepackage{xcolor}
-\usepackage{xltxtra}
 \usepackage{xunicode}
 
 \newmdtheoremenv[%
@@ -31,7 +33,8 @@
   linecolor=white!60!black,
   linewidth=3pt]{todo}{Todo}
 
-\parskip2pt
+\parskip3pt
+\setlength\parskip{0.7em}
 
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
@@ -39,12 +42,28 @@
 
 \makeatletter
 \def\@makechapterhead#1{%
-  \ifx\chappic\@empty
-  \vspace*{50\p@}%
-\else
-  \vspace*{5\p@}%
-    \noindent\def\svgwidth{100pt}\import*{img/}{\chappic} \\[10pt]
-\fi
+  \begin{parcolumns}[nofirstindent,colwidths={1=0.5\textwidth, 2=0.4\textwidth}, distance={0.1\textwidth}]{2}
+    \colchunk[1]{%
+      \ifx\chappic\@empty%
+        \vspace*{50\p@}%
+      \else%
+        \vspace*{5\p@}%
+          \includegraphics[width=100pt]\chappic %\\[15pt]
+      \fi%
+    }%
+    \colchunk[2]{%
+      \ifx\chapquote\@empty\else%
+        \vspace*{5\p@}
+          \begin{flushright}
+            %\begin{minipage}{0.3\textwidth}
+              \enquote{\textsc{\chapquote}}%
+            %\end{minipage}
+          \end{flushright}
+      \fi%
+    }
+    \colplacechunks
+  \end{parcolumns}
+
   {\parindent \z@ \raggedright \normalfont
     \ifnum \c@secnumdepth >\m@ne
       \if@mainmatter
@@ -59,6 +78,7 @@
   }}
 \makeatother
 \newcommand*\chappic{}
+\newcommand*\chapquote{}
 
 \makeindex
 
@@ -82,6 +102,10 @@
 \newcommand{\dnCc}{\texttt{\color{black}{C}}}
 \newcommand{\dnCd}{\texttt{\color{black}{D}}}
 \newcommand{\dnCh}{\texttt{\color{black}{-}}}
+
+\newcommand{\cNP}{$\mathcal{N\!P}$}
+\newcommand{\cP}{$\mathcal{P}$}
+\newcommand{\cNPC}{$\mathcal{N\!PC}$}
 
 \newcommand\set[1]{\left\{#1\right\}}
 \newcommand\boolf[1]{\texttt{#1}}
@@ -109,11 +133,12 @@
 \author{Lukas Prokop}
 \title{Differential cryptanalysis with SAT solvers}
 
-\theoremstyle{definition}
-
-\newtheorem{theorem}{Theorem}
-\newtheorem{defi}{Definition}
-\newtheorem{prop}{Proposition}
+\declaretheorem[thmbox={style=L,bodystyle=\noindent\normalfont\setlength{\parskip}{0.3\baselineskip}},style=plain,name={Theorem}]{theorem}
+\declaretheorem[thmbox={style=L,bodystyle=\noindent\normalfont\setlength{\parskip}{0.3\baselineskip}},style=plain,name={Definition}]{defi}
+\declaretheorem[thmbox={style=L,bodystyle=\noindent\normalfont\setlength{\parskip}{0.3\baselineskip}},style=plain,name={Proposition}]{prop}
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{defi}{Definition}
+%\newtheorem{prop}{Proposition}
 
 %\newcommand\theauthor{Lukas Prokop}
 \newcommand\authormail{admin@lukas-prokop.at}
@@ -130,7 +155,7 @@
     \textsc{\Large Master Thesis}\\[0.5cm]
 
     \hrulefill \\[0.4cm]
-    {\huge \bfseries \makeatletter\@title\makeatother\\}\vspace{0.1cm}
+    {\huge \bfseries Differential cryptanalysis \\ with SAT solvers\\}\vspace{0.1cm}
     \hrulefill \\[1.5cm]
 
     \begin{minipage}[t]{0.4\textwidth}
@@ -152,13 +177,12 @@
       \centering
       \institute
     \end{minipage}
-    \vspace{2cm}
+    \vspace{3.3cm}
 
-    {\large \today}\\[2cm]
+    {\large \today}\\[7pt]
     \begin{minipage}{0.4\textwidth}
       \centering
-      \def\svgwidth{\textwidth}
-      \import*{img/}{iaik.pdf_tex}
+      \includegraphics[width=\textwidth]{img/iaik.pdf}
     \end{minipage}
 
     \vfill
@@ -245,23 +269,25 @@
 
   Also thanks to Roderick Bloem and Armin Biere who organized a meeting
   one year before submitting this work defining the main approaches involved
-  in this thesis.
+  in this thesis. Armin Biere released a custom lingeling version ats1o0
+  featuring more important clauses in lingeling.
 
   And finally I am grateful for the support by Martina,
   who also supported me during good and bad days with this thesis,
   and my parents which provided a prosperous environment to me
-  to be able to be where I am today.
+  to be able to stand where I am today.
 
-  Thank you!
+  Thank you. \\
+  \indent どもありがとうございました。
 \end{acknowledgements}
 
 All source code is available at \href{http://lukas-prokop.at/proj/megosat}{lukas-prokop.at/proj/megosat}
 and published under terms and conditions of Free/Libre Open Source Software.
-This document was printed with \LuaLaTeX and Linux Libertine Font.
+This document was printed with \LuaLaTeX{} and Linux Libertine Font.
 
 
-\listoffigures
-\listoftables
+%\listoffigures
+%\listoftables
 \tableofcontents
 \mainmatter
 
@@ -271,6 +297,7 @@ This document was printed with \LuaLaTeX and Linux Libertine Font.
 \input{results}
 \input{appendix}
 
+\backmatter
 \printindex
 \printbibliography
 
