@@ -7,7 +7,7 @@
 \label{sec:dc-md4}
 %
 MD4 is a cryptographic hash function originally described in RFC~1186~\cite{rfc1186},
-updated in RFC~1320~\cite{rfc1320} and obsoleted by RFC~6150~\cite{rfc6150}. It was
+updated in RFC~1320~\cite{rfc1320} and declared obsolete by RFC~6150~\cite{rfc6150}. It was
 invented by Ronald Rivest in 1990 with properties given in Table~\ref{tab:md4}.
 Since 1995~\cite{Dobbertin1998} successful attacks have been found to break collisions,
 preimage and second-preimage resistance in MD4; including but not limited to~\cite{md4-2007} and
@@ -46,10 +46,21 @@ Four state variables $A$, $B$, $C$ and $D$ are initialized with hexadecimal valu
 \]
 To process one block, three auxiliary boolean functions are defined:
 \begin{align}
-  F(X,Y,Z) &= (X \land Y) \lor (\neg X \land Z) \\
-  G(X,Y,Z) &= (X \land Y) \lor (X \land Z) \lor (Y \land Z) \\
-  H(X,Y,Z) &= X \oplus Y \oplus Z
+  \IF(X,Y,Z) &= (X \land Y) \lor (\neg X \land Z) \\
+  \MAJ(X,Y,Z) &= (X \land Y) \lor (X \land Z) \lor (Y \land Z) \\
+  \XOR(X,Y,Z) &= X \oplus Y \oplus Z
 \end{align}
+
+\begin{defi}
+  The boolean $\IF$ function behaves the following way:
+  If the first argument is true, the second argument is returned.
+  If the first argument is false, the third argument is returned.
+
+  The boolean $\MAJ$ function returns true if the number
+  of boolean values true in arguments is at least $2$.
+  The boolean $\XOR$ function returns true if the number
+  of boolean values true in arguments is odd.
+\end{defi}
 
 \begin{figure}[t]
   \begin{center}
