@@ -2,8 +2,8 @@
 \usepackage{luatextra}
 \usepackage[utf8x]{luainputenc}
 
-\usepackage{amsmath} % dep: after unicode-math
 \usepackage{unicode-math}
+\usepackage{amsmath} % dep: after unicode-math
 \usepackage[toc,page]{appendix}
 \usepackage[autostyle=true]{csquotes}
 \usepackage{polyglossia} \setmainlanguage{english} % before biblatex
@@ -25,8 +25,16 @@
 \usepackage{thmtools}
 \usepackage{titling}
 \usepackage{pxfonts}
+\usepackage{pdfpages}
 \usepackage{xcolor}
 \usepackage{xunicode}
+
+
+
+%\usepackage[lf]{Baskervaldx}
+%\usepackage[bigdelims,vvarbb]{newtxmath}
+%\usepackage[cal=boondoxo]{mathalfa} % mathcal from STIX, unslanted a bit
+%\renewcommand*\oldstylenums[1]{\textosf{#1}}
 
 \newmdtheoremenv[%
   backgroundcolor=white,
@@ -36,9 +44,14 @@
 \parskip3pt
 \setlength\parskip{0.7em}
 
+\DeclareMathOperator\IF{\text{IF\,}}
+\DeclareMathOperator\MAJ{\text{MAJ\,}}
+\DeclareMathOperator\XOR{\text{XOR\,}}
+
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
 \setmonofont{Inconsolata}
+\setmathfont{Linux Libertine O}
 
 \makeatletter
 \def\@makechapterhead#1{%
@@ -144,7 +157,6 @@
 \newcommand\authormail{admin@lukas-prokop.at}
 \newcommand\institute{Institute of Applied Information Processing and Communications}
 \newcommand\university{University of Technology, Graz}
-\newcommand\supervisor{Florian Mendel}
 
 \begin{document}
 
@@ -161,13 +173,13 @@
     \begin{minipage}[t]{0.4\textwidth}
       \begin{flushleft} \large
         \emph{Author:}\\[3pt]
-        \href{mailto:\authormail}{\theauthor, \\ BSc~BSc}
+        \href{mailto:\authormail}{\theauthor}
       \end{flushleft}
     \end{minipage}
     \begin{minipage}[t]{0.4\textwidth}
       \begin{flushright} \large
         \emph{Supervisor:} \\[3pt]
-        {Dipl.-Ing.~Dr.techn. \\ \supervisor}
+        {Maria Eichlseder \\ Florian Mendel}
       \end{flushright}
     \end{minipage}\\[3cm]
 
@@ -222,12 +234,14 @@
   \begin{center}{\huge\textsc{Abstract}\par}\end{center}
 }{\vfil\vfil\null}
 
-
+\clearpage
+\ifodd\value{page}\else\hbox{}\newpage\fi
+\includepdf[pages=-]{Vorlage_TU.pdf}
 
 \begin{abstract}%
   \parskip5pt
   Hash functions are ubiquitous in the modern information age. They provide preimage, second preimage
-  and collision resistance ensuring data and origin integrity. They are used as cryptographic primitives
+  and collision resistance in a wide range of applications. They are used as cryptographic primitives
   in protocols and applications.
 
   In August 2006, Wang et al. showed efficient attacks against several hash function designs including
@@ -269,8 +283,9 @@
 
   Also thanks to Roderick Bloem and Armin Biere who organized a meeting
   one year before submitting this work defining the main approaches involved
-  in this thesis. Armin Biere released a custom lingeling version ats1o0
-  featuring more important clauses in lingeling.
+  in this thesis. Armin Biere released custom lingeling versions for us
+  featuring more important clauses in lingeling. He also provided further
+  analysis for our testcases.
 
   And finally I am grateful for the support by Martina,
   who also supported me during good and bad days with this thesis,
@@ -295,6 +310,7 @@ This document was printed with \LuaLaTeX{} and Linux Libertine Font.
 \input{crypto}
 \input{sat}
 \input{results}
+\input{summary}
 \input{appendix}
 
 \backmatter

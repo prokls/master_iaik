@@ -6,8 +6,8 @@
 Hash functions are used as cryptographic primitives in many applications and protocols.
 They take an arbitrary input message and provide a hash value. Input message and hash value
 are considered as byte strings in a particular encoding.
-The hash value is of fixed length and satisfies several properties which make them useful
-to enable data and origin integrity.
+The hash value is of fixed length and satisfies several properties which make it useful
+in a variety of applications.
 
 In this thesis we will consider the hash algorithms MD4 and SHA-256 and represent
 differential characteristics of hash collisions as SAT problem. If and only if
@@ -33,14 +33,15 @@ for our MD4 and SHA-256 testcases.
 \index{Hash function}
 \begin{defi}[Hash function]
   A \emph{hash function} is a mapping $h: X \to Y$ with $X = \left\{0,1\right\}^*$ and
-  $Y = \left\{0,1\right\}^n$ for some fixed $n \in \mathbb N_{\geq 1}$.
+  $Y = \left\{0,1\right\}^n$ for some fixed $n \in {\mathbb{N}}_{\geq 1}$.
   \begin{itemize}\itemsep0pt
     \item Let $x \in X$, then $h(x)$ is called \emph{hash value of $x$}.
-    \item Let $h(x) = y \in Y$, then $y$ is called \emph{preimage of $y$}.
+    \item Let $h(x) = y \in Y$, then $x$ is called \emph{preimage of $y$}.
   \end{itemize}
 \end{defi}
 
-One example showing the use of hash functions as primitives is PKCS~\#5
+One example showing the use of hash functions as primitives is  % TODO
+ PKCS~\#5
 specified in RFC~2898~\cite{rfc2898}. Section~5.2 specifies PBKDF1 and PBKDF2
 using an arbitrary pseudorandom function to derive password-based keys.
 Hash algorithms can be used as those pseudorandom functions.
@@ -72,7 +73,7 @@ A hash function has to satisfy the following security requirements:
 \end{defi}
 
 As far as hash functions accept input strings of arbitrary length, but return a fixed
-size output string, existence of preimages and collisions is unavoidable~\cite{schlaffer}.
+size output string, existence of collisions is unavoidable~\cite{schlaffer}.
 However, good hash functions make it very difficult to determine collisions or preimages.
 
 Most hash functions apply padding to their input to normalize the input size to a multiple
@@ -82,6 +83,7 @@ always considered part of this input message. Padding is negligible, because giv
 colliding blocks, we can add another incomplete block. Padding will occur only in the
 second block and with the same values in the second blocks it yield the same padded value.
 This results in a length extension attack, making input padding negligible for cryptanalysis.
+% TODO: only applies to single-pipe constructions like MD4
 
 \section{Cryptanalysis of Hash Functions}
 \label{sec:intro-cryptanalysis}
@@ -98,7 +100,7 @@ Let $n$ denote the digest size, hence the size of the hash value $h(x)$ as numbe
 Due to the birthday paradox, a collision attack has a generic complexity of $2^{n/2}$
 whereas pre-image and second pre-image attacks have generic complexities of $2^n$.
 
-Following results by Wang et al., differential cryptanalysis was discovered as
+Following results by Wang et al., differential cryptanalysis was shown as
 powerful tool for cryptanalysis of hash algorithms. This thesis applies those
 ideas to satisfiability approaches.
 
