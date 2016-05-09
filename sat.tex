@@ -1,5 +1,6 @@
 \renewcommand*\chappic{img/satisfiability.pdf}
-\renewcommand*\chapquote{What idiot called them logic errors rather than bool shit? \\ ---Unknown}
+\renewcommand*\chapquote{What idiot called them logic errors rather than bool shit?}
+\renewcommand*\chapquotesrc{Unknown}
 \chapter{Satisfiability}
 \label{ch:sat}
 \vspace{50pt}
@@ -8,7 +9,7 @@
 %  \import*{img/}{satisfiability.pdf_tex}
 %\end{center}
 
-\section{DIMACS quasi-standard}
+\section{The DIMACS de-facto standard}
 \label{sec:sat-dimacs}
 %
 \index{Conjunction}
@@ -71,10 +72,35 @@ For every row $i$ of the truth table with assignment $(r_i)$, add one disjunctio
 This disjunction contains $b_{i,l}$ if $r_{i,l}$ is false.
 The disjunction contains $b_{i,l}$ if $r_{i,l}$ is true.
 
-As far as $f$ is an arbitrary $k$-ary boolean function, any function can be
-represented as CNF.
+As far as $f$ is an arbitrary $k$-ary boolean function, we have proven that
+any function can be represented as CNF.
 
-SAT problems are usually represented in
+SAT problems are usually represented in the DIMACS de-facto standard.
+Consider a SAT problem in CNF with \emph{nbclauses} clauses and
+enumerate all variables from 1 to \emph{nbvars}. A DIMACS file is an ASCII text
+file. Lines starting with \enquote{\texttt{c}} are skipped (comment lines).
+The first remaining line has to begin with \enquote{\texttt{p cnf}} followed by
+\emph{nbclauses} and \emph{nbvars} separated by spaces (header line).
+All following non-comment lines are space-separated indices of boolean variables
+optionally prefixed by a minus symbol. Then one line represents one clause and
+must be terminated with a zero symbol after a space. All lines are conjuncted
+to form a CNF.
+
+Variations of the DIMACS de-facto standard also allow multiline clauses (the
+zero symbol constitutes the end of a clause) or arbitrary whitespace instead of
+spaces. The syntactical details are individually published on a per competition
+basis.
+
+\begin{lstlisting}[caption={Display~\ref{eq:xor} represented in DIMACS format}]
+  \begin{center}
+    %\fbox{%
+      \begin{verbatim}
+p cnf 2 2
+a b
+-a -b \end{verbatim}
+    %}
+  \end{center}
+\end{lstlisting}
 
 \index{Clause}
 \index{$k$-clause}
@@ -87,12 +113,6 @@ SAT problems are usually represented in
   A \emph{unit clause} is a $1$-clause.
   A \emph{Horn clause} is a clause with at most one positive literal.
   A \emph{definite clause} is a clause with exactly one positive literal.
-
-Positive clause, negative clause, empty clause and mixed clause: A clause that has no negative literals is a positive clause and a clause that has no positive literals is a negative clause. An empty clause or a null clause has zero positive and zero negative literals. A mixed clause has at least one positive and at least one negative literal.
-
-Horn clause: A Horn clause is a clause with at most one positive literal. A set of Horn clauses makes a Horn set.
-
-Definite clause
 \end{defi}
 
 \section{SAT features and CNF analysis}

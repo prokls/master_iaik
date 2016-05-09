@@ -1,5 +1,6 @@
 \renewcommand*\chappic{img/intro.pdf}
 \renewcommand*\chapquote{}
+\renewcommand*\chapquotesrc{}
 \chapter{Introduction}
 \label{ch:intro}
 %
@@ -45,7 +46,7 @@ One example showing the use of hash functions as primitives is  % TODO
 specified in RFC~2898~\cite{rfc2898}. Section~5.2 specifies PBKDF1 and PBKDF2
 using an arbitrary pseudorandom function to derive password-based keys.
 Hash algorithms can be used as those pseudorandom functions.
-Given a minimum iteration count of $1000$, as defined in section~4.2,
+Given a minimum iteration count of $1000$, as defined in Section~4.2,
 yields the additional requirement that fast computation of hash values
 for given $x \in X$ is desirable.
 
@@ -149,6 +150,7 @@ ideas to satisfiability approaches.
   Given a hash function $h$,
   a hash collision is a pair $(x, x_2)$ with $x \neq x_2$ such that
   $h(x) = h(x_2)$.
+
 \end{defi}
 
 Differential cryptanalysis is based on the idea to consider two execution states
