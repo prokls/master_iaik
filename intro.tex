@@ -41,14 +41,12 @@ for our MD4 and SHA-256 testcases.
   \end{itemize}
 \end{defi}
 
-One example showing the use of hash functions as primitives is  % TODO
- PKCS~\#5
-specified in RFC~2898~\cite{rfc2898}. Section~5.2 specifies PBKDF1 and PBKDF2
-using an arbitrary pseudorandom function to derive password-based keys.
-Hash algorithms can be used as those pseudorandom functions.
-Given a minimum iteration count of $1000$, as defined in Section~4.2,
-yields the additional requirement that fast computation of hash values
-for given $x \in X$ is desirable.
+One example showing the use of hash functions as primitives are JSON Web Tokens (JWT)
+specified in RFC~7519~\cite{rfc7519}. Section~8 defines implementation requirements
+and refers to RFC~7518~\cite{rfc7518}, which specifies cryptographic algorithms to
+be implemented. \enquote{HMAC SHA-256} is the only signature and MAC algorithm
+required to be implemented. SHA-256 as hash algorithm is used as cryptographic
+primitive in this configuration.
 
 A hash function has to satisfy the following security requirements:
 
