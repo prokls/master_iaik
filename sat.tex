@@ -19,9 +19,9 @@
 \index{Negative literal}
 \index{Conjunctive Normal Form}
 \begin{defi}
-  A \emph{conjunction} is a sequence of boolean functions combined using
-  a logical OR. A \emph{disjunction} is a sequence of boolean functions
-  combined using a logical AND. A \emph{literal} is a boolean variable
+  A \emph{conjunction} is a sequence of Boolean functions combined using
+  a logical OR. A \emph{disjunction} is a sequence of Boolean functions
+  combined using a logical AND. A \emph{literal} is a Boolean variable
   (\emph{positive}) or its negation (\emph{negative}).
 
   A SAT problem is given in \emph{Conjunctive Normal Form} (CNF) if
@@ -29,7 +29,7 @@
 \end{defi}
 
 A simple example for a SAT problem in CNF is the exclusive OR (XOR).
-It takes two boolean values $a$ and $b$ as arguments and returns true
+It takes two Boolean values $a$ and $b$ as arguments and returns true
 if and only if the two arguments differ.
 {
 \setlength{\abovedisplayskip}{5pt}
@@ -49,30 +49,30 @@ are negated and conjunctions become disjunctions, vice versa.
 
 \begin{theorem}
   \label{thm:all-cnf}
-  Every boolean function can be represented as CNF.
+  Every Boolean function can be represented as CNF.
 \end{theorem}
 
 Theorem~\ref{thm:all-cnf} is easy to prove.
 % Consider null-ary functions as
-% induction base. A (null-ary) boolean function is a set of associations.
+% induction base. A (null-ary) Boolean function is a set of associations.
 % An association maps an assignment for input arguments to one output value.
 % True can be represented as $a \lor \neg a$ and false can be
-% represented as $a \land \neg a$ for some free boolean variable $a$ and using
+% represented as $a \land \neg a$ for some free Boolean variable $a$ and using
 % only negation, conjunctions and disjunctions. Recognize that those representations
-% are given in DNF as well as CNF. Hence all null-ary boolean functions can be
+% are given in DNF as well as CNF. Hence all null-ary Boolean functions can be
 % represented as CNF and DNF.
 %
-% Let $f$ be a boolean function represented in DNF with $k$ input arguments.
-% Extend every conjunction with a boolean variable $v_{k+1}$.
-Consider the truth table of an arbitrary boolean function $f$ with $k$ input arguments
+% Let $f$ be a Boolean function represented in DNF with $k$ input arguments.
+% Extend every conjunction with a Boolean variable $v_{k+1}$.
+Consider the truth table of an arbitrary Boolean function $f$ with $k$ input arguments
 and $j$ rows of output value false. We represent $f$ as CNF.
 
-Consider boolean variables $b_{i,l}$ with $0 \leq i \leq j$ and $0 \leq l \leq k$.
+Consider Boolean variables $b_{i,l}$ with $0 \leq i \leq j$ and $0 \leq l \leq k$.
 For every row $i$ of the truth table with assignment $(r_i)$, add one disjunction to the CNF.
 This disjunction contains $b_{i,l}$ if $r_{i,l}$ is false.
 The disjunction contains $b_{i,l}$ if $r_{i,l}$ is true.
 
-As far as $f$ is an arbitrary $k$-ary boolean function, we have proven that
+As far as $f$ is an arbitrary $k$-ary Boolean function, we have proven that
 any function can be represented as CNF.
 
 SAT problems are usually represented in the DIMACS de-facto standard.
@@ -81,7 +81,7 @@ enumerate all variables from 1 to \emph{nbvars}. A DIMACS file is an ASCII text
 file. Lines starting with \enquote{\texttt{c}} are skipped (comment lines).
 The first remaining line has to begin with \enquote{\texttt{p cnf}} followed by
 \emph{nbclauses} and \emph{nbvars} separated by spaces (header line).
-All following non-comment lines are space-separated indices of boolean variables
+All following non-comment lines are space-separated indices of Boolean variables
 optionally prefixed by a minus symbol. Then one line represents one clause and
 must be terminated with a zero symbol after a space. All lines are conjuncted
 to form a CNF.
@@ -91,15 +91,11 @@ zero symbol constitutes the end of a clause) or arbitrary whitespace instead of
 spaces. The syntactical details are individually published on a per competition
 basis.
 
+\renewcommand{\lstlistingname}{Listing}  % TODO otherwise it's Japanese, WTF
 \begin{lstlisting}[caption={Display~\ref{eq:xor} represented in DIMACS format}]
-  \begin{center}
-    %\fbox{%
-      \begin{verbatim}
 p cnf 2 2
 a b
--a -b \end{verbatim}
-    %}
-  \end{center}
+-a -b
 \end{lstlisting}
 
 \index{Clause}
@@ -118,7 +114,6 @@ a b
 \section{SAT features and CNF analysis}
 \label{sec:sat-features}
 %
-% TODO: more citations needed
 At the very beginning I was very intrigued with the question
 \enquote{What is an \enquote{average} SAT problem?}. Answers to this
 question can help to optimize SAT solver memory layouts.
@@ -213,7 +208,7 @@ Categorize data.
     \satf{clauses_length2}        & clause contains exactly two literals \\
     \satf{clauses_unique}         & clause did not yet occur \\
     \satf{clauses_tautological}   & clause contains some literal and its negation \\
-    \sath{Given a set of literals/variables, return boolean property}
+    \sath{Given a set of literals/variables, return Boolean property}
     \satf{literals_existential}   & literal does not occur negated \\
     \satf{literals_unit}          & literal occurs in clause of length 1 \\
     \satf{literals_contradiction} & literal occurs with its negation on one clause \\
@@ -225,7 +220,7 @@ Categorize data.
     \satf{clauses_mapLength}      & number of literals in clause \\
     \satf{clauses_mapRatioPosNeg} & number of positive literals divided by total number of literal \\
     \satf{clauses_mapNumPos}      & number of positive literals in clause \\
-    \sath{Given one clause, return boolean property}
+    \sath{Given one clause, return Boolean property}
     \satf{clauselits_someEx}      & any is literal existential \\
     \satf{clauselits_allEx}       & all literals are existential \\
     \satf{clauselits_someUnit}    & contains unit variable \\

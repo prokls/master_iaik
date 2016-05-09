@@ -19,9 +19,9 @@ is available at github~\cite{md4-py3k}.
   \begin{center}
     \begin{tabular}{lcl}
       block size           & 512 bits       & namely variable \texttt{block} in RFC~1320~\cite{rfc1320} \\
-      digest size          & 128 bits       & as per section~3.5 in RFC~1320~\cite{rfc1320} \\
+      digest size          & 128 bits       & as per Section~3.5 in RFC~1320~\cite{rfc1320} \\
       internal state size  & 128 bits       & namely variables $A$, $B$, $C$ and $D$ \\
-      word size            & 32 bits        & as per section~2 in RFC~1320~\cite{rfc1320} \\
+      word size            & 32 bits        & as per Section~2 in RFC~1320~\cite{rfc1320} \\
     \end{tabular}
     \caption{MD4 hash algorithm properties}
     \label{tab:md4}
@@ -45,7 +45,7 @@ Four state variables $A$, $B$, $C$ and $D$ are initialized with hexadecimal valu
   \mathbf{[C]}\; \mathtt{fedcba98} \quad
   \mathbf{[D]}\; \mathtt{76543210}
 \]
-To process one block, three auxiliary boolean functions are defined:
+To process one block, three auxiliary Boolean functions are defined:
 \begin{align}
   \IF(X,Y,Z) &= (X \land Y) \lor (\neg X \land Z) \\
   \MAJ(X,Y,Z) &= (X \land Y) \lor (X \land Z) \lor (Y \land Z) \\
@@ -53,14 +53,14 @@ To process one block, three auxiliary boolean functions are defined:
 \end{align}
 
 \begin{defi}
-  The boolean $\IF$ function behaves the following way:
+  The Boolean $\IF$ function behaves the following way:
   If the first argument is true, the second argument is returned.
   If the first argument is false, the third argument is returned.
 
-  The boolean $\MAJ$ function returns true if the number
-  of boolean values true in arguments is at least $2$.
-  The boolean $\XOR$ function returns true if the number
-  of boolean values true in arguments is odd.
+  The Boolean $\MAJ$ function returns true if the number
+  of Boolean values true in arguments is at least $2$.
+  The Boolean $\XOR$ function returns true if the number
+  of Boolean values true in arguments is odd.
 \end{defi}
 
 \begin{figure}[t]
@@ -78,7 +78,7 @@ To process one block, three auxiliary boolean functions are defined:
 
 \begin{figure}[t]
   \begin{center}
-    \includegraphics{img/sha256.pdf}
+    \includegraphics[width=\textwidth]{img/sha256.pdf}
     \caption{SHA-256 round function}
     \label{fig:sha256-round-function}
   \end{center}

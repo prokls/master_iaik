@@ -26,8 +26,8 @@ We will discuss which SAT techniques lead to best performance characteristics
 for our MD4 and SHA-256 testcases.
 
 \newpage  % FIX manual pagebreak
-\section{Preliminaries}
-\label{sec:intro-prelim}
+\section{Cryptanalysis preliminaries}
+\label{sec:intro-crypt-prelim}
 %
 \index{Hash value}
 \index{Preimage}
@@ -35,7 +35,7 @@ for our MD4 and SHA-256 testcases.
 \begin{defi}[Hash function]
   A \emph{hash function} is a mapping $h: X \to Y$ with $X = \left\{0,1\right\}^*$ and
   $Y = \left\{0,1\right\}^n$ for some fixed $n \in {\mathbb{N}}_{\geq 1}$.
-  \begin{itemize}\itemsep0pt
+  \begin{itemize}[noitemsep,topsep=0pt]
     \item Let $x \in X$, then $h(x)$ is called \emph{hash value of $x$}.
     \item Let $h(x) = y \in Y$, then $x$ is called \emph{preimage of $y$}.
   \end{itemize}
@@ -44,9 +44,9 @@ for our MD4 and SHA-256 testcases.
 One example showing the use of hash functions as primitives are JSON Web Tokens (JWT)
 specified in RFC~7519~\cite{rfc7519}. Section~8 defines implementation requirements
 and refers to RFC~7518~\cite{rfc7518}, which specifies cryptographic algorithms to
-be implemented. \enquote{HMAC SHA-256} is the only signature and MAC algorithm
-required to be implemented. SHA-256 as hash algorithm is used as cryptographic
-primitive in this configuration.
+be implemented. \enquote{HMAC SHA-256} (besides \enquote{none}) is the only signature
+and MAC algorithm required to be implemented.
+SHA-256 as hash algorithm is used as cryptographic primitive in this configuration.
 
 A hash function has to satisfy the following security requirements:
 
@@ -75,14 +75,13 @@ As far as hash functions accept input strings of arbitrary length, but return a 
 size output string, existence of collisions is unavoidable~\cite{schlaffer}.
 However, good hash functions make it very difficult to determine collisions or preimages.
 
-Most hash functions apply padding to their input to normalize the input size to a multiple
-of its block size before running a round function. In the following we always consider
-input of block size meaning the round function is run only for one block and padding is
-always considered part of this input message. Padding is negligible, because given two
-colliding blocks, we can add another incomplete block. Padding will occur only in the
-second block and with the same values in the second blocks it yield the same padded value.
+The considered hash functions apply padding to their input to normalize their
+input size to a multiple of its block size. The round function follows afterwards.
+In the following we always consider input of block size meaning the round function
+is run only for one block and padding is always considered part of this input message.
+Padding is negligible, because once we have two colliding blocks,
+the collision will be reflected in the output in these single-pipe Merkle-Darmg\aa rd designs.
 This results in a length extension attack, making input padding negligible for cryptanalysis.
-% TODO: only applies to single-pipe constructions like MD4
 
 \section{Cryptanalysis of Hash Functions}
 \label{sec:intro-cryptanalysis}
@@ -95,9 +94,11 @@ Collisions for HAVAL-128, MD4 and RIPEMD were found as well. Patrick Stach's \te
 program~\cite{md4coll} implements Wang's approach and can find MD4 collisions in few seconds
 on my Thinkpad~x220 setup specified in \hyperref[app:setup]{Appendix~\ref{app:setup}}.
 
-Let $n$ denote the digest size, hence the size of the hash value $h(x)$ as number of bits.
+Let $n$ denote the digest size, i.e. the size of the hash value $h(x)$ as number of bits.
 Due to the birthday paradox, a collision attack has a generic complexity of $2^{n/2}$
-whereas pre-image and second pre-image attacks have generic complexities of $2^n$.
+whereas preimage and second preimage attacks have generic complexities of $2^n$.
+So it is cryptanalytically easier to find any two colliding hash values than the
+preimage or second preimage for a given hash value.
 
 Following results by Wang et al., differential cryptanalysis was shown as
 powerful tool for cryptanalysis of hash algorithms. This thesis applies those
@@ -140,51 +141,79 @@ ideas to satisfiability approaches.
   \end{center}
 \end{table}
 
+\newpage
 \section{Differential cryptanalysis}
 \label{sec:intro-diff-cryptanalysis}
 %
 \index{Hash collision}
-\begin{defi}[Hash collisoin]
+\begin{defi}[Hash collision]
   Given a hash function $h$,
   a hash collision is a pair $(x, x_2)$ with $x \neq x_2$ such that
   $h(x) = h(x_2)$.
-
 \end{defi}
 
 Differential cryptanalysis is based on the idea to consider two execution states
 of hash algorithms for slightly different input messages. We trace those difference
 to learn about the propagation of message differences.
 
-Considering some hash function $f$, we look for two input messages $x$ and $x_2$
-such that the output values $h(x)$ and $h(x_2)$ correspond yielding a hash collision.
+MD4 has a block size of 512~bits. Take some message in a particular encoding
+and provide this padded byte string as 512~bit input to the hash algorithm.
+Then use a copy of this byte string as input to a second hash algorithm implementation
+with slight modifications in few bits. MD4 has 48 round function applications
+in 3 rounds. Differential cryptanalysis considers the difference in the evaluation
+state between the two instances.
 
+Visualizing those differences helps the cryptanalyst to find modifications yielding
+a small number of differences in the evaluation state.
+The cryptanalyst consecutively modifies the input values to eventually
+receive a collision in the output value.
+If the number of differences in the evaluation state is small,
+this trail is expected to result in a hash collision with higher probability.
 
+\begin{figure}[bt]
+  \begin{center}
+    \fbox{\includegraphics[width=0.55\textwidth]{img/diff_cryptanalysis.pdf}}
+    \caption[Typical attack setting for a collision attack]{
+      Typical attack setting for a collision attack:
+      Hash function $f$ is applied to two inputs $M$ and $M^*$ which differ
+      by some predefined bits. A hash collision is given if and only if output values
+      $C$ and $C^*$ show the same value. In differential cryptanalysis we observe
+      the differences between two instances applying function $f$
+      to inputs $M$ and $M^*$.
+    }
+  \end{center}
+\end{figure}
 
 \section{Satisfiability}
 \label{sec:intro-sat}
 %
 \index{Boolean function}
 \begin{defi}
-  A \emph{boolean function} is a mapping $h: X \to Y$ with $X = \left\{0,1\right\}^n$
+  A \emph{Boolean function} is a mapping $h: X \to Y$ with $X = \left\{0,1\right\}^n$
   for $n \in \mathbb N_{\geq 1}$ and $Y = \left\{0,1\right\}$.
 \end{defi}
 
-The following definition gives three basic boolean functions:
+The following definition gives three basic Boolean functions:
 
 \index{AND}
 \begin{defi}
-  \emph{AND} is a boolean function mapping $X = \left\{0,1\right\}^2$
-  to $1$ if all values of $X$ are $1$.
-  \emph{OR} is a boolean function mapping $X = \left\{0,1\right\}^2$
-  to $1$ if any value of $X$ is $1$.
-  \emph{NOT} is a boolean function mapping $X = \left\{0,1\right\}^1$
-  to $1$ if the single value of $X$ is $0$.
+  \begin{itemize}[noitemsep,topsep=0pt]
+    \item
+      \emph{AND} maps $X = \left\{0,1\right\}^2$
+      to $1$ if all values of $X$ are $1$.
+    \item
+      \emph{OR} maps $X = \left\{0,1\right\}^2$
+      to $1$ if any value of $X$ is $1$.
+    \item
+      \emph{NOT} maps $X = \left\{0,1\right\}^1$
+      to $1$ if the single value of $X$ is $0$.
+  \end{itemize}
   All functions return $0$ in the other case.
 \end{defi}
 
 \index{Truth table}
 \begin{defi}
-  A \emph{truth table} unambiguously defines a boolean function
+  A \emph{truth table} unambiguously defines a Boolean function
   by enlisting the evaluated truth value for all possible sets of
   inputs.
 
@@ -230,7 +259,7 @@ The following definition gives three basic boolean functions:
   \label{tab:andornot-truthtables}
 \end{figure}
 
-In the following we discuss how boolean functions are related
+In the following we discuss how Boolean functions are related
 to computation in general and hash algorithms specifically.
 
 \index{Algorithm}
@@ -243,39 +272,38 @@ to some rules. Such algorithms are said to satisfy the \emph{I/O property}.
 Hash algorithms satisfy the I/O property.
 
 \begin{theorem}
-  Every algorithm can be represented as boolean function.
+  Every algorithm can be represented as Boolean function.
 \end{theorem}
 
 This is trivial to see considering that computers are built from logic gates.
 However, in practice physical properties are used to employ storage of values,
-which does not exist in the model of boolean algebra. This can be mapped to
-our boolean model by constants for stored values and assuming an infinite memory.
+which does not exist in the model of Boolean algebra. This can be mapped to
+our Boolean model by constants for stored values and assuming an infinite memory.
 
 \index{Satisfiability}
 \index{Assignment}
 \index{Model}
 \begin{defi}
-  A boolean function is \emph{satisfiable} iff there exists at least one
-  input $x \in X$ such that $h(x) = 1$.
+  A Boolean function $f$ is \emph{satisfiable} iff there exists at least one
+  input $x \in X$ such that $f(x) = 1$.
   Every input $x \in X$ satisfying this property is called \emph{model}.
   Every element of $X$ is called \emph{assignment}.
 \end{defi}
 
-In the following we will establish some theory to reach
-the following property:
+Consider a certain state during the computation of a hash value.
+Represent the computation (i.e. hash algorithm) as Boolean equation system.
+Represent the state as assignment to a subset of variables used in the computation.
+Now replace, omit or invert some of these variables.
+This modified state can be reached with some input if and only if
+the SAT problem is satisfiable.
 
-\begin{defi}
-  A boolean function is \emph{satisfiable} iff a certain state in two hash
-  algorithm instances is achievable.
-\end{defi}
-
-The generic complexity of SAT determination is given by $2^n$ for $n$ boolean variables.
+The generic complexity of SAT determination is given by $2^n$ for $n$ Boolean variables.
 %This is closely related to the \cP $\overset{?}{\neq}$ \cNP question.
 The corresponding tool to determine satisfiability is defined in the following.
 
 \index{SAT solver}
 \begin{defi}
-  A \emph{SAT solver} is a tool to determine satisfiability of a boolean function.
+  A \emph{SAT solver} is a tool to determine satisfiability of a Boolean function.
   If satisfiability is given, it returns some model.
 \end{defi}
 
