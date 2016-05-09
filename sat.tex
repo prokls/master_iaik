@@ -1,5 +1,5 @@
 \renewcommand*\chappic{img/satisfiability.pdf}
-\renewcommand*\chapquote{What idiot called them logic errors rather than bool shit?}
+\renewcommand*\chapquote{What idiot called them logic errors rather than bool shit? \\ ---Unknown}
 \chapter{Satisfiability}
 \label{ch:sat}
 \vspace{50pt}
@@ -7,6 +7,93 @@
 %  \def\svgwidth{100pt}
 %  \import*{img/}{satisfiability.pdf_tex}
 %\end{center}
+
+\section{DIMACS quasi-standard}
+\label{sec:sat-dimacs}
+%
+\index{Conjunction}
+\index{Disjunction}
+\index{Literal}
+\index{Positive literal}
+\index{Negative literal}
+\index{Conjunctive Normal Form}
+\begin{defi}
+  A \emph{conjunction} is a sequence of boolean functions combined using
+  a logical OR. A \emph{disjunction} is a sequence of boolean functions
+  combined using a logical AND. A \emph{literal} is a boolean variable
+  (\emph{positive}) or its negation (\emph{negative}).
+
+  A SAT problem is given in \emph{Conjunctive Normal Form} (CNF) if
+  the problem is defined as conjunction of disjunctions of literals.
+\end{defi}
+
+A simple example for a SAT problem in CNF is the exclusive OR (XOR).
+It takes two boolean values $a$ and $b$ as arguments and returns true
+if and only if the two arguments differ.
+{
+\setlength{\abovedisplayskip}{5pt}
+\setlength{\belowdisplayskip}{5pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
+\begin{align} (a \lor b) \land (\neg a \lor \neg b) \label{eq:xor}\end{align}
+}
+Display~\ref{eq:xor} shows one conjunction (denoted $\land$) of two disjunctions
+(denoted $\lor$) of literals (denoted $a$ and $b$ where prefix $\neg$ represents
+negation). This structure constitutes a CNF.
+
+\index{Disjunctive Normal Form}
+Analogously we define a \emph{Disjunctive Normal Form} (DNF) as disjunction
+of conjunctions of literals. The negation of a CNF is in DNF, because literals
+are negated and conjunctions become disjunctions, vice versa.
+
+\begin{theorem}
+  \label{thm:all-cnf}
+  Every boolean function can be represented as CNF.
+\end{theorem}
+
+Theorem~\ref{thm:all-cnf} is easy to prove.
+% Consider null-ary functions as
+% induction base. A (null-ary) boolean function is a set of associations.
+% An association maps an assignment for input arguments to one output value.
+% True can be represented as $a \lor \neg a$ and false can be
+% represented as $a \land \neg a$ for some free boolean variable $a$ and using
+% only negation, conjunctions and disjunctions. Recognize that those representations
+% are given in DNF as well as CNF. Hence all null-ary boolean functions can be
+% represented as CNF and DNF.
+%
+% Let $f$ be a boolean function represented in DNF with $k$ input arguments.
+% Extend every conjunction with a boolean variable $v_{k+1}$.
+Consider the truth table of an arbitrary boolean function $f$ with $k$ input arguments
+and $j$ rows of output value false. We represent $f$ as CNF.
+
+Consider boolean variables $b_{i,l}$ with $0 \leq i \leq j$ and $0 \leq l \leq k$.
+For every row $i$ of the truth table with assignment $(r_i)$, add one disjunction to the CNF.
+This disjunction contains $b_{i,l}$ if $r_{i,l}$ is false.
+The disjunction contains $b_{i,l}$ if $r_{i,l}$ is true.
+
+As far as $f$ is an arbitrary $k$-ary boolean function, any function can be
+represented as CNF.
+
+SAT problems are usually represented in
+
+\index{Clause}
+\index{$k$-clause}
+\index{Unit clause}
+\index{Horn clause}
+\index{Definite clause}
+\begin{defi}
+  A \emph{clause} is a disjunction of literals.
+  A $k$-\emph{clause} is a clause consisting of exactly $k$ literals.
+  A \emph{unit clause} is a $1$-clause.
+  A \emph{Horn clause} is a clause with at most one positive literal.
+  A \emph{definite clause} is a clause with exactly one positive literal.
+
+Positive clause, negative clause, empty clause and mixed clause: A clause that has no negative literals is a positive clause and a clause that has no positive literals is a negative clause. An empty clause or a null clause has zero positive and zero negative literals. A mixed clause has at least one positive and at least one negative literal.
+
+Horn clause: A Horn clause is a clause with at most one positive literal. A set of Horn clauses makes a Horn set.
+
+Definite clause
+\end{defi}
 
 \section{SAT features and CNF analysis}
 \label{sec:sat-features}
@@ -16,18 +103,16 @@ At the very beginning I was very intrigued with the question
 \enquote{What is an \enquote{average} SAT problem?}. Answers to this
 question can help to optimize SAT solver memory layouts.
 But originally I was wondering whether our differential cryptanalysis
-SAT problems distinguish from \enquote{average} SAT problems.
+SAT problems distinguish from \enquote{average} SAT problems in some
+very basic properties. \\
 First of all, we need to elaborate on the question itself.
 
 \index{SAT feature}
 \index{Feature value}
 \begin{defi}[SAT feature]
-  Given a SAT problem, a \emph{SAT feature} is a statistical value
-  (named \emph{feature value}) which can be retrieved from the given
-  problem in polynomial time.
+  A \emph{SAT feature} is a statistical value (named \emph{feature value})
+  retrievable from some given SAT problem in some well-defined encoding.
 
-  A SAT feature is called \emph{dynamic} if new clauses need to be formulated
-  to evaluate a SAT feature value. Other SAT features are called \emph{static}.
   A SAT feature is called \emph{performance-driven} if the runtime of any
   computation contributes to the feature value.
 \end{defi}
@@ -38,17 +123,29 @@ problem encoded in the DIMACS format.
 
 It should be computationally easy to evaluate SAT features of a given SAT problem.
 The general goal is to write a tool which evaluates several SAT features at the same
-time and prints them for comparison with other problems. A SAT feature
+time and retrieve them for comparison with other problems. A SAT feature
 is expected to be computable in linear time and memory with the number of variables
-and number of clauses. But a hard limit is only given with polynomial complexity
-for evaluation algorithms. This implies that evaluation of satisfiability
-must not be necessary to evaluate a SAT feature under the assumption that \cP $\neq$ \cNP.
-Hence the number of valid models is not a SAT feature as far as satisfiability
-needs to be determined.
+and number of clauses. But a suggested limit is only given with polynomial complexity
+for evaluation algorithms. Sticking to this convention implies that evaluation
+of satisfiability must not be necessary to evaluate a SAT feature under the
+assumption that \cPneqNP. Hence the number of valid models cannot be a SAT feature
+as far as satisfiability needs to be determined. But no actual hard boundary for
+runtime requirements is given. Previous work has shown that expensive algorithms
+can provide useful data in a small time frame if they are limited to a constant
+subproblem size.
 
 The most similar resource I found looking at SAT features was the
-SATzilla project~\ref{sec:sat-features} in 2012. The authors systematically defined
-138 SAT~features categorized in 12 groups.
+SATzilla project~\cite{satzilla2004,satzilla2008} in 2012. The authors systematically defined
+138 SAT~features categorized in 12 groups. The features themselves are not
+defined formally, but an implementation is provided bundled with example data.
+
+\begin{table}[!h]
+  \begin{center}
+    \begin{tabular}{rl}
+      \small{POSNEG\_RATIO\_CLAUSE\_mean} & ratio of positive to negative clauses, mean
+    \end{tabular}
+  \end{center}
+\end{table}
 
 Many SAT solvers collect feature values to improve algorithm selection,
 restart strategies and estimate problem sizes. Recent trends to apply Machine
@@ -59,6 +156,10 @@ using SAT features for algorithm selection is ASlib~\cite{aslib}.
 However, most of these SAT features are performance-driven.
 Examples for performance-driven SAT features include the number of
 restarts within a certain time frame or evaluation of local minima.
+
+
+
+POSNEG-RATIO-CLAUSE-mean
 
 In the following section we want to evaluate SAT features and
 compare test cases.
