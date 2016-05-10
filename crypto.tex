@@ -52,9 +52,9 @@ In the following a quick overview over MD4's design is given.
 
 \begin{description}
   \item[Padding and length extension]
-    First of all, padding is applied. A single bit 1 is appended to the
+    First of all, padding is applied. A single bit $1$ is appended to the
     input. As long as the input does not reach a length congruent 448 modulo 512,
-    bit 0 is appended.
+    bit $0$ is appended.
     Followingly, length appending takes place. Represent the length of the input
     (without the previous modifications) in binary and take its first
     64 less significant bits. Append those 64 bits to the input.
@@ -96,8 +96,8 @@ In the following a quick overview over MD4's design is given.
     for function $F$ where $F$ is \boolf{IF} in the first 16 iterations,
     \boolf{MAJ} in the following 16 iterations and finally \boolf{XOR}
     in the last 16 iterations. This return value is added to the value of state
-    variable $A$, the current message block $M_i$ and $X[i_{k,l}]$.
-    This sum is then left-rotated (definition given in Section~\ref{sec:dc-sha-256}) by
+    variable $A$, the current message block $M$ and $X_{i_{k,l}}$.
+    This sum modulo $2^{32}$ is then left-rotated (see Definition~\ref{def:shifts}) by
     $j_{k,l \bmod{4}}$ bits and stored in value B. State variables $B$, $C$ and
     $D$ update variables $C$, $D$ and $A$ respectively.
 
@@ -136,10 +136,10 @@ SHA-256 is a hash function from the SHA-2 family designed by the National Securi
 and published in 2001~\cite{fips-pub-180-4}. It uses a Merkle-Damg\aa{}rd construction
 with a Davies-Meyer compression function. The best known preimage attack was found in 2011
 and breaks preimage resistance for 52~rounds~\cite{bicliques}. The best known collision attack
-breaks collision resistance for 31~rounds of SHA-256~\cite{improving}.
-% TODO: pseudocollision results
-%
-\begin{table}[h]
+breaks collision resistance for 31~rounds of SHA-256~\cite{improving} and pseudo-collision
+resistance for 46~rounds~\cite{high2011}.
+
+\begin{table}[!hb]
   \begin{center}
     \begin{tabular}{lcl}
       block size           & 512 bits   & as per Section~1 of the standard~\cite{fips-pub-180-4} \\
@@ -151,117 +151,277 @@ breaks collision resistance for 31~rounds of SHA-256~\cite{improving}.
     \label{tab:sha256}
   \end{center}
 \end{table}
-
+%
 \index{Left-shift}
 \index{Right-shift}
 \index{Left-rotation}
 \index{Right-rotation}
-\begin{defi}[Shifts and a notational remark]
-  Consider a 32bit word $X$ with 32 binary values $b_i$ with $0 \leq i \leq 31$.
-  A \emph{left-shift} of $X$ by $n$ positions creates a new 32bit word with values
-  \[
-    b_i \coloneqq \begin{cases}
-      b_{i-n} & 0 \leq i-n < 32 \\
-      0       & \text{else}
-    \end{cases}
-  \]
-  A \emph{left-rotation} of $X$ by $n$ positions creates a new 32bit word with values
-  \[ b_i \coloneqq b_{i-n \bmod{32}} \]
-
+\begin{defi}[Shifts, rotations and a notational remark]
+  \label{def:shifts}
+  Consider a 32-bit word $X$ with 32 binary values $b_i$ with $0 \leq i \leq 31$.
+  $b_0$ refers to the least significant bit. Shifting ($≪$ and $≫$) and
+  rotation ($⋘$ and $⋙$) creates a new 32-bit word $Y$ with 32 binary values $a_i$.
+  %A \emph{left-shift} of $X$ by $n$ positions creates a new 32-bit word with values
+  %\[
+  %  b_{i} \coloneqq \begin{cases}
+  %    b_{i-n} & 0 \leq i-n < 32 \\
+  %    0       & \text{else}
+  %  \end{cases}
+  %\]
+  %A \emph{left-rotation} of $X$ by $n$ positions creates a new 32-bit word with values
+  %\[ b_i \coloneqq b_{i-n \bmod{32}} \]
+  %
   We define the following notations:
   \begin{align*}
-    X ≪ n &\coloneqq \text{left-shift of 32bit value } X \text{ by } n \text{ positions} \\
-    X ≫ n &\coloneqq \text{right-shift of 32bit value } X \text{ by } n \text{ positions} \\
-    X ⋘ n &\coloneqq something \\
-    X ⋙ n &\coloneqq something \\
+    Y \coloneqq X ≪ n  &\iff a_i \coloneqq b_{i-n} \text{ if } 0 \leq i-n < 32 \text{ and } 0 \text{ otherwise } \\
+    Y \coloneqq X ≫ n  &\iff a_i \coloneqq b_{i+n} \text{ if } 0 \leq i+n < 32 \text{ and } 0 \text{ otherwise } \\
+    Y \coloneqq X ⋘ n  &\iff a_i \coloneqq b_{i-n \bmod{32}} \\
+    Y \coloneqq X ⋙ n  &\iff a_i \coloneqq b_{i+n \bmod{32}}
   \end{align*}
-
-  Let $(X ≪ n)$ denote a left-shift of 32bit value $X$ by $n$ positions where $0 \leq n \leq 31$.
-  Then $(X ≫ n)$ analogously denotes a right-shift. Let $X ⋘ n$ denote
-  left-rotation of 32bit value $X$ by $n$ positions meaning
-  \[ X ⋘ n = (X ≪ n) \lor (X ≫ 32 - n) \]
-  \[ X ⋙ n = (X ≫ n) \lor (X ≪ 32 - n) \]
+  Furthermore $X \oplus Y$ denotes \boolf{XOR} with arguments $X$ and $Y$.
 \end{defi}
-
-
-Besides MD4's two auxiliary functions \boolf{MAJ} and \boolf{IF},
-another four auxiliary functions are defined.
-$ \mathbb{N} $
-left-rotation by $n$ values
-
 %
-%\begin{align}
-%  \Sigma_0(X,Y,Z) &= S^2(x) \oplus S^{13}(x) \oplus S^{22}(x) \\
-%  \Sigma_1(X,Y,Z) &= S^6(x) \oplus S^{11}(x) \oplus S^{25}(x)
-%\end{align}
-
+Besides MD4's two auxiliary functions \boolf{MAJ} and \boolf{IF},
+another four auxiliary functions are defined. Be aware that $\oplus$ denotes
+the XOR functions whereas $+$ denotes addition modulo $2^{32}$.
+\[
+  \begin{array}{rcccccl}
+    \Sigma_0(X) &\coloneqq& (X ⋙ 2) &\oplus& (X ⋙ 13) &\oplus& (X ⋙ 22) \\
+    \Sigma_1(X) &\coloneqq& (X ⋙ 6) &\oplus& (X ⋙ 11) &\oplus& (X ⋙ 25) \\
+    \sigma_0(X) &\coloneqq& (X ⋙ 7) &\oplus& (X ⋙ 18) &\oplus& (X ≫ 3) \\
+    \sigma_1(X) &\coloneqq& (X ⋙ 17) &\oplus& (X ⋙ 19) &\oplus& (X ≫ 10)
+  \end{array}
+\]
+%
 \begin{description}
   \item[Padding and length extension]
     The padding and length extension scheme of MD4 is used also in SHA-256.
-    Append bit 1 and append single bits 0 until the message reaches a length
-    of $448 \mod{512}$. Afterwards the first 64 bits of the binary representation
-    of the original input is appended.
+    Append bit $1$ and followed by a sequence of bit $0$ until the message reaches a length
+    of 448 modulo 512 bits. Afterwards the first 64 bits of the binary representation
+    of the original input are appended.
   \item[Initialization]
-    In a similar manner to MD4,
-    initialization of internal state variables takes place before running the
-    round function.
+    In a similar manner to MD4, initialization of internal state variables
+    (called \enquote{working variables} in~\cite[Section~6.2.2]{fips-pub-180-4})
+    takes place before running the round function. The eight state variables
+    are initialized with the following hexadecimal values:
     \[
       \begin{array}{llll}
-        H_1^{(0)} = \texttt{6a09e667} &
-        H_2^{(0)} = \texttt{bb67ae85} &
-        H_3^{(0)} = \texttt{3c6ef372} &
-        H_4^{(0)} = \texttt{a54ff53a} \\
-        H_5^{(0)} = \texttt{510e527f} &
-        H_6^{(0)} = \texttt{9b05688c} &
-        H_7^{(0)} = \texttt{1f83d9ab} &
-        H_8^{(0)} = \texttt{5be0cd19}
+        A_{-1} = \texttt{6a09e667} &
+        A_{-2} = \texttt{bb67ae85} &
+        A_{-3} = \texttt{3c6ef372} &
+        A_{-4} = \texttt{a54ff53a} \\
+        E_{-1} = \texttt{510e527f} &
+        E_{-2} = \texttt{9b05688c} &
+        E_{-3} = \texttt{1f83d9ab} &
+        E_{-4} = \texttt{5be0cd19}
       \end{array}
     \]
+    Furthermore SHA-256 uses 64 constant values in its round function.
+    We initialize step constants $K_i$ for $0 \leq i < 64$ with the following hexadecimal
+    values (which must be read left to right and top to bottom):
+    \[
+      \begin{array}{cccccc}
+        \texttt{428a2f98} & \texttt{71374491} & \texttt{b5c0fbcf} & \texttt{e9b5dba5} & \texttt{3956c25b} & \texttt{59f111f1} \\
+        \texttt{923f82a4} & \texttt{ab1c5ed5} & \texttt{d807aa98} & \texttt{12835b01} & \texttt{243185be} & \texttt{550c7dc3} \\
+        \texttt{72be5d74} & \texttt{80deb1fe} & \texttt{9bdc06a7} & \texttt{c19bf174} & \texttt{e49b69c1} & \texttt{efbe4786} \\
+        \texttt{0fc19dc6} & \texttt{240ca1cc} & \texttt{2de92c6f} & \texttt{4a7484aa} & \texttt{5cb0a9dc} & \texttt{76f988da} \\
+        \texttt{983e5152} & \texttt{a831c66d} & \texttt{b00327c8} & \texttt{bf597fc7} & \texttt{c6e00bf3} & \texttt{d5a79147} \\
+        \texttt{06ca6351} & \texttt{14292967} & \texttt{27b70a85} & \texttt{2e1b2138} & \texttt{4d2c6dfc} & \texttt{53380d13} \\
+        \texttt{650a7354} & \texttt{766a0abb} & \texttt{81c2c92e} & \texttt{92722c85} & \texttt{a2bfe8a1} & \texttt{a81a664b} \\
+        \texttt{c24b8b70} & \texttt{c76c51a3} & \texttt{d192e819} & \texttt{d6990624} & \texttt{f40e3585} & \texttt{106aa070} \\
+        \texttt{19a4c116} & \texttt{1e376c08} & \texttt{2748774c} & \texttt{34b0bcb5} & \texttt{391c0cb3} & \texttt{4ed8aa4a} \\
+        \texttt{5b9cca4f} & \texttt{682e6ff3} & \texttt{748f82ee} & \texttt{78a5636f} & \texttt{84c87814} & \texttt{8cc70208} \\
+        \texttt{90befffa} & \texttt{a4506ceb} & \texttt{bef9a3f7} & \texttt{c67178f2}
+      \end{array}
+    \]
+  \item[Precomputation of W]
+    Let $W_i$ for $0 \leq i < 16$ be the sixteen 32-bit words of the padded input message.
+    Then compute $W_i$ for $16 \leq i < 64$ the following way:
+    \[ W_i \coloneqq \sigT(W_{i-2}) + W_{i-7} + \sigO(W_{i-15}) + W_{i-16} \]
   \item[Round function]
-    For every block of 512 bits, the round function is applied.
-    The round function entails a much larger internal state than MD4.
-
-
+    For every block of 512~bits, the round function is applied.
+    The eight state variables are updated iteratively for $i$ from 0 to 63.
+    \begin{align*}
+      E_i     &\coloneqq A_{i-4} + E_{i-4} + \SigT(E_{i-1}) + \IF{(E_{i-1}, E_{i-2}, E_{i-3})} + K_i + W_i \\
+      A_i     &\coloneqq E_i - A_{i-4} + \SigO(A_{i-1}) + \MAJ{(A_{i-1}, A_{i-2}, A_{i-3})}
+    \end{align*}
+    $W_i$ and $K_i$ refer to the previously initialized values.
+  \item[Computation of intermediate hash values]
+    Intermediate hash values for the Davies-Meyer construction are
+    initialized with the following values:
+    \[
+      \begin{array}{cp{10pt}cp{10pt}cp{10pt}c}
+        H_0^{(0)} \coloneqq A_{-1}  & &  H_1^{(0)} \coloneqq A_{-2}  & &  H_2^{(0)} \coloneqq A_{-3}  & &  H_3^{(0)} \coloneqq A_{-4} \\
+        H_4^{(i)} \coloneqq E_{-1}  & &  H_5^{(i)} \coloneqq E_{-2}  & &  H_6^{(i)} \coloneqq E_{-3}  & &  H_7^{(i)} \coloneqq E_{-4} \\
+      \end{array}
+    \]
+    Every block creates its own $E_{i}$ and $A_{i}$ values for $60 \leq i < 64$.
+    These are used to compute the next intermediate values:
+    \[
+      \begin{array}{lp{10pt}r}
+        H_0^{(j)} \coloneqq A_{63} + H_0^{(i-1)}  & &  H_4^{(j)} \coloneqq E_{63} + H_4^{(i-1)} \\
+        H_1^{(j)} \coloneqq A_{62} + H_1^{(i-1)}  & &  H_5^{(j)} \coloneqq E_{62} + H_5^{(i-1)} \\
+        H_2^{(j)} \coloneqq A_{61} + H_2^{(i-1)}  & &  H_6^{(j)} \coloneqq E_{61} + H_6^{(i-1)} \\
+        H_3^{(j)} \coloneqq A_{60} + H_3^{(i-1)}  & &  H_7^{(j)} \coloneqq E_{60} + H_7^{(i-1)}
+      \end{array}
+    \]
+  \item[Finalization]
+    The final hash digest of size 256 bits is provided as
+    \[
+      H_0^{(N)} \concat
+      H_1^{(N)} \concat
+      H_2^{(N)} \concat
+      H_3^{(N)} \concat
+      H_4^{(N)} \concat
+      H_5^{(N)} \concat
+      H_6^{(N)} \concat
+      H_7^{(N)}
+    \]
+    where $N$ denotes the index of the last block and operator $\|$ denotes
+    concatenation. Hence $H_0^{(N)}$ are the four least significant bytes of the digest.
 \end{description}
 
 \section{Differential notation}
 \label{sec:dc-notation}
 %
-\cite{char-2006}
+\index{Bit condition}
+\index{Differential notation}
+Differential notation helps us to visualize differential characteristics
+by defining so-called \emph{bit conditions}.
+It was introduced by Christian Rechberger and Christophe de Canni\`ere
+in 2006~\cite[Section 3.2]{char-2006} and is shown in Table~\ref{tab:diff-notation}.
+
+Consider two hash algorithm implementations. Let $x_i$ be some bit
+from the first implementation and let $x_i^*$ be the corresponding bit
+from the second implementation. Differences are computed using a \boolf{XOR}
+and commonly denoted as $\Delta x = x_i \oplus x_i^*$.
+Bit conditions allow us to encode possible
+relations between bits $x_i$ and $x_i^*$.
+
+For example, let us take a look at the original Wang et al. hash collision
+in MD4 provided in Table~\ref{tab:wang-md4-collision1}.
+We extract all values with differences and represent them using differential notation.
+This gives us Table~\ref{tab:differential-wang-values}.
+
+The following properties hold for bit conditions:
+\begin{itemize}[noitemsep,topsep=0pt]
+  \item If $x_i = x_i^*$ holds and some value is known, $\set{0,1}$ contains its bit condition.
+  \item If $x_i \neq x_i^*$ holds and some value is known, $\set{u,n}$ contains its bit condition.
+  \item If $x_i = x_i^*$ holds and the values are unknown, its bit condition is $\dnI{-}$.
+  \item If $x_i \neq x_i^*$ holds and the values are unknown, its bit condition is $\dnI{x}$.
+\end{itemize}
+Applying this notation to hash collisions means that arbitrary bit conditions
+(expect for \dnI{\#}) can be specified for the input values. In one of the
+intermediate iterations, we enforce a difference using one of the bit conditions
+$\set{u,n,x}$. This excludes trivial solutions with no differences from the set of
+possible solutions. And the final values need to lack differences thus are
+represented using \dnI{-}.
+
+\begin{table}[bt]
+  \begin{center}
+    \small
+    \begin{tabular}{lll}
+      \hline \hline
+      bit & binary & hexadecimal representation / differential notation \\
+      \hline \hline
+      $x_0$ & \dnI{d6cb927a} & \dnI{11010110110010111001001001111010} \\
+      $x_1$ & \dnI{29d5a578} & \dnI{00101001110101011010010101111000} \\
+      $x_2$ & \dnI{45dc8e31} & \dnI{01000101110111001000111000110001} \\
+      \hline
+      $x_0^*$ & \dnI{56cb927a} & \dnI{01010110110010111001001001111010} \\
+      $x_1^*$ & \dnI{b9d5a578} & \dnI{10111001110101011010010101111000} \\
+      $x_2^*$ & \dnI{45dd8e31} & \dnI{01000101110111011000111000110001} \\
+      \hline
+      $\Delta x$ & & \dnI{u1010110110010111001001001111010} \\
+                 & & \dnI{n01n1001110101011010010101111000} \\
+                 & & \dnI{010001011101110n1000111000110001} \\
+      \hline \hline
+    \end{tabular}
+    \caption[Bit differences in the original Wang et al. hash collision]{
+      The three words different between Message~1 and Message~2 of the original
+      MD4 hash collision. The last three lines show how differences can be
+      written down using bit conditions. As far as 4 symbols are not from the
+      set $\set{0, 1}$ it holds that the messages differ by 4~bits.
+    }
+    \label{tab:differential-wang-values}
+  \end{center}
+\end{table}
+
+\begin{table}[b]
+  \small
+  \begin{center}
+    \begin{tabular}{|c|cccc|}
+    \hline\hline
+      $(x_i, x_i^*)$ & $(0,0)$ & $(1,0)$ & $(0,1)$ & $(1,1)$ \\
+    \hline
+      \dnI{?}        & \yes    & \yes    & \yes    & \yes    \\
+      \dnI{-}        & \yes    & \no     & \no     & \yes    \\
+      \dnI{x}        & \no     & \yes    & \yes    & \no     \\
+      \dnI{0}        & \yes    & \no     & \no     & \no     \\
+      \dnI{u}        & \no     & \yes    & \no     & \no     \\
+      \dnI{n}        & \no     & \no     & \yes    & \no     \\
+      \dnI{1}        & \no     & \no     & \no     & \yes    \\
+      \dnI{\#}       & \no     & \no     & \no     & \no     \\
+    \hline \hline
+    \end{tabular}
+    \begin{tabular}{|c|cccc|}
+    \hline\hline
+      $(x_i, x_i^*)$ & $(0,0)$ & $(1,0)$ & $(0,1)$ & $(1,1)$ \\
+    \hline
+      \dnI{3}        & \yes    & \yes    & \no     & \no     \\
+      \dnI{5}        & \yes    & \no     & \yes    & \no     \\
+      \dnI{7}        & \yes    & \yes    & \yes    & \no     \\
+      \dnI{A}        & \no     & \yes    & \no     & \yes    \\
+      \dnI{B}        & \yes    & \yes    & \no     & \yes    \\
+      \dnI{C}        & \no     & \no     & \yes    & \yes    \\
+      \dnI{D}        & \yes    & \no     & \yes    & \yes    \\
+      \dnI{E}        & \no     & \yes    & \yes    & \yes    \\
+    \hline \hline
+    \end{tabular}
+    \caption{
+      Differential notation as introduced in~\cite{char-2006}.
+      The left-most column specifies a symbol called \enquote{bit condition}
+      and right-side columns indicate which bit configurations
+      are possible for two given bits $x_i$ and $x_i^*$.
+    }
+    \label{tab:diff-notation}
+  \end{center}
+\end{table}
 
 \begin{table}[b]
   \begin{center}
     \begin{tabular}{cp{5cm}cl}
-      bit condition  & conjunctive normal form &
-      bit condition  & conjunctive normal form \\
+      $\Delta x$      & conjunctive normal form &
+      $\Delta x$      & conjunctive normal form \\
     \hline
-      \dnI{\#}        & $(z) \land (\neg z)$ &
-      \dnI{1}         & $(z) \land (z^*)$ \\
+      \dnI{\#}        & $(x) \land (\neg x)$ &
+      \dnI{1}         & $(x) \land (x^*)$ \\
 
-      \dnI{0}         & $(\neg z) \land (\neg z^*)$ &
-      \dnI{-}         & $\neg (z \oplus z^*)$ \\
+      \dnI{0}         & $(\neg x) \land (\neg x^*)$ &
+      \dnI{-}         & $\neg (x \oplus x^*)$ \\
 
-      \dnI{u}         & $(z) \land (\neg z^*)$ &
-      \dnI{A}         & $(z)$ \\
+      \dnI{u}         & $(x) \land (\neg x^*)$ &
+      \dnI{A}         & $(x)$ \\
 
-      \dnI{3}         & $(\neg z^*)$ &
-      \dnI{B}         & $(z \lor \neg z^*)$ \\
+      \dnI{3}         & $(\neg x^*)$ &
+      \dnI{B}         & $(x \lor \neg x^*)$ \\
 
-      \dnI{n}         & $(\neg z) \land (z^*)$ &
-      \dnI{C}         & $(z^*)$ \\
+      \dnI{n}         & $(\neg x) \land (x^*)$ &
+      \dnI{C}         & $(x^*)$ \\
 
-      \dnI{5}         & $(\neg z)$ &
-      \dnI{D}         & $(\neg z \lor z^*)$ \\
+      \dnI{5}         & $(\neg x)$ &
+      \dnI{D}         & $(\neg x \lor x^*)$ \\
 
-      \dnI{x}         & $(z \oplus z^*)$ &
-      \dnI{E}         & $(z \lor z^*)$ \\
+      \dnI{x}         & $(x \oplus x^*)$ &
+      \dnI{E}         & $(x \lor x^*)$ \\
 
-      \dnI{7}         & $(\neg z \lor \neg z^*)$ &
+      \dnI{7}         & $(\neg x \lor \neg x^*)$ &
       \dnI{?}         &  \\
     \end{tabular}
-    \caption[Simple Evaluation clauses]{
-        Set bit condition value clauses in Simple Evaluation added for a bit condition.
-        A bit condition corresponds to two boolean variables $z$ and $z^*$.
+    \caption[Representation of bit conditions as CNF]{
+      All bit conditions represented as CNF using
+      two boolean variables $x$ and $x^*$ to represent
+      two bits.
     }
     \label{tab:simple-eval-clauses}
   \end{center}
@@ -269,4 +429,11 @@ left-rotation by $n$ values
 
 
 \section{Addition example}
+TODO illustrate how differences propagate by an addition example illustrated in differential notation
+
+TODO reference to Magnus Daum's thesis
+
 \section{Differential path}
+
+TODO refer to some testcase which shows a differential path with many unresolved differences.
+Then show the corresponding testcase where \dnI{?} became \dnI{-} and \dnI{x}.

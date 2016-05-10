@@ -44,10 +44,6 @@
 \parskip3pt
 \setlength\parskip{0.7em}
 
-\DeclareMathOperator\IF{\texttt{IF\,}}
-\DeclareMathOperator\MAJ{\texttt{MAJ\,}}
-\DeclareMathOperator\XOR{\texttt{XOR\,}}
-
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
 \setmonofont{Inconsolata}
@@ -124,12 +120,23 @@
 \newcommand{\cNPC}{$\mathcal{N\!PC}$}
 \newcommand{\cPneqNP}{$\mathcal{P} \neq \mathcal{N\!P}$}
 
+\newcommand\concat{\,\|\,}
+\newcommand\yes{$✓$}
+\newcommand\no{$✗$}  % TODO not supported by any loaded font, but missing character looks visually fine
 \newcommand\set[1]{\left\{#1\right\}}
 \newcommand\boolf[1]{\texttt{#1}}
 
+\DeclareMathOperator\IF{\boolf{IF\,}}
+\DeclareMathOperator\MAJ{\boolf{MAJ\,}}
+\DeclareMathOperator\XOR{\boolf{XOR\,}}
+\DeclareMathOperator\SigO{\Sigma_0\,}
+\DeclareMathOperator\SigT{\Sigma_1\,}
+\DeclareMathOperator\sigO{\sigma_0\,}
+\DeclareMathOperator\sigT{\sigma_1\,}
+
 \hypersetup{
   pdfpagemode={UseOutlines},
-  pdftitle={}, % TODO
+  pdftitle={Differential cryptanalysis with SAT solvers},
   pdfauthor={Lukas Prokop},
   pdfkeywords={master thesis, satisfiability, differential cryptanalysis},
   bookmarksopen=true,
