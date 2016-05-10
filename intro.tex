@@ -14,14 +14,14 @@ In this thesis we will consider the hash algorithms MD4 and SHA-256 and represen
 differential characteristics of hash collisions as SAT problem. If and only if
 satisfiability is given, the particular differential state is achievable
 using two different inputs leading to the same output. As far as SAT solvers
-return an actual model satisfying that state, we get a complete hash collision
+return an actual model satisfying that state, we get an actual hash collision
 which can be verified and visualized.
-If the internal state of the hash algorithm is too large, the attack can be easily
+If the internal state of the hash algorithm is too large, the attack can be
 computationally simplified by modelling only a subset of steps of the hash algorithm
 or changing the modelled differential path.
 
-Gaining experience with these kind of problems with previous non-SAT-based tools
-we try to apply best practices to a satisfiability setting.
+Based on experience with these kind of problems with previous non-SAT-based tools
+we aim to apply best practices to a satisfiability setting.
 We will discuss which SAT techniques lead to best performance characteristics
 for our MD4 and SHA-256 testcases.
 
@@ -73,12 +73,12 @@ A hash function has to satisfy the following security requirements:
 
 As far as hash functions accept input strings of arbitrary length, but return a fixed
 size output string, existence of collisions is unavoidable~\cite{schlaffer}.
-However, good hash functions make it very difficult to determine collisions or preimages.
+However, good hash functions make it very difficult to find collisions or preimages.
 
 The considered hash functions apply padding to their input to normalize their
 input size to a multiple of its block size. The round function follows afterwards.
-In the following we always consider input of block size meaning the round function
-is run only for one block and padding is always considered part of this input message.
+In the following, we always consider input of block size instead of the original
+input message as bytestring.
 Padding is negligible, because once we have two colliding blocks,
 the collision will be reflected in the output in these single-pipe Merkle-Darmg\aa rd designs.
 This results in a length extension attack, making input padding negligible for cryptanalysis.
@@ -97,8 +97,8 @@ on my Thinkpad~x220 setup specified in \hyperref[app:setup]{Appendix~\ref{app:se
 Let $n$ denote the digest size, i.e. the size of the hash value $h(x)$ in bits.
 Due to the birthday paradox, a collision attack has a generic complexity of $2^{n/2}$
 whereas preimage and second preimage attacks have generic complexities of $2^n$.
-So it is cryptanalytically easier to find any two colliding hash values than the
-preimage or second preimage for a given hash value.
+In other words it is computationally easier to find any two colliding hash values
+than the preimage or second preimage for a given hash value.
 
 Following results by Wang et al., differential cryptanalysis was shown as
 powerful tool for cryptanalysis of hash algorithms. This thesis applies those
@@ -156,11 +156,13 @@ Differential cryptanalysis is based on the idea to consider two execution states
 of hash algorithms for slightly different input messages. We trace those difference
 to learn about the propagation of message differences.
 
-MD4 has a block size of 512~bits. Take some message in a particular encoding
-and provide this padded byte string as 512~bit input to the hash algorithm.
-Then use a copy of this byte string as input to a second hash algorithm implementation
-with slight modifications in few bits. MD4 has 48 round function applications
-in 3 rounds. Differential cryptanalysis considers the difference in the evaluation
+Hash algorithms consume input values as blocks of bits.
+As far as the length of the input must not conform to the block size,
+padding is applied. Now consider such a block of input values
+and another copy of it. We use those two blocks as inputs for two
+hash algorithm implementations, but provide slight modifications in few bits.
+MD4 has 48 round function applications in 3 rounds.
+Differential cryptanalysis considers the difference in the evaluation
 state between the two instances (compare with Figure~\ref{tab:collision-attack}).
 
 Visualizing those differences helps the cryptanalyst to find modifications yielding
@@ -176,7 +178,8 @@ this trail is expected to result in a hash collision with higher probability.
     \caption[Typical attack setting for a collision attack]{
       Typical attack setting for a collision attack:
       Hash function $f$ is applied to two inputs $M$ and $M^*$ which differ
-      by some predefined bits. A hash collision is given if and only if output values
+      by some predefined bits. $\triangle M$ describes the difference between
+      these values. A hash collision is given if and only if output values
       $C$ and $C^*$ show the same value. In differential cryptanalysis we observe
       the differences between two instances applying function $f$
       to inputs $M$ and $M^*$.

@@ -253,19 +253,42 @@
 \begin{abstract}%
   \parskip5pt
   Hash functions are ubiquitous in the modern information age. They provide preimage, second preimage
-  and collision resistance in a wide range of applications. They are used as cryptographic primitives
-  in protocols and applications.
+  and collision resistance which are needed in a wide range of applications.
 
   In August 2006, Wang et al. showed efficient attacks against several hash function designs including
-  MD4, MD5, HAVAL-128 and RIPEMD. With these results differential cryptanalysis has been proven useful
+  MD4, MD5, HAVAL-128 and RIPEMD. With these results differential cryptanalysis has been shown useful
   to break collision resistance in hash functions. Over the years advanced attacks based on those
   differential approaches have been developed.
 
-  In this thesis we encode differential attack settings as SAT problems.
-  SAT solvers are utilized to solve the problem revealing actual message collisions for a defined message difference.
+  To find collisions like Wang et al., a cryptanalyst needs to specify a differential characteristic.
+  Looking at the differential behavior of the underlying operations of the hash algorithm
+  shows how differential values propagate in the algorithm. The goal is to find a differential
+  characteristic whose differences cancel out in the output. Once such a differential characteristic
+  was discovered, in a second step the actual values for those differences are defined
+  yielding an actual hash collision.
+
+  Finding a differential characteristic can be a cumbersome and tedious task.
+  Whereas propagations can be automated using dedicated tools,
+  finding an initial differential characteristic is a difficult task
+  as they can be specified with arbitrary levels of granularity.
+
+  SAT research at same time faces similar problems. SAT solvers implement heuristics
+  to find satisfying assignments for Boolean functions. They also propagate values
+  once knowledge about the problem gets derived.
+
+  In this thesis we look at differential characteristics and encode
+  them as SAT problem. A SAT solver tells us whether a differential characteristic
+  can represent a hash collision or not. We implemented a framework which allows
+  us to verify differential behavior for integer operations. We then looked at the
+  encoded problems in details and tried to change the encoding to improve the runtime
+  of the SAT solver. We also provide a small CNF analysis library to compare an
+  encoded problem with others.
 
   \vspace{3pt}
-  \textbf{Keywords:} hash function, differential cryptanalysis, MD4, collision resistance, satisfiability, SAT solver
+  \textbf{Keywords:}
+    hash function, differential cryptanalysis, differential characteristic,
+    MD4, SHA-256, collision resistance,
+    satisfiability, SAT solver
 \end{abstract}
 
 %% Skipped because TU Graz form already included
@@ -287,7 +310,7 @@
   First of all I would like to thank my academic advisor for his continuous support
   during this project. Many hours of debugging were involved in writing this
   master thesis project, but thanks to Florian Mendel, this project came to a release
-  with nice results.
+  with nice results. Also thanks for continuously reviewing this document.
 
   I would also like to thank Maria Eichlseder for her great support. Her unique
   way to ask questions brought me back on track several times.
