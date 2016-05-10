@@ -51,7 +51,9 @@
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
 \setmonofont{Inconsolata}
-\setmathfont{Asana Math} % FAIL does not power \mathbb N
+% FAIL does not power \mathbb N
+% http://tex.stackexchange.com/a/47300/18015
+\setmathfont{Asana Math}
 
 \makeatletter
 \def\@makechapterhead#1{%

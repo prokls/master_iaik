@@ -96,7 +96,8 @@ In the following a quick overview over MD4's design is given.
     for function $F$ where $F$ is \boolf{IF} in the first 16 iterations,
     \boolf{MAJ} in the following 16 iterations and finally \boolf{XOR}
     in the last 16 iterations. This return value is added to the value of state
-    variable $A$, the current message block $M_i$ and $X[i_{k,l}]$. This sum is then left-rotated by
+    variable $A$, the current message block $M_i$ and $X[i_{k,l}]$.
+    This sum is then left-rotated (definition given in Section~\ref{sec:dc-sha-256}) by
     $j_{k,l \bmod{4}}$ bits and stored in value B. State variables $B$, $C$ and
     $D$ update variables $C$, $D$ and $A$ respectively.
 
@@ -118,6 +119,15 @@ In the following a quick overview over MD4's design is given.
   \end{center}
 \end{figure}
 
+
+
+
+
+
+
+
+
+
 \section{SHA-256}
 \label{sec:dc-sha-256}
 %
@@ -127,6 +137,7 @@ and published in 2001~\cite{fips-pub-180-4}. It uses a Merkle-Damg\aa{}rd constr
 with a Davies-Meyer compression function. The best known preimage attack was found in 2011
 and breaks preimage resistance for 52~rounds~\cite{bicliques}. The best known collision attack
 breaks collision resistance for 31~rounds of SHA-256~\cite{improving}.
+% TODO: pseudocollision results
 %
 \begin{table}[h]
   \begin{center}
@@ -141,10 +152,41 @@ breaks collision resistance for 31~rounds of SHA-256~\cite{improving}.
   \end{center}
 \end{table}
 
+\index{Left-shift}
+\index{Right-shift}
+\index{Left-rotation}
+\index{Right-rotation}
+\begin{defi}[Shifts and a notational remark]
+  Consider a 32bit word $X$ with 32 binary values $b_i$ with $0 \leq i \leq 31$.
+  A \emph{left-shift} of $X$ by $n$ positions creates a new 32bit word with values
+  \[
+    b_i \coloneqq \begin{cases}
+      b_{i-n} & 0 \leq i-n < 32 \\
+      0       & \text{else}
+    \end{cases}
+  \]
+  A \emph{left-rotation} of $X$ by $n$ positions creates a new 32bit word with values
+  \[ b_i \coloneqq b_{i-n \bmod{32}} \]
+
+  We define the following notations:
+  \begin{align*}
+    X ≪ n &\coloneqq \text{left-shift of 32bit value } X \text{ by } n \text{ positions} \\
+    X ≫ n &\coloneqq \text{right-shift of 32bit value } X \text{ by } n \text{ positions} \\
+    X ⋘ n &\coloneqq something \\
+    X ⋙ n &\coloneqq something \\
+  \end{align*}
+
+  Let $(X ≪ n)$ denote a left-shift of 32bit value $X$ by $n$ positions where $0 \leq n \leq 31$.
+  Then $(X ≫ n)$ analogously denotes a right-shift. Let $X ⋘ n$ denote
+  left-rotation of 32bit value $X$ by $n$ positions meaning
+  \[ X ⋘ n = (X ≪ n) \lor (X ≫ 32 - n) \]
+  \[ X ⋙ n = (X ≫ n) \lor (X ≪ 32 - n) \]
+\end{defi}
+
+
 Besides MD4's two auxiliary functions \boolf{MAJ} and \boolf{IF},
-%another four auxiliary functions are defined. Let $\ll_n$ $\lll_n$ denote
-$⋘	⋙
- \mathbb{N} $
+another four auxiliary functions are defined.
+$ \mathbb{N} $
 left-rotation by $n$ values
 
 %
