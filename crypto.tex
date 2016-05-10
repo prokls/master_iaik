@@ -99,7 +99,7 @@ In the following a quick overview over MD4's design is given.
     variable $A$, the current message block $M_i$ and $X[i_{k,l}]$. This sum is then left-rotated by
     $j_{k,l \bmod{4}}$ bits and stored in value B. State variables $B$, $C$ and
     $D$ update variables $C$, $D$ and $A$ respectively.
-    
+
     This round function design is visualized in Figure~\ref{fig:md4-round-function}.
 \end{description}
 
@@ -113,7 +113,7 @@ In the following a quick overview over MD4's design is given.
 %\begin{figure}[p]
   \begin{center}
     \includegraphics[width=\textwidth]{img/sha256.pdf}
-    \caption{SHA-256 round function}
+    \caption{SHA-256 round function as characterized in~\cite{analysisSHA256}}
     \label{fig:sha256-round-function}
   \end{center}
 \end{figure}
@@ -123,18 +123,18 @@ In the following a quick overview over MD4's design is given.
 %
 \index{SHA-256}
 SHA-256 is a hash function from the SHA-2 family designed by the National Security Agency (NSA)
-and published in 2001. It uses a Merkle-Damg\aa{}rd construction with a Davies-Meyer
-compression function.
-% TODO: reference to standard
-% https://web.archive.org/web/20130526224224/http://csrc.nist.gov/groups/STM/cavp/documents/shs/sha256-384-512.pdf
-
+and published in 2001~\cite{fips-pub-180-4}. It uses a Merkle-Damg\aa{}rd construction
+with a Davies-Meyer compression function. The best known preimage attack was found in 2011
+and breaks preimage resistance for 52~rounds~\cite{bicliques}. The best known collision attack
+breaks collision resistance for 31~rounds of SHA-256~\cite{improving}.
+%
 \begin{table}[h]
   \begin{center}
     \begin{tabular}{lcl}
-      block size           & 512 bits       & as per Section~2.2 of the standard \\
-      digest size          & 256 bits       & as per Section~1 of the standard \\
-      internal state size  & 256 bits       & as per Section~2.2 of the standard \\
-      word size            & 32 bits        & as per Section~2.2 of the standard \\
+      block size           & 512 bits   & as per Section~1 of the standard~\cite{fips-pub-180-4} \\
+      digest size          & 256 bits   & mentioned as Message Digest size~\cite{fips-pub-180-4} \\
+      internal state size  & 256 bits   & as per Section~1 of the standard~\cite{fips-pub-180-4} \\
+      word size            & 32 bits    & as per Section~1 of the standard~\cite{fips-pub-180-4}
     \end{tabular}
     \caption{SHA-256 hash algorithm properties}
     \label{tab:sha256}
@@ -142,12 +142,16 @@ compression function.
 \end{table}
 
 Besides MD4's two auxiliary functions \boolf{MAJ} and \boolf{IF},
-another two auxiliary functions are defined:
+%another four auxiliary functions are defined. Let $\ll_n$ $\lll_n$ denote
+$⋘	⋙
+ \mathbb{N} $
+left-rotation by $n$ values
 
-\begin{align}
-  \Sigma_0(X,Y,Z) &= S^2(x) \oplus S^{13}(x) \oplus S^{22}(x) \\
-  \Sigma_1(X,Y,Z) &= S^6(x) \oplus S^{11}(x) \oplus S^{25}(x)
-\end{align}
+%
+%\begin{align}
+%  \Sigma_0(X,Y,Z) &= S^2(x) \oplus S^{13}(x) \oplus S^{22}(x) \\
+%  \Sigma_1(X,Y,Z) &= S^6(x) \oplus S^{11}(x) \oplus S^{25}(x)
+%\end{align}
 
 \begin{description}
   \item[Padding and length extension]
