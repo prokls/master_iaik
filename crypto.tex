@@ -33,7 +33,8 @@ MD4 uses three auxiliary Boolean functions:
 \begin{align}
   \IF(X,Y,Z) &= (X \land Y) \lor (\neg X \land Z) \\
   \MAJ(X,Y,Z) &= (X \land Y) \lor (X \land Z) \lor (Y \land Z) \\
-  \XOR(X,Y,Z) &= X \oplus Y \oplus Z
+  \XOR(X,Y,Z) &= (X \land \neg Y \land \neg Z) \lor (\neg X \land Y \land \neg Z) \nonumber\\
+              &\lor (\neg X \land \neg Y \land Z) \lor (X \land Y \land Z)
 \end{align}
 
 \begin{defi}
@@ -55,8 +56,8 @@ In the following a quick overview over MD4's design is given.
     input. As long as the input does not reach a length congruent 448 modulo 512,
     bit 0 is appended.
     Followingly, length appending takes place. Represent the length of the input
-    (without the modifications of the previous step) in binary and take its first
-    64 bits. Append those 64 bits to the input.
+    (without the previous modifications) in binary and take its first
+    64 less significant bits. Append those 64 bits to the input.
   \item[Initialization]
     The message is split into 512-bit blocks (i.e. 16 32-bit words).
     Four state variables $A$, $B$, $C$ and $D$ are initialized with these
@@ -69,9 +70,9 @@ In the following a quick overview over MD4's design is given.
     \]
   \item[Round function with state variable updates]
     We also need an auxiliary matrix $(i_{k,l})$ which stores indices.
-    Let $i_{k,l}$ be value in the $k$-th row and $l$-th column of matrix $(i_{k,l})$.
+    Let $i_{k,l}$ be the value in the $k$-th row and $l$-th column of matrix $(i_{k,l})$.
     Analogously $j_{k,l}$ is defined for matrix $(j_{k,l})$.
-
+    %
     \[
       (i_{k,l}) = \left(\begin{array}{cccccccccccccccc}
         0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 \\
@@ -79,13 +80,13 @@ In the following a quick overview over MD4's design is given.
         0 & 8 & 4 & 12 & 2 & 10 & 6 & 14 & 1 & 9 & 5 & 13 & 3 & 11 & 7 & 15
       \end{array}\right)
     \] \[
-      J = \begin{pmatrix}
+      (j_{k,l}) = \begin{pmatrix}
         3 & 7 & 9 & 11 \\
         3 & 5 & 9 & 13 \\
         3 & 9 & 11 & 15
       \end{pmatrix}
     \]
-
+    %
     Then the round function is applied to this block in three rounds
     with 16 iterations each. Let $1 \leq k \leq 3$ be the round counter
     and $1 \leq l \leq 16$ be the iteration counter. For every round,
@@ -95,10 +96,10 @@ In the following a quick overview over MD4's design is given.
     for function $F$ where $F$ is \boolf{IF} in the first 16 iterations,
     \boolf{MAJ} in the following 16 iterations and finally \boolf{XOR}
     in the last 16 iterations. This return value is added to the value of state
-    variable $A$ and $X[i_{k,l}]$. This sum is then left-rotated by
+    variable $A$, the current message block $M_i$ and $X[i_{k,l}]$. This sum is then left-rotated by
     $j_{k,l \bmod{4}}$ bits and stored in value B. State variables $B$, $C$ and
     $D$ update variables $C$, $D$ and $A$ respectively.
-%
+    
     This round function design is visualized in Figure~\ref{fig:md4-round-function}.
 \end{description}
 
