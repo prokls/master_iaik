@@ -44,14 +44,16 @@
 \parskip3pt
 \setlength\parskip{0.7em}
 
-\DeclareMathOperator\IF{\text{IF\,}}
-\DeclareMathOperator\MAJ{\text{MAJ\,}}
-\DeclareMathOperator\XOR{\text{XOR\,}}
+\DeclareMathOperator\IF{\texttt{IF\,}}
+\DeclareMathOperator\MAJ{\texttt{MAJ\,}}
+\DeclareMathOperator\XOR{\texttt{XOR\,}}
 
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
 \setromanfont[Ligatures=TeX,Numbers=OldStyle,Variant=01,Fractions=On]{Linux Libertine O}
 \setmonofont{Inconsolata}
-\setmathfont{Linux Libertine O}
+%\setmathfont{Linux Libertine O}
+\setmathfont{Asana Math} % TODO: |N is missing again
+\setmathfont[range={"2115}]{Linux Libertine O}% "0221E = \infty
 
 \makeatletter
 \def\@makechapterhead#1{%
