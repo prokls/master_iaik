@@ -95,8 +95,8 @@ In the following a quick overview over MD4's design is given.
     for function $F$ where $F$ is \boolf{IF} in the first 16 iterations,
     \boolf{MAJ} in the following 16 iterations and finally \boolf{XOR}
     in the last 16 iterations. This return value is added to the value of state
-    variable $A$ and $X[(i)_{k,l}]$. This sum is then left-rotated by
-    $(j)_{k,l \bmod{4}}$ bits and stored in value B. State variables $B$, $C$ and
+    variable $A$ and $X[i_{k,l}]$. This sum is then left-rotated by
+    $j_{k,l \bmod{4}}$ bits and stored in value B. State variables $B$, $C$ and
     $D$ update variables $C$, $D$ and $A$ respectively.
 %
     This round function design is visualized in Figure~\ref{fig:md4-round-function}.
