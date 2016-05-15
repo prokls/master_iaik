@@ -9,6 +9,174 @@
 %  \import*{img/}{satisfiability.pdf_tex}
 %\end{center}
 
+\section{Preliminaries Redux}
+\section{Satisfiability}
+\label{sec:intro-sat}
+%
+\index{Boolean function}
+\begin{defi}
+  A \emph{Boolean function} is a mapping $h: X \to Y$ with $X = \left\{0,1\right\}^n$
+  for $n \in \mathbb N_{\geq 1}$ and $Y = \left\{0,1\right\}$.
+\end{defi}
+
+The following definition gives three basic Boolean functions:
+
+\index{AND (Boolean function)}
+\index{OR (Boolean function)}
+\index{NOT (Boolean function)}
+\begin{defi}
+  Let \boolf{AND}, \boolf{OR} and \boolf{NOT} be three Boolean functions.
+  \begin{itemize}[noitemsep,topsep=0pt]
+    \item
+      \boolf{AND} maps $X = \left\{0,1\right\}^2$
+      to $1$ if all values of $X$ are $1$.
+    \item
+      \boolf{OR} maps $X = \left\{0,1\right\}^2$
+      to $1$ if any value of $X$ is $1$.
+    \item
+      \boolf{NOT} maps $X = \left\{0,1\right\}^1$
+      to $1$ if the single value of $X$ is $0$.
+  \end{itemize}
+  All functions return $0$ in the other case.
+\end{defi}
+
+\index{Truth table}
+\begin{defi}
+  A \emph{truth table} unambiguously defines a Boolean function
+  by enlisting the evaluated truth value for all possible sets of
+  inputs.
+
+  Table~\ref{tab:andornot-truthtables} shows truth tables for
+  \boolf{AND}, \boolf{OR} and \boolf{NOT}.
+\end{defi}
+
+\begin{table}[pt]
+  \centering
+  \subfloat[\boolf{AND}]{%
+    \begin{tabular}{cc|c}
+      $v_1$ & $v_2$ & $f(v_1, v_2)$ \\
+     \hline
+      $1$ & $1$ & $1$ \\
+      $1$ & $0$ & $0$ \\
+      $0$ & $1$ & $0$ \\
+      $0$ & $0$ & $0$
+    \end{tabular}
+  }
+  ~
+  \subfloat[\boolf{OR}]{%
+    \begin{tabular}{cc|c}
+      $v_1$ & $v_2$ & $f(v_1, v_2)$ \\
+     \hline
+      $1$ & $1$ & $1$ \\
+      $1$ & $0$ & $1$ \\
+      $0$ & $1$ & $1$ \\
+      $0$ & $0$ & $0$
+    \end{tabular}
+  }
+  ~
+  \raisebox{13.6pt}{%
+    \subfloat[\boolf{NOT}]{%
+      \begin{tabular}{c|c}
+        $v$ & $f(v)$ \\
+       \hline
+        $1$ & $0$ \\
+        $0$ & $1$
+      \end{tabular}
+    }%
+  }%
+  \caption{Truth tables for \boolf{AND}, \boolf{OR} and \boolf{NOT}}
+  \label{tab:andornot-truthtables}
+\end{table}
+
+Boolean functions have an important property which is characterized
+in the following definition:
+
+\index{Satisfiability}
+\index{Assignment}
+\index{Model}
+\begin{defi}
+  A Boolean function $f$ is \emph{satisfiable} iff there exists at least one
+  input $x \in X$ such that $f(x) = 1$.
+  Every input $x \in X$ satisfying this property is called \emph{model}.
+  Every element of $X$ is called \emph{assignment}.
+\end{defi}
+
+The generic complexity of SAT determination is given by $2^n$ for $n$ Boolean variables.
+%This is closely related to the \cP $\overset{?}{\neq}$ \cNP question.
+The corresponding tool to determine satisfiability is defined as follows:
+
+\index{SAT solver}
+\begin{defi}
+  A \emph{SAT solver} is a tool to determine satisfiability of a Boolean function.
+  If satisfiability is given, it returns some model.
+\end{defi}
+
+SAT research is heavily concerned with finding good heuristics to find some model
+for a given SAT problem as fast as possible. Biyearly
+\href{http://satcompetition.org/}{SAT competitions} take place to challenge
+SAT solvers in a set of benchmarks. The committee evaluates the most successful
+SAT solvers solving the most problems within a given time frame.
+
+\section{Satisfiability of hash algorithm states}
+\label{sec:intro-algo-sat}
+%
+We discussed Boolean functions and satisfiability. At the same time we looked
+at basic properties of hash algorithms. But the question remains how we can
+link those areas together? This section is dedicated to this question.
+
+\index{Algorithm}
+\index{I/O Algorithm}
+\begin{defi}
+  An \emph{algorithm} is a step-wise set of instructions to solve a problem.
+  An \emph{I/O algorithm} transforms given input values to output values.
+\end{defi}
+
+Hash algorithms are one example of I/O algorithms.
+
+I/O algorithms can be implemented as a sequence of instructions for computers.
+At the same time I/O algorithms can be represented as combination of Boolean
+functions. This claim is backed in more detail in Section~\ref{sec:sat-dimacs}
+with Theorem~\ref{thm:all-cnf}. It follows immediately that we can represent
+I/O algorithms such as hash algorithms entirely as Boolean function.
+
+\begin{theorem}
+  Every algorithm can be represented as Boolean function.
+\end{theorem}
+
+\index{Least significant bit}
+\index{Most significant bit}
+We consider 2bit addition as small example. Let $a_{i}$ be the first argument
+where $i$ denotes the binary position. If $i=0$, the \emph{least significant bit}
+(LSB) is considered. If $i=1$, the \emph{most significant bit} (MSB) is considered.
+
+Let $b_{i}$ be the second argument and $s_{i}$ be the output value.
+Furthermore $c_{i}$ is the carry bit, where $c_1$ is left out, because
+it is not used in 2bit addition. This model of 2bit addition as Boolean
+function can be seen in Figure~\ref{fig:intro-2bit-addition}.
+
+\begin{figure}
+  \begin{center}
+    \begin{tabular}{lrcc}
+      1st arg: &   & $a_{1}$ & $a_{0}$ \\
+      2nd arg: & + & $b_{1}$ & $b_{0}$ \\
+    \hline
+      carry:   &   &         & $c_0$ \\
+      sum:     & = & $s_{1}$ & $s_0$
+    \end{tabular}
+    \hspace{10pt}~$\leadsto$\hspace{10pt}%
+    \begin{minipage}{50pt}%
+      \begin{flalign*}
+        s_0 &= \boolf{XOR}(a_0, b_0) &\\
+        c_0 &= a_0 \land b_0 &\\
+        s_1 &= \boolf{XOR}(a_0, b_0, c_0) &
+      \end{flalign*}
+    \end{minipage}
+  \end{center}
+  \caption{Modelling 2bit addition (left) as Boolean function (right)}
+  \label{fig:intro-2bit-addition}
+\end{figure}
+
+
 \section{The DIMACS de-facto standard}
 \label{sec:sat-dimacs}
 %
