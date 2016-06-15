@@ -277,13 +277,16 @@
   yielding an actual hash collision.
 
   Finding a differential characteristic can be a cumbersome and tedious task.
-  Whereas propagations can be automated using dedicated tools,
+  Whereas propagation can be automated using dedicated tools,
   finding an initial differential characteristic is a difficult task
   as they can be specified with arbitrary levels of granularity.
 
-  SAT research at same time faces similar problems. SAT solvers implement heuristics
-  to find satisfying assignments for Boolean functions. They also propagate values
-  once knowledge about the problem gets derived.
+  SAT solvers inherently implement both tasks.
+  They consecutively propagate values which limit the search space.
+  The probability to find a satisfiable assignment increases if the limited search
+  space has many satisfiable assignments. And finally the assignment reveals
+  initial values. On the other hand, SAT solvers have no notion of differential
+  values and therefore problem encoding becomes an important topic.
 
   In this thesis we look at differential characteristics and encode
   them as SAT problem. A SAT solver tells us whether a differential characteristic
