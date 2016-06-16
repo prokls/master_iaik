@@ -13,7 +13,11 @@ are considered as byte strings in a particular encoding.
 The hash value is of fixed length and satisfies several properties which make it useful
 in a variety of applications.
 
-In this thesis we will consider the hash algorithms MD4 and SHA-256 and represent
+In this thesis we will consider the hash algorithms MD4 and SHA-256.
+They use basic arithmetic functions like addition and bit-level functions
+such as XOR to transform an input to a hash value. We use a bit vector
+as input to this implementation and all operations applied to this bit vector
+will be represented as clauses of a SAT problem. Additionally we represent
 differential characteristics of hash collisions as SAT problem. If and only if
 satisfiability is given, the particular differential state is achievable
 using two different inputs leading to the same output. As far as SAT solvers
@@ -34,17 +38,31 @@ for our MD4 and SHA-256 testcases.
 This thesis is organized as follows:
 
 \begin{description}
-\item[In Chapter~\ref{ch:intro}] we discussed the basic properties and fundamentals
-of the tools in discussion including hash functions and SAT solvers.
+\item[In Chapter~\ref{ch:intro}] we discuss the basic properties and fundamentals
+of the tools in discussion including hash functions and SAT solvers. We develop
+a theoretical notion of the basic terms, we will use in the following chapters.
 
-\item[In Chapter~\ref{ch:dc}] we introduce the MD4 and SHA-256 hash functions and
-discuss possible approaches in differential cryptanalysis.
+\item[In Chapter~\ref{ch:hash-algos}] we introduce the MD4 and SHA-256 hash functions.
+Certain design decisions imply certain properties which can be used in differential
+cryptanalysis. We discuss those decisions in this chapter after a formal definition
+of the function itself.
 
-\item[In Chapter~\ref{ch:sat}] we discuss SAT solving and potential
-approaches to speed up SAT solvers for cryptographic problems.
+\item[In Chapter~\ref{ch:dc}] we discuss approaches of differential cryptanalysis.
+We begin with work done by Wang, et al. and followingly introduce differential notation
+to simplify representation of differential states. This way we can easily dump
+hash collisions.
 
-\item[In Chapter~\ref{ch:results}] we show results of our work
-and discuss its implications.
+\item[In Chapter~\ref{ch:sat}] we discuss SAT solving. We give a brief overview
+over used SAT solvers and discuss how we can speed up SAT solvers for cryptographic
+problems.
+
+\item[In Chapter~\ref{ch:sat-features}] we define SAT features which help us to
+classify SAT problems. This is a small subproject we did to look at properties
+of resulting DIMACS~CNF files.
+
+\item[In Chapter~\ref{ch:results}] we show data as result of our work.
+Runtimes are the main part of this chapter, but also results of the SAT~features
+project are presented.
 
 \item[In Chapter~\ref{ch:summary}] we suggest future work based on our results.
 \end{description}

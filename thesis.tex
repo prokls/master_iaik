@@ -1,4 +1,5 @@
 \documentclass[11pt,a4paper,final,openright]{book}
+% TODO final, not draft
 \usepackage{luatextra}
 \usepackage[utf8x]{luainputenc}
 
@@ -53,16 +54,24 @@
 
 \makeatletter
 \def\@makechapterhead#1{%
-  \begin{parcolumns}[nofirstindent,colwidths={1=0.5\textwidth, 2=0.4\textwidth}, distance={0.1\textwidth}]{2}
-    \colchunk[1]{%
+  % REMARK I removed parcolumns, because it collides with
+  % lualatexja-fontspec. See issue 978
+  % http://tracker.luatex.org/view.php?id=978
+  \noindent
+  \begin{minipage}{0.5\textwidth}
+  %\begin{parcolumns}[nofirstindent,colwidths={1=0.5\textwidth, 2=0.4\textwidth}, distance={0.1\textwidth}]{2}
+  %  \colchunk[1]{%
       \ifx\chappic\@empty%
         \vspace*{50\p@}%
       \else%
         \vspace*{5\p@}%
           \includegraphics[width=100pt]\chappic %\\[15pt]
       \fi%
-    }%
-    \colchunk[2]{%
+  %  }%
+    \vspace{20pt}
+  \end{minipage}%
+  \begin{minipage}{0.5\textwidth}
+  %  \colchunk[2]{%
       \ifx\chapquote\@empty\else%
         \vspace*{5\p@}
           \begin{flushright}
@@ -71,9 +80,10 @@
             %\end{minipage}
           \end{flushright}
       \fi%
-    }
-    \colplacechunks
-  \end{parcolumns}
+  %  }
+  %  \colplacechunks
+  %\end{parcolumns}
+  \end{minipage}
 
   {\parindent \z@ \raggedright \normalfont
     \ifnum \c@secnumdepth >\m@ne
@@ -86,7 +96,8 @@
     \interlinepenalty\@M
     \Huge \bfseries #1\par\nobreak
     \vskip 40\p@
-  }}
+  }
+}
 \makeatother
 \newcommand*\chappic{}
 \newcommand*\chapquote{}
@@ -279,11 +290,11 @@
   Finding a differential characteristic can be a cumbersome and tedious task.
   Whereas propagation can be automated using dedicated tools,
   finding an initial differential characteristic is a difficult task
-  as they can be specified with arbitrary levels of granularity.
+  as it can be specified with arbitrary levels of granularity.
 
   SAT solvers inherently implement both tasks.
-  They consecutively propagate values which limit the search space.
-  The probability to find a satisfiable assignment increases if the limited search
+  They consecutively propagate values which narrow the search space.
+  The probability to find a satisfiable assignment increases if the narrowed search
   space has many satisfiable assignments. And finally the assignment reveals
   initial values. On the other hand, SAT solvers have no notion of differential
   values and therefore problem encoding becomes an important topic.
@@ -332,8 +343,8 @@
   Also thanks to Roderick Bloem and Armin Biere who organized a meeting
   one year before submitting this work defining the main approaches involved
   in this thesis. Armin Biere released custom lingeling versions for us,
-  e.g. featuring more important clauses in lingeling. He also provided further
-  analysis for our testcases.
+  e.g. featuring \enquote{more important} clauses in lingeling.
+  He also provided further analysis for our testcases.
 
   And finally I am grateful for the support by Martina,
   who also supported me during good and bad days with this thesis,
@@ -349,21 +360,21 @@ and published under terms and conditions of Free/Libre Open Source Software.
 This document was printed with \LuaLaTeX{} and Linux Libertine Font.
 
 
-%\listoffigures
-%\listoftables
 \tableofcontents
 \mainmatter
 
 \input{intro}
 \input{hashalgos}
 \input{crypto}
-\input{satfeatures}
 \input{sat}
+\input{satfeatures}
 \input{results}
 \input{summary}
 \input{appendix}
 
 \backmatter
+%\listoffigures
+%\listoftables
 \printindex
 \printbibliography
 
