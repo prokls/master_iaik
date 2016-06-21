@@ -3,11 +3,7 @@
 \renewcommand*\chapquotesrc{Unknown}
 \chapter{Satisfiability}
 \label{ch:sat}
-%\begin{center}
-%  \def\svgwidth{100pt}
-%  \import*{img/}{satisfiability.pdf_tex}
-%\end{center}
-
+%
 Boolean algebra allows us to describe functions over two-valued variables.
 Satisfiability is the question for an assignment such that a function
 evaluates to true. Satisfiability problems are solved by SAT~solvers.
@@ -181,12 +177,12 @@ The corresponding tool to determine satisfiability is defined as follows:
 
 \index{SAT solver}
 \begin{defi}
-  A \emph{SAT solver} is a tool to determine satisfiability of a Boolean function.
-  If satisfiability is given, it returns some model.
+  A \emph{SAT solver} is a tool to determine satisfiability (SAT or UNSAT)
+  of a Boolean function. If satisfiability is given, it returns some model.
 \end{defi}
 
 \subsection{Computational considerations}
-\label{label:sat-complexity}
+\label{sec:sat-complexity}
 %
 The generic complexity of SAT determination is given by $2^n$ for $n$ Boolean variables.
 
@@ -195,21 +191,33 @@ No known algorithm exists to determine satisfiability in polynomial runtime.
 This means no algorithm solves the SAT problem with runtime behavior
 which depends polynomially on the growth of $n$.
 
-This is known as the famous \cP $\overset{?}{\neq}$ \cNP question.
+This is known as the famous {\cP $\overset{?}{\neq}$ \cNP} problem.
 
 \index{Unit propagation}
 However, SAT solver can take advantage of the problem's description.
-For example consider function $f(x_0, x_1, x_2) = x_0 \land (\neg x_1 \lor x_2)$.
+For example consider function $f$ in Display~\ref{eq:3f}.
+\begin{align} f(x_0, x_1, x_2) &= x_0 \land (\neg x_1 \lor x_2) \label{eq:3f} \end{align}
 Instead of trying all possible 8~cases for 3~Boolean variables,
 we can immediately see that $x_0$ is required to be $1$.
 So we don't need to test $x_0 = 0$ and can skip 4~cases.
 This particular strategy is called \emph{unit propagation}.
 
+\subsection{SAT competitions}
+\label{sec:sat-competitions}
+%
 SAT research is heavily concerned with finding good heuristics to find some model
 for a given SAT problem as fast as possible. Biyearly
 \href{http://satcompetition.org/}{SAT competitions} take place to challenge
 SAT solvers in a set of benchmarks. The committee evaluates the most successful
 SAT solvers solving the most problems within a given time frame.
+
+SAT~2016 is currently ongoing, but in 2014 lingeling by Armin Biere has won first prize in
+the Application benchmarks track and second prize in the Hard Combinatorial benchmarks
+track for SAT and UNSAT instances respectively. Its parallelized sibling plingeling
+and Cube \& Conquer sibling treengeling have won prizes in parallel settings.
+
+In chapter~\ref{ch:results} we will look at runtime results shown by (but not limited to)
+those SAT solvers.
 
 %\section{Satisfiability of hash algorithm states}
 %\label{sec:intro-algo-sat}

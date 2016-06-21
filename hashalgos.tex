@@ -8,7 +8,7 @@
 In this chapter we will define hash functions and their desired security
 properties. Followingly we look at SHA256 and MD4 as established hash functions.
 We will represent them with Boolean algebra (in chapter~\ref{ch:enc}) to make
-reasoning about states in those hash function possible using SAT solvers.
+reasoning about states in those hash functions possible using SAT solvers.
 
 \section{Preliminaries Redux}
 \label{sec:hash-prelim}
@@ -26,7 +26,7 @@ reasoning about states in those hash function possible using SAT solvers.
 \end{defi}
 
 Hash functions are considered as cryptographic primitives
-used as building blocks in cryptographic protocols 
+used as building blocks in cryptographic protocols.
 A hash function has to satisfy the following security requirements:
 
 \index{Preimage resistance}
@@ -36,6 +36,7 @@ A hash function has to satisfy the following security requirements:
   to find $x \in X$ such that $h(x) = y$.
 \end{defi}
 
+\clearpage
 \index{Second-preimage resistance}
 \begin{defi}[Second-preimage resistance]
   Given $x \in X$,
@@ -45,9 +46,11 @@ A hash function has to satisfy the following security requirements:
 \end{defi}
 
 \index{Collision resistance}
+\index{Collision}
 \begin{defi}[Collision resistance]
   A hash function $h$ is \emph{collision resistant} iff it is computationally infeasible to
   find any two $x \in X$ and $x_2 \in X$ with $x \neq x_2$ such that $h(x) = h(x_2)$.
+  Tuple $(x, x_2)$ is called \emph{collision}.
 \end{defi}
 
 As far as hash functions accept input strings of arbitrary length, but return a fixed
@@ -66,49 +69,51 @@ following security guarantee:
 
 \begin{defi}[Collision resistance inheritance]
   Let $F_0$ be a collision resistant compression function.
-  A hash function in Merkle-Damg\aa{}rd design is collision resistant if and only if $F_0$ is collision resistant.
+  A hash function in Merkle-Damg\aa{}rd design is collision resistant if $F_0$ is collision resistant.
 \end{defi}
 
 This motivates thorough research of collisions in compression functions.
-
 The design was found independently by Ralph C. Merkle and Ivan B. Damg\aa{}rd.
-It was described by Merkle in his PhD thesis~\cite{merkle1979secrecy} and it
-was proven non-rigorously on pages~13 to 15.
-
+It was described by Merkle in his PhD thesis~\cite[p. 13--15]{merkle1979secrecy}
+and followingly used in popular hash functions such as MD4, MD5 and the SHA2 hash function family.
 The single-pipe design works as follows:
-\begin{enumerate}
+\begin{enumerate}\itemsep0pt
 \item Split the input into blocks of uniform block size.
   If necessary, apply padding to the last block to achieve full block size.
-\item Compression function $F_0$ is applied iteratively using the output of
-  the previous iteration and the next input block.
+\item Compression function $F_0$ is applied iteratively using the output $y_{i-1}$ of
+  the previous iteration and the next input block $x_i$, denoted $y_i = F_0(y_{i-1}, x_i)$.
 \item An optional postprocessing function is applied.
 \end{enumerate}
 
-SHA256 is one hash function following the Merkle-Damg\aa{}rd design.
-Also MD4 shares this property.
-
-\subsection{Padding and length extension attack}
+\subsection{Padding and length extension attacks}
 \label{sec:hash-length-ext-attack}
 %
 Hash functions of single-piped Merkle-Damg\aa{}rd design inherently suffer
-from length extension attacks.
+from length extension attacks. MD4 and SHA256 apply padding to their input
+to normalize their input size to a multiple of its block size.
+The compression function is applied afterwards. This design is vulnerable
+to length extensions.
 
-MD4 and SHA256 apply padding to their input to normalize their input size
-to a multiple of its block size. The compression function is applied afterwards.
-
-Consider some collision $(x_0, x_1)$ with $F_0(x_0) = F_0(x_1)$ where $x_0$ and
-$x_1$ have a size of one block. Then also $(x_0 \,\|\, p, x_1 \,\|\, p)$ with an arbitrary
-string $p$ represents a collision in single-piped Merkle-Damg\aa{}rd designs,
-because $x_0$ or $x_1$ already wiped out differences and therefore yielded
-the same hash value. A common suffix $p$ changes the hash value to the same value.
+Consider some collision $(x_0, x_1)$ with $F_0(x_0) = y = F_0(x_1)$ where $x_0$ and
+$x_1$ have a size of one block. Let $p$ be a suffix with size of one block.
+Then also $(x_0 \,\|\, p, x_1 \,\|\, p)$ (where $\|$ denotes concatenation)
+represents a collision in single-piped Merkle-Damg\aa{}rd designs, because
+it holds that:
+\[ F_0(F_0(x_0), p) = F_0(F_0(x_1), p) \iff F_0(y, p) = F_0(y, p) \]
+%$x_0$ or $x_1$ already wiped
+%out differences and therefore yielded the same hash value.
+%A common suffix $p$ changes the hash value to the same value.
 Hence $(x_0 \,\|\, p, x_1 \,\|\, p)$ is a collision as well.
+As far as $F_0$ is applied recursively to every block, $p$ can be of arbitrary size
+and $(x_0, x_1)$ can be of arbitrary uniform size.
 
-For the same reason padding of a hash function is negligible. In our tests will
-only consider input of one block and padding will be neglected.
+Because of this vulnerability, cryptanalysts only need to find a collision
+in compression functions. In our tests will only consider input of one block
+and padding will be neglected.
 
 \subsection{Example usage}
 \label{sec:hash-usage}
-
+%
 One example showing the use of hash functions as primitives are JSON Web Tokens (JWT)
 specified in RFC~7519~\cite{rfc7519}. Its application allows web developers to
 represent claims to be transferred between two parties.
@@ -117,7 +122,7 @@ Section~8 defines implementation requirements
 and refers to RFC~7518~\cite{rfc7518}, which specifies cryptographic algorithms to
 be implemented. \enquote{HMAC SHA-256} (besides \enquote{none}) is the only signature
 and MAC algorithm required to be implemented.
-
+%
 Hence SHA-256 as hash algorithm is used as primitive in this configuration.
 
 \section{MD4}
@@ -127,11 +132,12 @@ Hence SHA-256 as hash algorithm is used as primitive in this configuration.
 MD4 is a cryptographic hash function originally described in RFC~1186~\cite{rfc1186},
 updated in RFC~1320~\cite{rfc1320} and declared obsolete by RFC~6150~\cite{rfc6150}. It was
 invented by Ronald Rivest in 1990 with properties given in Table~\ref{tab:md4}.
-Since 1995~\cite{Dobbertin1998} successful full-round attacks have been found to break collisions,
-preimage and second-preimage resistance in MD4; including but not limited to~\cite{md4-2007} and
-\cite{cryptoeprint:2005:151}. We derived a Python~3 implementation based on
-a previous Python version and made it available on github~\cite{md4-py3k}.
-
+In 1995~\cite{Dobbertin1998} successful full-round attacks have been found to break collision resistance.
+Followingly preimage and second-preimage resistance in MD4 have been broken as well.
+Some of those attacks are described in~\cite{md4-2007} and \cite{cryptoeprint:2005:151}.
+We derived a Python~3 implementation based on a Python~2 implementation
+and made it available on github~\cite{md4-py3k}.
+%
 \begin{table}[h]
   \begin{center}
     \begin{tabular}{lcl}
@@ -182,15 +188,16 @@ In the following a brief overview over MD4's design is given.
     64 less significant bits. Append those 64 bits to the input.
   \item[Initialization.]
     The message is split into 512-bit blocks (i.e. 16 32-bit words).
-    Four state variables $A$, $B$, $C$ and $D$ are initialized with these
+    Four state variables $A_{i}$ with $-4 \leq i < 0$ are initialized with these
     hexadecimal values:
     \[
-      \mathtt{[A]}\; \texttt{01234567} \quad
-      \mathtt{[B]}\; \texttt{89abcdef} \quad
-      \mathtt{[C]}\; \texttt{fedcba98} \quad
-      \mathtt{[D]}\; \texttt{76543210}
+      \mathtt{[A_{-4}]}\; \texttt{01234567} \quad
+      \mathtt{[A_{-1}]}\; \texttt{89abcdef} \quad
+      \mathtt{[A_{-2}]}\; \texttt{fedcba98} \quad
+      \mathtt{[A_{-3}]}\; \texttt{76543210}
     \]
   \item[Round function with state variable updates.]
+    % TODO simplify
     We also need an auxiliary matrix $(i_{k,l})$ which stores indices.
     Let $i_{k,l}$ be the value in the $k$-th row and $l$-th column of matrix $(i_{k,l})$.
     Analogously $j_{k,l}$ is defined for matrix $(j_{k,l})$.
@@ -214,14 +221,14 @@ In the following a brief overview over MD4's design is given.
     and $1 \leq l \leq 16$ be the iteration counter. For every round,
     for every iteration apply the following function:
 
-    The values of state variable $B$, $C$ and $D$ are taken as arguments
+    The values of state variable $A_{-1}$, $A_{-2}$ and $A_{-3}$ are taken as arguments
     for function $F$ where $F$ is \boolf{IF} in the first 16 iterations,
     \boolf{MAJ} in the following 16 iterations and finally \boolf{XOR}
     in the last 16 iterations. This return value is added to the value of state
-    variable $A$, the current message block $M$ and $X_{i_{k,l}}$.
+    variable $A_{-4}$, the current message block $M$ and $X_{i_{k,l}}$.
     This sum modulo $2^{32}$ is then left-rotated (see Definition~\ref{def:shifts}) by
-    $j_{k,l \bmod{4}}$ bits and stored in value B. State variables $B$, $C$ and
-    $D$ update variables $C$, $D$ and $A$ respectively.
+    $j_{k,l \bmod{4}}$ bits and stored in value $A_{-1}$. State variables $A_{-1}$, $A_{-2}$ and
+    $A_{-3}$ update variables $A_{-2}$, $A_{-3}$ and $A_{-4}$ respectively.
 
     This round function design is visualized in Figure~\ref{fig:md4-round-function}.
 \end{description}
