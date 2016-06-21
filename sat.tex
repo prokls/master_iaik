@@ -3,58 +3,51 @@
 \renewcommand*\chapquotesrc{Unknown}
 \chapter{Satisfiability}
 \label{ch:sat}
-\vspace{50pt}
 %\begin{center}
 %  \def\svgwidth{100pt}
 %  \import*{img/}{satisfiability.pdf_tex}
 %\end{center}
 
-\section{Preliminaries Redux}
-\section{Satisfiability}
-\label{sec:intro-sat}
+Boolean algebra allows us to describe functions over two-valued variables.
+Satisfiability is the question for an assignment such that a function
+evaluates to true. Satisfiability problems are solved by SAT~solvers.
+We discuss the basic theory behind satisfiability. We will learn that any
+computation can be represented as satisfiability problem. In Chapter~\ref{ch:enc}
+we will represent a differential cryptanalysis problem such that it is
+solvable iff the corresponding SAT~problem is satisfiable.
+
+\section{Basic notation and definitions}
+\label{sec:sat-intro}
 %
 \index{Boolean function}
-\begin{defi}
+\begin{defi}[Boolean function]
   A \emph{Boolean function} is a mapping $h: X \to Y$ with $X = \left\{0,1\right\}^n$
   for $n \in \mathbb N_{\geq 1}$ and $Y = \left\{0,1\right\}$.
 \end{defi}
 
-The following definition gives three basic Boolean functions:
+\index{Assignment}
+\begin{defi}[Assignment]
+  A \emph{$k$-assignment} is an element of $\left\{0,1\right\}^k$.
 
-\index{AND (Boolean function)}
-\index{OR (Boolean function)}
-\index{NOT (Boolean function)}
-\begin{defi}
-  Let \boolf{AND}, \boolf{OR} and \boolf{NOT} be three Boolean functions.
-  \begin{itemize}[noitemsep,topsep=0pt]
-    \item
-      \boolf{AND} maps $X = \left\{0,1\right\}^2$
-      to $1$ if all values of $X$ are $1$.
-    \item
-      \boolf{OR} maps $X = \left\{0,1\right\}^2$
-      to $1$ if any value of $X$ is $1$.
-    \item
-      \boolf{NOT} maps $X = \left\{0,1\right\}^1$
-      to $1$ if the single value of $X$ is $0$.
-  \end{itemize}
-  All functions return $0$ in the other case.
+  \noindent
+  Let $f$ be some $k$-ary Boolean function.
+  An \emph{assignment for function $f$} is any $k$-assignment.
 \end{defi}
 
 \index{Truth table}
-\begin{defi}
-  A \emph{truth table} unambiguously defines a Boolean function
-  by enlisting the evaluated truth value for all possible sets of
-  inputs.
-
-  Table~\ref{tab:andornot-truthtables} shows truth tables for
-  \boolf{AND}, \boolf{OR} and \boolf{NOT}.
+\begin{defi}[Truth table]
+  Let $f$ be some $k$-ary Boolean function.
+  The \emph{truth table of Boolean function $f$} assigns
+  truth value $0$ or $1$ to any assignment of $f$.
 \end{defi}
+
+Boolean functions are characterized by their corresponding truth table.
 
 \begin{table}[pt]
   \centering
   \subfloat[\boolf{AND}]{%
     \begin{tabular}{cc|c}
-      $v_1$ & $v_2$ & $f(v_1, v_2)$ \\
+      $x_1$ & $x_2$ & $f(x_1, x_2)$ \\
      \hline
       $1$ & $1$ & $1$ \\
       $1$ & $0$ & $0$ \\
@@ -65,7 +58,7 @@ The following definition gives three basic Boolean functions:
   ~
   \subfloat[\boolf{OR}]{%
     \begin{tabular}{cc|c}
-      $v_1$ & $v_2$ & $f(v_1, v_2)$ \\
+      $x_1$ & $x_2$ & $f(x_1, x_2)$ \\
      \hline
       $1$ & $1$ & $1$ \\
       $1$ & $0$ & $1$ \\
@@ -88,7 +81,91 @@ The following definition gives three basic Boolean functions:
   \label{tab:andornot-truthtables}
 \end{table}
 
-Boolean functions have an important property which is characterized
+Table~\ref{tab:andornot-truthtables} shows example truth tables for
+the Boolean \boolf{AND}, \boolf{OR} and \boolf{NOT} functions.
+A different definition of the three functions is given the following way:
+
+\index{AND (Boolean function)}
+\index{OR (Boolean function)}
+\index{NOT (Boolean function)}
+\begin{defi}
+  Let \boolf{AND}, \boolf{OR} and \boolf{NOT} be three Boolean functions.
+  \begin{itemize}[noitemsep,topsep=0pt]
+    \item
+      \boolf{AND} maps $X = \left\{0,1\right\}^2$
+      to $1$ if all values of $X$ are $1$.
+    \item
+      \boolf{OR} maps $X = \left\{0,1\right\}^2$
+      to $1$ if any value of $X$ is $1$.
+    \item
+      \boolf{NOT} maps $X = \left\{0,1\right\}^1$
+      to $1$ if the single value of $X$ is $0$.
+  \end{itemize}
+  All functions return $0$ in the other case.
+
+  Those functions are denoted $a_0 \land a_1$, $a_0 \lor a_1$
+  and $\neg a_0$ respectively, for input parameters $a_0$ and $a_1$.
+\end{defi}
+
+It is interesting to observe, that any Boolean function can be represented
+using only these three operators. This can be proven by complete induction
+over the number of arguments $k$ of the function.
+
+Let $k = 1$. Then we consider any possible $2$-assignment for one input
+variable $x_1$ and one value of $f(x_1)$. Then four truth tables are possible
+listed in Table~\ref{tab:unary-f}. The description shows the corresponding
+definition of $f$ using \boolf{AND}, \boolf{OR} and \boolf{NOT} only.
+
+Now let $g$ be some $k$-ary function. Let $(a_0, a_1, \ldots, a_k)$ be the
+$k$ input arguments to $g$ and $x_1 \coloneqq g(a_0, a_1, \ldots, a_k)$.
+Then we can again look at Table~\ref{tab:unary-f} to discover that 4 cases
+are possible: 2 cases where the return value of our new $(k+1)$-ary function
+depends on value $x_1$ and 2 cases where the return value is constant.
+
+This completes our proof.
+
+\begin{table}[ht]
+  \centering
+  \subfloat[$f: x \mapsto 1$]{%
+    \begin{tabular}{cc}
+      $x_1$ & $f(x_1)$ \\
+     \hline
+      $1$ & $1$ \\
+      $0$ & $1$
+    \end{tabular}
+  }
+  ~
+  \subfloat[$f: x \mapsto x$]{%
+    \begin{tabular}{cc}
+      $x_1$ & $f(x_1)$ \\
+     \hline
+      $1$ & $1$ \\
+      $0$ & $0$
+    \end{tabular}
+  }
+  ~
+  \subfloat[$f: x \mapsto \neg x$]{%
+    \begin{tabular}{cc}
+      $x_1$ & $f(x_1)$ \\
+     \hline
+      $1$ & $0$ \\
+      $0$ & $1$
+    \end{tabular}
+  }
+  ~
+  \subfloat[$f: x \mapsto 0$]{%
+    \begin{tabular}{cc}
+      $x_1$ & $f(x_1)$ \\
+     \hline
+      $1$ & $0$ \\
+      $0$ & $0$
+    \end{tabular}
+  }%
+  \caption{Unary $f$ and its four possible cases}
+  \label{tab:unary-f}
+\end{table}
+
+Boolean functions have an important property which is described
 in the following definition:
 
 \index{Satisfiability}
@@ -98,11 +175,8 @@ in the following definition:
   A Boolean function $f$ is \emph{satisfiable} iff there exists at least one
   input $x \in X$ such that $f(x) = 1$.
   Every input $x \in X$ satisfying this property is called \emph{model}.
-  Every element of $X$ is called \emph{assignment}.
 \end{defi}
 
-The generic complexity of SAT determination is given by $2^n$ for $n$ Boolean variables.
-%This is closely related to the \cP $\overset{?}{\neq}$ \cNP question.
 The corresponding tool to determine satisfiability is defined as follows:
 
 \index{SAT solver}
@@ -110,6 +184,26 @@ The corresponding tool to determine satisfiability is defined as follows:
   A \emph{SAT solver} is a tool to determine satisfiability of a Boolean function.
   If satisfiability is given, it returns some model.
 \end{defi}
+
+\subsection{Computational considerations}
+\label{label:sat-complexity}
+%
+The generic complexity of SAT determination is given by $2^n$ for $n$ Boolean variables.
+
+Let $n$ be the number of variables of a Boolean function.
+No known algorithm exists to determine satisfiability in polynomial runtime.
+This means no algorithm solves the SAT problem with runtime behavior
+which depends polynomially on the growth of $n$.
+
+This is known as the famous \cP $\overset{?}{\neq}$ \cNP question.
+
+\index{Unit propagation}
+However, SAT solver can take advantage of the problem's description.
+For example consider function $f(x_0, x_1, x_2) = x_0 \land (\neg x_1 \lor x_2)$.
+Instead of trying all possible 8~cases for 3~Boolean variables,
+we can immediately see that $x_0$ is required to be $1$.
+So we don't need to test $x_0 = 0$ and can skip 4~cases.
+This particular strategy is called \emph{unit propagation}.
 
 SAT research is heavily concerned with finding good heuristics to find some model
 for a given SAT problem as fast as possible. Biyearly
