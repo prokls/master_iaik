@@ -1,18 +1,31 @@
 \chapter{SAT features}
 \label{ch:sat-features}
 
+At the very beginning I was very intrigued with the question
+\enquote{What is an \enquote{average} SAT problem?}. Answers to this
+question can help to optimize SAT solver memory layouts.
+Specifically for this thesis I wanted to find out whether
+our problems distinguish from \enquote{average} problems in any
+way such that we can use this distinction for runtime optimization.
+
+I came up with 8 questions related to basic properties of SAT problems
+we will discuss in depth in this section:
+\begin{enumerate}
+\item Given an arbitrary literal. What is the percentage it is positive?
+\item What is the variables / clauses ratio?
+\item How many iterals occur only either positive or negative?
+\item What is the average and longest clause length among CNF benchmarks?
+\item How many Horn clauses exist in a CNF?
+\item Are there any tautological clauses?
+\item Are there any CNF files with more than one connected variable component?
+\item How many variables of a CNF are covered by unit clauses?
+\end{enumerate}
+
+We will now define the terms used in those questions.
 
 \section{SAT features and CNF analysis}
 \label{sec:sat-features}
 %
-At the very beginning I was very intrigued with the question
-\enquote{What is an \enquote{average} SAT problem?}. Answers to this
-question can help to optimize SAT solver memory layouts.
-But originally I was wondering whether our differential cryptanalysis
-SAT problems distinguish from \enquote{average} SAT problems in some
-very basic properties. \\
-First of all, we need to elaborate on the question itself.
-
 \index{SAT feature}
 \index{Feature value}
 \begin{defi}[SAT feature]
