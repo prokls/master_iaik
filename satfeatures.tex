@@ -1,7 +1,7 @@
 \chapter{SAT features}
-\label{ch:sat-features}
-
-At the very beginning I was very intrigued with the question
+\label{ch:features}
+%
+At the very beginning I was very intrigued by the question
 \enquote{What is an \enquote{average} SAT problem?}. Answers to this
 question can help to optimize SAT solver memory layouts.
 Specifically for this thesis I wanted to find out whether
@@ -13,7 +13,7 @@ we will discuss in depth in this section:
 \begin{enumerate}
 \item Given an arbitrary literal. What is the percentage it is positive?
 \item What is the variables / clauses ratio?
-\item How many iterals occur only either positive or negative?
+\item How many literals occur only either positive or negative?
 \item What is the average and longest clause length among CNF benchmarks?
 \item How many Horn clauses exist in a CNF?
 \item Are there any tautological clauses?
@@ -24,49 +24,57 @@ we will discuss in depth in this section:
 We will now define the terms used in those questions.
 
 \section{SAT features and CNF analysis}
-\label{sec:sat-features}
+\label{sec:features-analysis}
 %
 \index{SAT feature}
 \index{Feature value}
 \begin{defi}[SAT feature]
   A \emph{SAT feature} is a statistical value (named \emph{feature value})
-  retrievable from some given SAT problem in some well-defined encoding.
-
-  A SAT feature is called \emph{performance-driven} if the runtime of any
-  computation contributes to the feature value.
+  retrievable from some given SAT problem.
 \end{defi}
 
 The most basic example of a SAT feature is the number of variables and clauses
 of a given SAT problem. This SAT feature is stored in the CNF header of a SAT
 problem encoded in the DIMACS format.
 
-It should be computationally easy to evaluate SAT features of a given SAT problem.
 The general goal is to write a tool which evaluates several SAT features at the same
-time and retrieve them for comparison with other problems. A SAT feature
-is expected to be computable in linear time and memory with the number of variables
-and number of clauses. But a suggested limit is only given with polynomial complexity
-for evaluation algorithms. Sticking to this convention implies that evaluation
-of satisfiability must not be necessary to evaluate a SAT feature under the
-assumption that \cPneqNP. Hence the number of valid models cannot be a SAT feature
-as far as satisfiability needs to be determined. But no actual hard boundary for
-runtime requirements is given. Previous work has shown that expensive algorithms
-can provide useful data in a small time frame if they are limited to a constant
-subproblem size.
+time and retrieve them for comparison with other problems. Therefore it should be
+computationally easy to evaluate SAT features of a given SAT problem. A suggested
+computational limit is given with polynomial complexity in terms of number of
+variables and number of clauses for memory as well as runtime for evaluation algorithms.
+Sticking to this convention implies that evaluation of satisfiability must not be
+necessary to evaluate a SAT feature under the assumption that \cPneqNP. Hence the
+number of valid models cannot be a SAT feature as far as satisfiability needs to
+be determined. But no actual hard computational limit is defined.
 
+\section{Related work}
+\label{sec:features-related}
+%
 The most similar resource I found looking at SAT features was the
 SATzilla project~\cite{satzilla2004,satzilla2008} in 2012. The authors systematically defined
 138 SAT~features categorized in 12 groups. The features themselves are not
 defined formally, but an implementation is provided bundled with example data.
+The following list provides an excerpt of the features:
 
-\begin{table}[!h]
-  \begin{center}
-    \begin{tabular}{rl}
-      \small{POSNEG\_RATIO\_CLAUSE\_mean} & ratio of positive to negative clauses, mean
-    \end{tabular}
-    \caption{SAT features defined by SATzilla}
-    \label{tab:satzilla-features}
-  \end{center}
-\end{table}
+\begin{description}
+\item[\satfeature{nvarsOrig}] number of variables defined in the CNF header
+\item[\satfeature{nvars}] number of active variables
+\item[\satfeature{reducedVars}] \satfeature{nvarsOrig} - \satfeature{nvars}, divided by \satfeature{nvars}
+\item[\satfeature{vars-clauses-ratio}] nvars divided by number of active clauses
+\item[\satfeature{POSNEG-RATIO-CLAUSE-mean}] mean of $2 \cdot \left\| 0.5 - {\text{pos}_c}/{\text{length}_c}\right\|$ where $\text{pos}_c$ is the number of positive literals of clause $c$ and $\text{length}_c$ clause length of $c$
+\item[\satfeature{POSNEG-RATIO-CLAUSE-entropy}] like \satfeature{POSNEG-RATIO-CLAUSE-mean} but entropy
+\item[\satfeature{TRINARY+}] number of clauses with clause length 1, 2 or 3 divided by number of active clauses
+\item[\satfeature{HORNY-VAR-min}] minimum number of times a variable occurs in a horn clause
+\item[\satfeature{cluster-coeff-mean}]
+   let neighbors of a clause be all clauses containing any literal negated
+   and let clauses $c_1$ and $c_2$ be conflicting if $c_1$ contains literal $l$ and $c_2$ contains $-l$,
+   then return the mean of $2$ times the number of conflicting neighbors of a clause $c$
+   divided by the number of unordered pairs of neighbors,
+   returned iff computable within 20 seconds for all clauses
+\end{description}
+
+Please recognize that active clauses are the unsatisfied clauses after BCP has been applied.
+Equivalently active variables are remaining variables after application of BCP.
 
 Many SAT solvers collect feature values to improve algorithm selection,
 restart strategies and estimate problem sizes. Recent trends to apply Machine
@@ -74,27 +82,131 @@ Learning to SAT solving imply feature evaluation. SAT features and the resulting
 satisfiability runtime are used as training data for Machine Learning. One example
 using SAT features for algorithm selection is ASlib~\cite{aslib}.
 
-However, most of these SAT features are performance-driven.
-Examples for performance-driven SAT features include the number of
-restarts within a certain time frame or evaluation of local minima.
+Previous work has shown that expensive algorithms can provide useful data in a
+small time frame if they are limited to a constant subproblem size.
+
+\section{Statistical features}
+\label{sec:features-stats}
+%
+For our SAT~features we need to define some basic statistical terminology.
+Let $x_1, x_2, \ldots, x_n$ be a finite sequence of numbers ($n \in \mathbb N$).
+\begin{description}
+  \item[Arithmetic mean] (or short: mean)
+    is defined as
+    \[ \overline{x} = \frac1n \sum_{i=1}^n x_i \]
+  \item[Standard deviation] (or short: sd)
+    with mean $\overline{x}$ is defined as
+    \[ \sigma(x) = \sqrt{\frac1n \sum_{i=1}^n (x_i - \overline{x})} \]
+  \item[Median]
+    with $x_1 \leq x_2 \leq \ldots \leq x_n$
+    (i.e. sorted ascendingly) is defined as
+    \[
+       m = \begin{cases}
+         x_{\lceil \text{mid}\rceil} & \text{if } n \text{ odd} \\
+         \frac{x_{\text{mid}} + x_{\text{mid} + 1}}{2} & \text{if } n \text{ even}
+       \end{cases}
+       \quad\text{ with } \text{mid} = \frac{n}{2}
+    \]
+    and often considered more \enquote{robust} than the arithmetic mean.
+  \item[Entropy]
+    is defined according to Claude Shannon's information theory:
+    \[ H(x) = -\sum_{i=1}^n x_i \cdot \log_2(x_i) \]
+    where $0 \cdot \log_2(0) \coloneqq 0$.
+\end{description}
+
+Furthermore \emph{count} refers to the number of elements $n$,
+\emph{largest} refers to the maximum element $\max_{1 \leq i \leq n}(x_i)$
+and \emph{smallest} refers to the minimum element $\min_{1 \leq i \leq n}(x_i)$.
+
+\section{Suggested SAT features}
+\label{sec:features-suggested}
+%
+We wrote a tool called cnf-analysis. The evaluated features are partially inspired
+by SATzilla and lingeling. The latter prints basic statistics for every CNF it
+evaluates.
+
+A summary of our suggested SAT features is given:
+
+\begin{description}
+\item[\satfeature{clause\_variables\_sd\_mean}] \hfill{} \\
+  mean of sd of variables in a clause
+\item[\satfeature{clauses\_length\_(largest, smallest, mean, median, sd)}] \hfill{} \\
+  statistics related to the clause length
+\item[\satfeature{connected\_(literal, variable)\_components\_count}] \hfill{} \\
+  two literals (variables) are connected if they occur in some clause together,
+  count the number of connected components
+\item[\satfeature{definite\_clauses\_count}] \hfill{} \\
+  number of definite clauses in the CNF
+\item[\satfeature{existential\_literals\_count}] \hfill{} \\
+  number of existential literals in the CNF
+\item[\satfeature{existential\_positive\_literals\_count}] \hfill{} \\
+  number of positive, existential literals in the CNF
+\item[\satfeature{(false, true)\_trivial}] \hfill{} \\
+  is the CNF satisfied if all variables are claimed to be false (true)?
+\item[\satfeature{goal\_clauses\_count}] \hfill{} \\
+  number of goal clauses in the CNF
+\item[\satfeature{literals\_count}] \hfill{} \\
+  number of literals in the CNF (i.e. sum of clause lengths)
+\item[\satfeature{literals\_frequency\_$k$\_to\_$k+5$}] \hfill{} \\
+  let $n_l$ be the literal frequency of literal $l$,
+  count the number of $n_l$ satisfying $\frac{k}{100} \leq n_l < \frac{k+5}{100}$
+  where $k$ is a variable in $\{0,5,10,\ldots,90,95\}$ and $k=95$ counts
+  $\frac{k}{100} \leq n_l \leq \frac{k+5}{100}$.
+\item[\satfeature{literals\_frequency\_(largest, smallest, mean, median, sd)\_entropy}] \hfill{} \\
+  statistics related to literal frequencies
+\item[\satfeature{literals\_occurence\_one\_count}] \hfill{} \\
+  number of literals with occurence $1$
+\item[\satfeature{nbclauses}, \satfeature{nbvars}] \hfill{}
+  number of clauses (variables) as defined in the CNF header
+\item[\satfeature{negative\_literals\_in\_clause\_(smallest, largest, mean)}] \hfill{} \\
+  statistics related to number of negative literals in clauses
+\item[\satfeature{(positive, negative)\_unit\_clause\_count}] \hfill{} \\
+  number of unit clauses with a positive (negative) literal
+\item[\satfeature{positive\_literals\_count}] \hfill{} \\
+  number of positive literals in CNF
+\item[\satfeature{positive\_literals\_in\_clause\_(largest, smallest, mean, median, sd)}] \hfill{} \\
+  statistics related to number of positive literals in clauses
+\item[\satfeature{positive\_negative\_literals\_in\_clause\_ratio\_(mean, entropy)}] \hfill{} \\
+  let $r_c$ be the number of positive literals divided by clause length of clause $c$,
+  mean and related of all $r_c$
+\item[\satfeature{positive\_negative\_literals\_in\_clause\_ratio\_mean}] \hfill{} \\
+  mean of all $r_c$
+\item[\satfeature{tautological\_literals\_count}] \hfill{} \\
+  number of clauses which contain a tautological literal
+\item[\satfeature{two\_literals\_clause\_count}] \hfill{} \\
+  number of clauses with two literals
+\item[\satfeature{variables\_frequency\_$k$\_to\_$k+5$}] \hfill{} \\
+  same as \satfeature{literals\_frequency\_$k$\_to\_$k+5$} but for variables
+\item[\satfeature{variables\_frequency\_(largest, smallest, mean, median, sd, entropy)}] \hfill{} \\
+  same as \satfeature{literals\_frequency} but for variables
+\item[\satfeature{variables\_used\_count}] \hfill{} \\
+  number of variables with occurence greater 0
+\end{description}
 
 
-
-POSNEG-RATIO-CLAUSE-mean
 
 In the following section we want to evaluate SAT features and
 compare test cases.
 
-\section{SAT features in comparison}
+TODO: classify SAT features
+
+\section{CNF dataset}
+\label{sec:features-dataset}
+
+TODO: list data set explicitly
+
+TODO: Illustrate basic properties about those CNF files
+
+
+\section{The average SAT problem}
+\label{sec:features-average}
 
 \begin{prop}
   The set of public benchmarks in SAT competitions between 2008 and 2015
   represent average SAT problems
 \end{prop}
 
-Define a large set of SAT features.
-Present data.
-Categorize data.
+TODO: what is an average SAT problem?
 
 %\newcommand\satf{\begingroup\catcode`_=12\xxx}
 %\newcommand\xxx[1]{\texttt{#1}\endgroup}

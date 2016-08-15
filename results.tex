@@ -4,19 +4,56 @@
 \chapter{Results}
 \label{ch:results}
 %
+\section{SAT features results}
+\label{sec:results-features}
 
-\section{Benchmark results}
+TODO: do cryptoproblems distinguish from other problems?
+
+TODO: do our benchmark distinguish from other problems?
+
+TODO: answer the 8 questions posed previously
+
+\section{Attack results}
+\label{sec:results-attacks}
+
+TODO: is simplification worth it?
+
+TODO: discuss runtime and development
+
+Appendix~\ref{sec:sat-related} provide a more exhaustive list of runtimes retrieved.
 
 \section{Related work}
+\label{sec:results-related}
 
 \section{Conclusion}
 \label{sec:conclusion}
 
+TODO: we attacked MD4 and SHA2, but can see the problems with
 
+\section{Contributions}
+\label{sec:contributions}
+%
+To strengthen Reproducible Research, the source code and data resulting from this thesis is available online.
+It allows the reader to run the experiments again and verify our claims.
+At the following website, any results part of this project are collected:
 
+\begin{quote}
+  \url{http://lukas-prokop.at/proj/megosat/}
+\end{quote}
 
-%\section{The distinction between concurrency and parallelism}
-
-%\section{The characteristics of Go routines}
-
-%CSP, Hoare paper
+Several subprojects are part of this master thesis:
+\begin{description}
+\item[algotocnf]\hfill{} \\
+  A python library implementing the encoding described in chapter~\ref{ch:enc}. \\[4pt]
+  \textbf{Python3 library and program:} \url{https://github.com/prokls/algotocnf}
+\item[cnf-hash]\hfill{} \\
+  A standardized way to produce a unique hash for CNF files \\[4pt]
+  \textbf{Go implementation:} \url{https://github.com/prokls/cnf-hash-go} \\
+  \textbf{Python3 implementation:} \url{https://github.com/prokls/cnf-hash-py} \\
+  \textbf{Testsuite:} \url{https://github.com/prokls/cnf-hash-tests2}
+\item[cnf-analysis]\hfill{} \\
+  Evaluate SAT features for a given CNF file. \\[4pt]
+  \textbf{Go implementation:} \url{https://github.com/prokls/cnf-analysis-go} \\
+  \textbf{Python3 implementation:} \url{https://github.com/prokls/cnf-analysis-py} \\
+  \textbf{Testsuite:} \url{https://github.com/prokls/cnf-analysis-tests}
+\end{description}

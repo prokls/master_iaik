@@ -5,21 +5,14 @@
 \chapter{Differential cryptanalysis}
 \label{ch:dc}
 %
-In chapter~\ref{ch:hash-algos} we defined two hash functions. In this chapter
+In chapter~\ref{ch:hash} we defined two hash functions. In this chapter
 we consider such functions from a differential perspective. Differential
 considerations will turn out to yield successful collision attacks on hash
 functions. We introduce a notation to easily represent differential
 characteristics.
 
-\section{Preliminaries Redux}
-\label{sec:crypto-prelim}
-%
-TODO
-% TODO: what does differential mean?
-% TODO: what is a differential characteristic?
-
-\section{Cryptanalysis of Hash Functions}
-\label{sec:intro-cryptanalysis}
+\section{Motivation}
+\label{sec:dc-motivation}
 %
 In August 2004, Wang et al. published results at Crypto'04~\cite{wang2004} which revealed
 that MD4, MD5, HAVAL-128 and RIPEMD can be broken practically using differential cryptanalysis.
@@ -77,8 +70,8 @@ ideas to satisfiability approaches.
 \end{table}
 
 \newpage
-\section{Differential cryptanalysis}
-\label{sec:intro-diff-cryptanalysis}
+\section{Fundamentals}
+\label{sec:dc-fundamentals}
 %
 \index{Hash collision}
 \begin{defi}[Hash collision]
@@ -91,7 +84,7 @@ Differential cryptanalysis is based on the idea to consider two execution states
 of hash algorithms for slightly different input messages. We trace those difference
 to learn about the propagation of message differences.
 
-% TODO: explain pseudo collisions
+TODO: explain pseudo collisions
 
 Hash algorithms consume input values as blocks of bits.
 As far as the length of the input must not conform to the block size,
@@ -274,15 +267,18 @@ represented using \dnI{-}.
 \end{table}
 
 
-\section{Addition example}
+\section{A simple addition example}
+\label{sec:dc-example}
+%
 TODO:
 \begin{itemize}
   \item illustrate how differences propagate by an addition example illustrated in differential notation
-  \item reference to Magnus Daum's thesis
+  \item reference to Magnus Daum's thesis ($\neq$ signed bit diff desc)
 \end{itemize}
 
 \section{Differential path}
-
+\label{sec:dc-path}
+%
 TODO:
 \begin{itemize}
   \item refer to some testcase which shows a differential path with many unresolved differences.
