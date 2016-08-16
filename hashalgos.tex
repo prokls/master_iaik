@@ -100,16 +100,13 @@ Then also $(x_0 \,\|\, p, x_1 \,\|\, p)$ (where $\|$ denotes concatenation)
 represents a collision in single-piped Merkle-Damg\aa{}rd designs, because
 it holds that:
 \[ F_0(F_0(x_0), p) = F_0(F_0(x_1), p) \iff F_0(y, p) = F_0(y, p) \]
-%$x_0$ or $x_1$ already wiped
-%out differences and therefore yielded the same hash value.
-%A common suffix $p$ changes the hash value to the same value.
 Hence $(x_0 \,\|\, p, x_1 \,\|\, p)$ is a collision as well.
 As far as $F_0$ is applied recursively to every block, $p$ can be of arbitrary size
 and $(x_0, x_1)$ can be of arbitrary uniform size.
 
 Because of this vulnerability, cryptanalysts only need to find a collision
 in compression functions. In our tests will only consider input of one block
-and padding will be neglected.
+and padding will be neglected due to this vulnerability.
 
 \subsection{Example usage}
 \label{sec:hash-usage}
@@ -118,12 +115,9 @@ One example showing the use of hash functions as primitives are JSON Web Tokens 
 specified in RFC~7519~\cite{rfc7519}. Its application allows web developers to
 represent claims to be transferred between two parties.
 
-Section~8 defines implementation requirements
-and refers to RFC~7518~\cite{rfc7518}, which specifies cryptographic algorithms to
-be implemented. \enquote{HMAC SHA-256} (besides \enquote{none}) is the only signature
-and MAC algorithm required to be implemented.
-%
-Hence SHA-256 as hash algorithm is used as primitive in this configuration.
+Section~8 defines implementation requirements and refers to RFC~7518~\cite{rfc7518},
+which specifies cryptographic algorithms such as \enquote{HMAC SHA-256} to be
+implemented. It is (besides \enquote{none}) the only required signature and MAC algorithm.
 
 \section{MD4}
 \label{sec:dc-md4}
@@ -137,7 +131,7 @@ Followingly preimage and second-preimage resistance in MD4 have been broken as w
 Some of those attacks are described in~\cite{md4-2007} and \cite{cryptoeprint:2005:151}.
 We derived a Python~3 implementation based on a Python~2 implementation
 and made it available on github~\cite{md4-py3k}.
-%
+
 \begin{table}[h]
   \begin{center}
     \begin{tabular}{lcl}
@@ -155,9 +149,7 @@ MD4 uses three auxiliary Boolean functions:
 \begin{defi}
   The Boolean \boolf{IF} function is defined as follows:
   If the first argument is true, the second argument is returned.
-  %If the first argument is false,
-  Otherwise
-  the third argument is returned.
+  Otherwise the third argument is returned.
 
   The Boolean \boolf{MAJ} function returns true if the number
   of Boolean values true in arguments is at least $2$.
@@ -169,10 +161,11 @@ Using the logical operators $\land$ (AND), $\lor$ (OR) and $\neg$ (NEG)
 we can define them as (see section~\ref{sec:sat-intro} for a thorough
 discussion of these operators):
 \begin{align}
-  \IF(X,Y,Z) &= (X \land Y) \lor (\neg X \land Z) \\
-  \MAJ(X,Y,Z) &= (X \land Y) \lor (X \land Z) \lor (Y \land Z) \\
-  \XOR(X,Y,Z) &= (X \land \neg Y \land \neg Z) \lor (\neg X \land Y \land \neg Z) \nonumber\\
-              &\lor (\neg X \land \neg Y \land Z) \lor (X \land Y \land Z)
+  \IF(X,Y,Z) &\coloneqq (X \land Y) \lor (\neg X \land Z) \\
+  \MAJ(X,Y,Z) &\coloneqq (X \land Y) \lor (X \land Z) \lor (Y \land Z) \\
+  \XOR(X,Y,Z) &\coloneqq (X \land \neg Y \land \neg Z) \lor (\neg X \land Y \land \neg Z) \nonumber\\
+              &\lor (\neg X \land \neg Y \land Z) \lor (X \land Y \land Z) \nonumber\\
+              &\coloneqq (X \oplus Y \oplus Z)
 \end{align}
 
 
@@ -190,6 +183,7 @@ In the following a brief overview over MD4's design is given.
     The message is split into 512-bit blocks (i.e. 16 32-bit words).
     Four state variables $A_{i}$ with $-4 \leq i < 0$ are initialized with these
     hexadecimal values:
+    % remark: A_{-4} := A, A_{-1} := B, A_{-2} := C, A_{-3} := D on Wikipedia
     \[
       \mathtt{[A_{-4}]}\; \texttt{01234567} \quad
       \mathtt{[A_{-1}]}\; \texttt{89abcdef} \quad
@@ -197,38 +191,33 @@ In the following a brief overview over MD4's design is given.
       \mathtt{[A_{-3}]}\; \texttt{76543210}
     \]
   \item[Round function with state variable updates.]
-    % TODO simplify
-    We also need an auxiliary matrix $(i_{k,l})$ which stores indices.
-    Let $i_{k,l}$ be the value in the $k$-th row and $l$-th column of matrix $(i_{k,l})$.
-    Analogously $j_{k,l}$ is defined for matrix $(j_{k,l})$.
-    %
+    The round function is applied in three rounds with 16 iterations.
+    In every iteration values $A_{-1}$, $A_{-2}$ and $A_{-3}$ are taken
+    as arguments to function $F$. Function $F$ is \boolf{IF} in round~1,
+    followed by \boolf{MAJ} for round~2 and \boolf{XOR} for the final round~3.
+    The resulting value is added to $A_{-1}$, current message block $M$
+    and constant $X$. Finally the 32-bit sum will be left-rotated by $p$
+    positions. Left rotation is formally defined in Definition~\ref{def:shifts}.
+    The values of $X$ and $p$ are defined as follows:
+
+    Let $i$ be the iteration counter between $1$ and $16$ and
+    $r$ the round between $1$ and $3$. Then $X$ takes the value
+    of the $i$-th column and $r$-th row of matrix $C$.
+    $p$ takes the value of row $r$ and column $i \bmod{4}$ of matrix $P$.
+    
     \[
-      (i_{k,l}) = \left(\begin{array}{cccccccccccccccc}
+      C = \left(\begin{array}{cccccccccccccccc}
         0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 \\
         0 & 4 & 8 & 12 & 1 & 5 & 9 & 13 & 2 & 6 & 10 & 14 & 3 & 7 & 11 & 15 \\
         0 & 8 & 4 & 12 & 2 & 10 & 6 & 14 & 1 & 9 & 5 & 13 & 3 & 11 & 7 & 15
       \end{array}\right)
     \] \[
-      (j_{k,l}) = \begin{pmatrix}
+      P = \begin{pmatrix}
         3 & 7 & 9 & 11 \\
         3 & 5 & 9 & 13 \\
         3 & 9 & 11 & 15
       \end{pmatrix}
     \]
-    %
-    Then the round function is applied to this block in three rounds
-    with 16 iterations each. Let $1 \leq k \leq 3$ be the round counter
-    and $1 \leq l \leq 16$ be the iteration counter. For every round,
-    for every iteration apply the following function:
-
-    The values of state variable $A_{-1}$, $A_{-2}$ and $A_{-3}$ are taken as arguments
-    for function $F$ where $F$ is \boolf{IF} in the first 16 iterations,
-    \boolf{MAJ} in the following 16 iterations and finally \boolf{XOR}
-    in the last 16 iterations. This return value is added to the value of state
-    variable $A_{-4}$, the current message block $M$ and $X_{i_{k,l}}$.
-    This sum modulo $2^{32}$ is then left-rotated (see Definition~\ref{def:shifts}) by
-    $j_{k,l \bmod{4}}$ bits and stored in value $A_{-1}$. State variables $A_{-1}$, $A_{-2}$ and
-    $A_{-3}$ update variables $A_{-2}$, $A_{-3}$ and $A_{-4}$ respectively.
 
     This round function design is visualized in Figure~\ref{fig:md4-round-function}.
 \end{description}
@@ -236,7 +225,7 @@ In the following a brief overview over MD4's design is given.
 \begin{figure}[p]
   \begin{center}
     \includegraphics{img/md4.pdf}
-    \caption{MD4 round function updating state variables $A$, $B$, $C$ and $D$}
+    \caption{MD4 round function updating state variables}
     \label{fig:md4-round-function}
   \end{center}
 %\end{figure}
@@ -290,29 +279,18 @@ resistance for 46~rounds~\cite{high2011}.
   Consider a 32-bit word $X$ with 32 binary values $b_i$ with $0 \leq i \leq 31$.
   $b_0$ refers to the least significant bit. Shifting ($≪$ and $≫$) and
   rotation ($⋘$ and $⋙$) creates a new 32-bit word $Y$ with 32 binary values $a_i$.
-  %A \emph{left-shift} of $X$ by $n$ positions creates a new 32-bit word with values
-  %\[
-  %  b_{i} \coloneqq \begin{cases}
-  %    b_{i-n} & 0 \leq i-n < 32 \\
-  %    0       & \text{else}
-  %  \end{cases}
-  %\]
-  %A \emph{left-rotation} of $X$ by $n$ positions creates a new 32-bit word with values
-  %\[ b_i \coloneqq b_{i-n \bmod{32}} \]
-  %
   We define the following notations:
   \begin{align*}
     Y \coloneqq X ≪ n  &\iff a_i \coloneqq b_{i-n} \text{ if } 0 \leq i-n < 32 \text{ and } 0 \text{ otherwise } \\
     Y \coloneqq X ≫ n  &\iff a_i \coloneqq b_{i+n} \text{ if } 0 \leq i+n < 32 \text{ and } 0 \text{ otherwise } \\
-    Y \coloneqq X ⋘ n  &\iff a_i \coloneqq b_{i-n \bmod{32}} \\
+    Y \coloneqq X ⋘ n  &\iff a_i \coloneqq b_{i-n \bmod{32}} \text{ as used in MD4} \\
     Y \coloneqq X ⋙ n  &\iff a_i \coloneqq b_{i+n \bmod{32}}
   \end{align*}
-  Furthermore $X \oplus Y$ denotes \boolf{XOR} with arguments $X$ and $Y$.
 \end{defi}
 %
-Besides MD4's two auxiliary functions \boolf{MAJ} and \boolf{IF},
-another four auxiliary functions are defined. Be aware that $\oplus$ denotes
-the XOR functions whereas $\boxplus$ denotes addition modulo $2^{32}$.
+Besides MD4's \boolf{MAJ} and \boolf{IF},
+another four auxiliary functions are defined. Recognize that $\oplus$ denotes
+the XOR function whereas $\boxplus$ denotes 32-bit addition.
 \[
   \begin{array}{rcccccl}
     \Sigma_0(X) &\coloneqq& (X ⋙ 2) &\oplus& (X ⋙ 13) &\oplus& (X ⋙ 22) \\
@@ -323,12 +301,12 @@ the XOR functions whereas $\boxplus$ denotes addition modulo $2^{32}$.
 \]
 %
 \begin{description}
-  \item[Padding and length extension]
+  \item[Padding and length extension.]
     The padding and length extension scheme of MD4 is used also in SHA-256.
     Append bit $1$ and followed by a sequence of bit $0$ until the message reaches a length
     of 448 modulo 512 bits. Afterwards the first 64 bits of the binary representation
     of the original input are appended.
-  \item[Initialization]
+  \item[Initialization.]
     In a similar manner to MD4, initialization of internal state variables
     (called \enquote{working variables} in~\cite[Section~6.2.2]{fips-pub-180-4})
     takes place before running the round function. The eight state variables
@@ -363,11 +341,11 @@ the XOR functions whereas $\boxplus$ denotes addition modulo $2^{32}$.
         \texttt{90befffa} & \texttt{a4506ceb} & \texttt{bef9a3f7} & \texttt{c67178f2}
       \end{array}
     \]
-  \item[Precomputation of W]
+  \item[Precomputation of W.]
     Let $W_i$ for $0 \leq i < 16$ be the sixteen 32-bit words of the padded input message.
     Then compute $W_i$ for $16 \leq i < 64$ the following way:
     \[ W_i \coloneqq \sigT(W_{i-2}) + W_{i-7} + \sigO(W_{i-15}) + W_{i-16} \]
-  \item[Round function]
+  \item[Round function.]
     For every block of 512~bits, the round function is applied.
     The eight state variables are updated iteratively for $i$ from 0 to 63.
     \begin{align*}
@@ -375,7 +353,7 @@ the XOR functions whereas $\boxplus$ denotes addition modulo $2^{32}$.
       A_i     &\coloneqq E_i - A_{i-4} + \SigO(A_{i-1}) + \MAJ{(A_{i-1}, A_{i-2}, A_{i-3})}
     \end{align*}
     $W_i$ and $K_i$ refer to the previously initialized values.
-  \item[Computation of intermediate hash values]
+  \item[Computation of intermediate hash values.]
     Intermediate hash values for the Davies-Meyer construction are
     initialized with the following values:
     \[
@@ -394,7 +372,7 @@ the XOR functions whereas $\boxplus$ denotes addition modulo $2^{32}$.
         H_3^{(j)} \coloneqq A_{60} + H_3^{(i-1)}  & &  H_7^{(j)} \coloneqq E_{60} + H_7^{(i-1)}
       \end{array}
     \]
-  \item[Finalization]
+  \item[Finalization.]
     The final hash digest of size 256 bits is provided as
     \[
       H_0^{(N)} \concat

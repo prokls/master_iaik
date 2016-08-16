@@ -80,27 +80,49 @@ ideas to satisfiability approaches.
   $h(x_1) = h(x_2)$.
 \end{defi}
 
-Differential cryptanalysis is based on the idea to consider two execution states
-of hash algorithms for slightly different input messages. We trace those difference
-to learn about the propagation of message differences.
-
-TODO: explain pseudo collisions
+\index{Pseudo collision}
+Pseudo-collisions are also often considered when attacking hash functions.
+A \emph{pseudo collision} is given if a hash collision can be found for a given
+hash function, but the initial vectors (IV) can be chosen arbitrarily.
 
 Hash algorithms consume input values as blocks of bits.
 As far as the length of the input must not conform to the block size,
 padding is applied. Now consider such a block of input values
 and another copy of it. We use those two blocks as inputs for two
 hash algorithm implementations, but provide slight modifications in few bits.
-MD4 has 48 round function applications in 3 rounds.
-Differential cryptanalysis considers the difference in the evaluation
-state between the two instances (compare with Figure~\ref{tab:collision-attack}).
+Differential cryptanalysis is based on the idea to consider those execution states
+and tracing those difference to learn about the propagation of message differences.
+Compare this setup with Figure~\ref{tab:collision-attack}.
 
-Visualizing those differences helps the cryptanalyst to find modifications yielding
-a small number of differences in the evaluation state.
+\index{Avalanche effect}
+At the very beginning only the few defined differences are given. But as the
+hash algorithm progresses in computation, differences are propagated to more
+and more bits. Most likely the final value will differ in many bits, because
+of a desirable hash algorithm property called \emph{Avalanche effect}.
+A small difference in the input should lead to a visually recognizable
+difference in the output.
+
+Visualizing those differences helps the cryptanalyst to find modifications
+yielding a small number of differences in the evaluation state. The propagation
+of differences in a particular hash algorithm is called \emph{differential
+path}. Empirical results in differential cryptanalysis indicate that spare
+paths are desirable, because it is easier to cancel out few differences in the
+output compared to many differences.
 The cryptanalyst consecutively modifies the input values to eventually
 receive a collision in the output value.
-If the number of differences in the evaluation state is small,
-this trail is expected to result in a hash collision with higher probability.
+
+\begin{theorem}
+  Assuming the number of differences in a differential path is small,
+  this path is expected to result in a hash collision with higher probability.
+\end{theorem}
+
+\index{Differential path}
+\index{Differential characteristic}
+\begin{defi}
+  The propagation of differences in a particular function is called
+  \emph{differential path}. The complete differential state during
+  a computation is called \emph{differential characteristic}.
+\end{defi}
 
 \begin{figure}[pbt]
   \begin{center}
@@ -134,8 +156,7 @@ Consider two hash algorithm implementations. Let $x_i$ be some bit
 from the first implementation and let $x_i^*$ be the corresponding bit
 from the second implementation. Differences are computed using a \boolf{XOR}
 and commonly denoted as $\Delta x = x_i \oplus x_i^*$.
-Bit conditions allow us to encode possible
-relations between bits $x_i$ and $x_i^*$.
+Bit conditions allow us to encode possible relations between bits $x_i$ and $x_i^*$.
 
 For example, let us take a look at the original Wang et al. hash collision
 in MD4 provided in Table~\ref{tab:wang-md4-collision1}.
@@ -154,7 +175,7 @@ Applying this notation to hash collisions means that arbitrary bit conditions
 intermediate iterations, we enforce a difference using one of the bit conditions
 $\set{u,n,x}$. This excludes trivial solutions with no differences from the set of
 possible solutions. And the final values need to lack differences thus are
-represented using \dnI{-}.
+represented using a dash \dnI{-}.
 
 \begin{table}[bt]
   \begin{center}
@@ -178,7 +199,8 @@ represented using \dnI{-}.
     \end{tabular}
     \caption[Bit differences in the original Wang et al. hash collision]{
       The three words different between Message~1 and Message~2 of the original
-      MD4 hash collision. The last three lines show how differences can be
+      MD4 hash collision by Wang et al. The last three lines show
+      how differences can be
       written down using bit conditions. As far as 4 symbols are not from the
       set $\set{0, 1}$ it holds that the messages differ by 4~bits.
     }
@@ -186,7 +208,7 @@ represented using \dnI{-}.
   \end{center}
 \end{table}
 
-\begin{table}[b]
+\begin{table}[p]
   \small
   \begin{center}
     \begin{tabular}{|c|cccc|}
@@ -227,7 +249,7 @@ represented using \dnI{-}.
   \end{center}
 \end{table}
 
-\begin{table}[b]
+\begin{table}[p]
   \begin{center}
     \begin{tabular}{cp{5cm}cl}
       $\Delta x$      & conjunctive normal form &
@@ -270,6 +292,26 @@ represented using \dnI{-}.
 \section{A simple addition example}
 \label{sec:dc-example}
 %
+Using this notation, we can now reason about the behavior of functions on differential values.
+We start with 1-bit addition as most basic exercise to the reader. Consider a matrix with
+two input rows and one output row. The values of the first two lines are added to 
+
+\begin{table}[p]
+  \begin{center}
+    \begin{minipage}{20pt}\begin{tabular}{c} \dnI{-} \\ \dnI{-} \\ \hline \dnI{-} \end{tabular}\end{minipage}
+    \hspace{20pt}$\Rightarrow$\hspace{20pt}
+    \begin{minipage}{20pt}\begin{tabular}{c} \dnI{0}\dnI{0} \\ \dnI{0}\dnI{0} \\ \hline \dnI{0}\dnI{0} \end{tabular}\end{minipage}
+    \begin{minipage}{20pt}\begin{tabular}{c} \dnI{0}\dnI{0} \\ \dnI{1}\dnI{1} \\ \hline \dnI{1}\dnI{1} \end{tabular}\end{minipage}
+    \begin{minipage}{20pt}\begin{tabular}{c} \dnI{1}\dnI{1} \\ \dnI{0}\dnI{0} \\ \hline \dnI{1}\dnI{1} \end{tabular}\end{minipage}
+    \begin{minipage}{20pt}\begin{tabular}{c} \dnI{1}\dnI{1} \\ \dnI{1}\dnI{1} \\ \hline \dnI{0}\dnI{0} \end{tabular}\end{minipage}
+    \caption{
+      A simple 1-bit addition example:
+      On the left the differential characteristic is given
+    }
+  \end{center}
+\end{table}
+
+
 TODO:
 \begin{itemize}
   \item illustrate how differences propagate by an addition example illustrated in differential notation
