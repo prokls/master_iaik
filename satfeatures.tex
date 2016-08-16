@@ -52,19 +52,19 @@ be determined. But no actual hard computational limit is defined.
 %
 The most similar resource I found looking at SAT features was the
 SATzilla project~\cite{satzilla2004,satzilla2008} in 2012. The authors systematically defined
-138 SAT~features categorized in 12 groups. The features themselves are not
-defined formally, but an implementation is provided bundled with example data.
-The following list provides an excerpt of the features:
+138 SAT~features categorized in 12 groups. Some features are only evaluated conditionally.
+The features themselves are not defined formally, but an implementation is provided bundled
+with example data. The following list provides an excerpt of the features:
 
 \begin{description}
 \item[\satfeature{nvarsOrig}] number of variables defined in the CNF header
 \item[\satfeature{nvars}] number of active variables
 \item[\satfeature{reducedVars}] \satfeature{nvarsOrig} - \satfeature{nvars}, divided by \satfeature{nvars}
 \item[\satfeature{vars-clauses-ratio}] nvars divided by number of active clauses
-\item[\satfeature{POSNEG-RATIO-CLAUSE-mean}] mean of $2 \cdot \left\| 0.5 - {\text{pos}_c}/{\text{length}_c}\right\|$ where $\text{pos}_c$ is the number of positive literals of clause $c$ and $\text{length}_c$ clause length of $c$
+\item[\satfeature{POSNEG-RATIO-CLAUSE-mean}] mean of $2 \cdot \left\| 0.5 - {\text{pos}}/{\text{length}}\right\|$ where $\text{pos}$ is the number of positive literals and $\text{length}$ clause length of a specific clause
 \item[\satfeature{POSNEG-RATIO-CLAUSE-entropy}] like \satfeature{POSNEG-RATIO-CLAUSE-mean} but entropy
 \item[\satfeature{TRINARY+}] number of clauses with clause length 1, 2 or 3 divided by number of active clauses
-\item[\satfeature{HORNY-VAR-min}] minimum number of times a variable occurs in a horn clause
+\item[\satfeature{HORNY-VAR-min}] minimum number of times a variable occurs in a Horn clause
 \item[\satfeature{cluster-coeff-mean}]
    let neighbors of a clause be all clauses containing any literal negated
    and let clauses $c_1$ and $c_2$ be conflicting if $c_1$ contains literal $l$ and $c_2$ contains $-l$,
@@ -81,9 +81,6 @@ restart strategies and estimate problem sizes. Recent trends to apply Machine
 Learning to SAT solving imply feature evaluation. SAT features and the resulting
 satisfiability runtime are used as training data for Machine Learning. One example
 using SAT features for algorithm selection is ASlib~\cite{aslib}.
-
-Previous work has shown that expensive algorithms can provide useful data in a
-small time frame if they are limited to a constant subproblem size.
 
 \section{Statistical features}
 \label{sec:features-stats}
@@ -183,79 +180,85 @@ A summary of our suggested SAT features is given:
   number of variables with occurence greater 0
 \end{description}
 
+\section{Evaluation efficiency}
+\label{sec:features-efficiency}
+%
+The resource requirements of those features have been classified:
+\begin{description}
+  \item[Type 1] read the files as bytes, a DIMACS parser is not necessary, constant memory is used
+  \item[Type 2] features understand what a clause is, but still need constant memory
+  \item[Type 3] subquadratic runtime and linear memory
+  \item[Type 4] unrestricted
+\end{description}
+%
+Memory and runtime is always considered in comparison with the filesize.
 
+This classification should support future considerations regarding feature evaluation tools.
+The suggested SAT features above have been explicitly selected to avoid Type 4 implementations to limit the time to compute features.
+The Python implementation triggered MemoryErrors on a computer with 4~GB RAM for a 770~MB CNF file.
+Followingly a much more efficient Go implementation was implemented which requires much less memory and is much faster.
+\texttt{bench\_573.smt2.cnf} took 1 second in Go instead of 2 minutes in Python.
+However, the data evaluated is less accurate compared to Python, because Python unlike Go provide nice implementation of statistical tools in the standard library.
 
 In the following section we want to evaluate SAT features and
 compare test cases.
 
-TODO: classify SAT features
-
 \section{CNF dataset}
 \label{sec:features-dataset}
+%
+To evaluate CNF features of a representative set of CNF files, it was necessary to identify equivalent CNF files in the best possible way.
+Therefore I defined a hashing algorithm standardizing the CNF input provided to a SHA1 instance. Every CNF file is identifiable by its
+\enquote{cnfhash 2.0.0} hash value.
 
-TODO: to retrieve a unique set of CNF files, it was necessary to devise a hash algorithm
+In the next step a complete set of CNF files of previous SAT competitions was collected.
+The following CNF file collections have been considered:
 
-TODO: list data set explicitly
+\begin{itemize}
+  \item SAT Race 2008
+  \item SAT09 Competition
+  \item SAT-Race 2010
+  \item SAT11 Competition
+  \item SAT Challenge 2012
+  \item SAT Competition 2013
+  \item SAT Competition 2014
+  \item SAT-Race 2015
+  \item SAT Competition 2016
+  \item SATlib
+\end{itemize}
+The benchmarks are mostly contributed by the participants of the associated conferences.
+Others are reused from previous years. Individual projects allow to generate CNF files
+for specific problems in a selectable problem size; such as 
 
-TODO: Illustrate basic properties about those CNF files
-
+Some files turned out to be problematic. In SATlib, 3 gzipped files couldn't be decompressed and several files
+contain empty clauses. Empty clauses are assumed to immediately falsify the CNF and are therefore pointless.
+I removed trailing zeros in CNFs. Variants of the DIMACS standard also expect lines with a percent symbol to
+terminate the CNF. Besides those minor issues documented as part of the cnf-analysis project,
+many gigabytes of CNF files have been evaluated.
 
 \section{The average SAT problem}
 \label{sec:features-average}
-
+%
 \begin{prop}
   The set of public benchmarks in SAT competitions between 2008 and 2015
   represent average SAT problems
 \end{prop}
 
-TODO: what is an average SAT problem?
+It is important to point out that public benchmark files are specifically chosen
+to be evaluated before a conference is held. Hence they are expected to terminate
+within a given time frame and are therefore not oversized. On the one hand this
+ensures that the problems are actually solvable, however they might not be a
+representative selection. At this point no better data set is available and therefore
+we proceeded with this dataset.
 
-%\newcommand\satf{\begingroup\catcode`_=12\xxx}
-%\newcommand\xxx[1]{\texttt{#1}\endgroup}
-\newcommand{\satf}{\begingroup \catcode`_=12 \dosatf}
-\newcommand{\dosatf}[1]{\texttt{#1}\endgroup}
-\newcommand\sath[1]{\hline \multicolumn{2}{|c|}{#1} \\ \hline}
-\begin{table}[!ht]
-  \begin{tabular}{rl}
-    \sath{Given a set of clauses, return a subset of clauses satisfying given criterion}
-    \satf{clauses_allLitsNeg}     & all literals are negative \\
-    \satf{clauses_oneLitNeg}      & exactly one literal is negative \\
-    \satf{clauses_geqOneLitNeg}   & more than one literal is negative \\
-    \satf{clauses_allLitsPos}     & all literals are positive \\
-    \satf{clauses_oneLitPos}      & exactly one literal is positive \\
-    \satf{clauses_geqOneLitPos}   & more than one literal is positive \\
-    \satf{clauses_length1}        & clause contains exactly one literal (\enquote{unit clause}) \\
-    \satf{clauses_length2}        & clause contains exactly two literals \\
-    \satf{clauses_unique}         & clause did not yet occur \\
-    \satf{clauses_tautological}   & clause contains some literal and its negation \\
-    \sath{Given a set of literals/variables, return Boolean property}
-    \satf{literals_existential}   & literal does not occur negated \\
-    \satf{literals_unit}          & literal occurs in clause of length 1 \\
-    \satf{literals_contradiction} & literal occurs with its negation on one clause \\
-    \satf{literals_1occ}          & literal occurs only in one clause once \\
-    \satf{literals_2occs}         & literal occurs two times in clauses \\
-    \satf{literals_3occs}         & literal occurs three times in clauses \\
-    \satf{variables_unit}         & variable occurs in clause of length 1 \\
-    \sath{Given a set of clauses, return real number based on this clause}
-    \satf{clauses_mapLength}      & number of literals in clause \\
-    \satf{clauses_mapRatioPosNeg} & number of positive literals divided by total number of literal \\
-    \satf{clauses_mapNumPos}      & number of positive literals in clause \\
-    \sath{Given one clause, return Boolean property}
-    \satf{clauselits_someEx}      & any is literal existential \\
-    \satf{clauselits_allEx}       & all literals are existential \\
-    \satf{clauselits_someUnit}    & contains unit variable \\
-    \satf{clauselits_someContra}  & contains contradiction variable \\
-    \satf{clauselits_all1occ}     & all variables occur only once in all clauses \\
-    \satf{clauselits_all12occ}    & all variables occur only once or twice in all clauses \\
-    \sath{Given all clauses, return the following property} \\
-    \satf{concomp_variable}       & number of connected components where \\
-                                  & two variables are in the same component \\
-                                  & iff they occur in at least one clause together \\
-    \satf{concomp_literal}        & number of connected components where \\
-                                  & two literals are in the same component \\
-                                  & iff they occur in at least one clause together \\
-    \satf{xor2_count}             & Number of clause pairs ($a \lor b$, $\neg a \lor b$) \\
-                                  & for two variables $a$ and $b$ \\
-  \end{tabular}
-\end{table}
-
+According to my results, an average SAT problem consists of:
+\begin{itemize}
+  \item 83650 clauses in average ranging from 21 to 53616734
+  \item The longest clause we found had 61473~literals, but the longest clause of CNFs typically covers 17 literals.
+  \item The average length of a clause is expected to be 3.
+  \item In average a CNF file has 67 connected variable components.
+  \item In average 31315 clauses are definite clauses and 29995 clauses are goal clauses.
+  \item In average a literal occurs in 1.3~\% of the clauses of the CNF.
+  \item 48~\% of literals in a clause are positive.
+  \item The arithmetic mean tells 137 unit clauses per CNF file can be expected, but the median tells it is mostly 0.
+  \item The largest variable found was 13842706 and 13829558~variables were used at most.
+\end{itemize}

@@ -420,9 +420,10 @@ related to this structure:
 \subsection{Boolean constraint propagation (BCP)}
 \label{sec:sat-bcp}
 %
-One of the most basic techniques to SAT solving is boolean constraint propagation.
+One of the most basic techniques to SAT solving is \emph{Boolean Constraint Propagation},
+also called \emph{unit propagation}.
 It is so fundamental that SATzilla, introduced in section~\ref{sec:features-related},
-applies it even when looking at SAT features.
+applies it immediately before looking at SAT features.
 
 Let $l$ be the literal of a unit clause in a CNF. Remove any clause containing
 $l$ and replace any occurences of $-l$ from the CNF. It is easy to see, that
@@ -438,13 +439,68 @@ Watched Literals are another fundamental concept in SAT solving. It is very
 expensive to check satisfiability of all clauses for every value of a literal.
 Watched Literals is a neat technique to reduce the number of checks.
 
-TODO: finish
+Consider the solver assigns a value for literal $l$. Instead of looking at
+all clauses and testing whether the clause is falsified by $l$, only clauses
+containing $l$ are checked if $l$ is one of the watched literals of the clause.
+This empirical approach was established with the Chaff and zChaff SAT solvers
+and has proven useful in various variants.
 
+\subsection{Remark}
+\label{sec:sat-remark}
+%
+The previous two techniques shall illustrate basic approaches, but actual SAT
+solving research requires decades of development to tune individual SAT solvers.
+Memory models and concurrency strategies lead to fundamentally different runtime
+behaviours of SAT solvers.
+
+As such an initial idea to initiate an individual SAT solver specifically designed for
+solving problems in differential cryptanalysis was dropped, because development time
+is expected too long for a master thesis to be fruitful. As such we focused on popular
+and established SAT solvers of the SAT community.
 
 \section{SAT solvers in use}
 \label{sec:sat-solvers}
 %
 \index{lingeling}
-TODO: discuss minisat, treengeling, lingeling, plingeling, cmsat 4.5, cmsat 5, glucose syrup static, glucose static, lingeling ats1o1, ats1o2, ats1o4
+In this thesis we consider the several SAT solvers.
+They have been selected either by their popularity
+or their good results at previous SAT competitions:
+\begin{itemize}
+  \item MiniSat 2.2.0
+  \item treengeling, lingeling and plingeling, in versions:
+    \begin{itemize}
+      \item lingeling ats1
+      \item lingeling ats1o1
+      \item lingeling ats1o2
+      \item lingeling ats1o4
+      \item lingeling baz
+    \end{itemize}
+  \item CryptoMiniSat 4.5
+  \item CryptoMiniSat 5
+  \item glucose syrup
+\end{itemize}
 
-TODO: discuss how Armin modified lingeling
+Specifically this means the hash collision attacks we looked have run with
+these SAT solvers. The results are discussed in section~\ref{ch:results}
+and provided in Appendix~\ref{app:runtimes}.
+
+lingeling ats1o1, ats1o2 and ats1o4 are non-public releases of lingeling.
+They have been developed in private communication with Armin Biere.
+Our main goal was to achieve a separation between two sets of variables.
+First all variables of the first need to be assigned in the best possible
+way. Afterwards the second set of variables is considered.
+Specifically variables modelling the differences between the two hash
+algorithm instances should constitute the first set.
+
+ats1o1 implements that difference variables are guessed with false first and
+usual heuristics apply for all other variables.
+Our intermediate results with incomplete CNF files showed a high number of restarts.
+Therefore ats1o2 disables backjumping and therefore skips decisions for important variables.
+Finally ats1o4 is not expected to distinguish from ats1o2. It only provides further debugging information.
+
+The SAT solvers have generally been run without any special options, except for
+\begin{itemize}
+  \item MiniSat was run with \texttt{\textendash{}\textendash{}pre=once} as it is generally recommended to run with the builtin preprocessor.
+  \item Lingeling has been generally run with \texttt{\textendash{}\textendash{}phase=-1} to prefer false as initial assignment to literals.
+    However, lingeling ats1o1 implements this with more forceful strategy.
+\end{itemize}
