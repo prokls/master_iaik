@@ -11,26 +11,111 @@ subjects and describe how we designed an attack setting.
 
 \section{STP approach}
 \label{sec:enc-stp}
+%
+Our first approach started with STP~\cite{stp} initially written by Vijay Ganesh and David L. Dill.
+It is currently maintained by Mate Soos.
 
+First we wrote an implementation using the CVC language to model the MD4 hash algorithm.
+Reimplementing hash algorithms in CVC language (i.e. generating the corresponding code)
+seemed cumbersome and we switched to the Python binding. With little modifications to
+a working pure-Python implementation, the prototype was working.
 
-TODO: describe approach
+However, STP was not fruitful for us, because we needed good control over the SAT encoding
+which we expected to have a major influence on the performance. We use minisat as SAT solver
+in the backend, but STP allows to exchange it for CryptoMiniSat which is a more modern and
+versatile SAT solver.
 
 \section{Two instances and its difference}
 \label{sec:enc-algotocnf}
+%
+\index{algotocnf}
+Our second approach was our own library which generated a CNF for a given hash algorithm
+implementation which is fed with a symbolic variable. Only integer operations have been
+implemented.
 
-TODO: we wrote a tool called algotocnf for our differential needs
+Our tool \emph{algotocnf} implements the following strategy:
+\begin{enumerate}
+  \item Take a differential characteristic as input and specify the hash algorithm in use.
+  \item Initialize symbolic variables for two instances (bitvectors).
+    Every bit is therefore represented as a boolean variable.
+    If you apply addition, operator overloading in python will ensure
+    that clauses are generated to describe the addition consisting of \boolf{XOR}s and \boolf{MAJ}s.
+    Equivalently other operations related to integers are implemented as well.
+  \item Constants used in the implementation are automatically converted to unit clauses.
+  \item After running the hash algorithm with symbolic variables per instance,
+    all constraints related to the hash algorithm are added.
+  \item Followingly the differential characteristic is read. Values such as $A_i$
+    represent intermediate states of bitvectors. Therefore the corresponding bitvectors
+    are looked up and constraints resulting from the differential characteristic are
+    added.
+  \item Finally the SAT solver is called. The CNF was mostly solved on a cluster
+    specified in Appendix~\ref{app:setup}. Afterwards the program is run again to
+    create the exactly same problem instance and the solver's solution replaces
+    symbolic values with boolean values. The resulting differential characteristic
+    is parsed backed and printed out.
+\end{enumerate}
 
+We think \emph{algotocnf} mainly differs from other SAT tools because of its
+differential implementation. When adding clauses resulting from the differential
+characteristic as constraints, the question arises how those bit conditions are
+encoded. Essentially, we have only boolean values available, but bit conditions
+tell constraints such as \enquote{a difference is given, but the actual value
+is unknown}.
 
-TODO:
-\begin{itemize}
-  \item reference to Magnus Daum's thesis ($\neq$ signed bit diff desc)
-\end{itemize}
+It seemed trivial to add a \emph{difference variable} for every pair of boolean
+values representing a bit in the two instances. Furthermore the difference
+variable $\Delta x$ is connected by a XOR with the variables of the pair $(x', x)$.
+\[ \Delta x = x' \oplus x \]
+Therefore it should be trivial for a preprocessor to simplify the formula
+appropriately or actually we don't expect runtime differences for the larger
+amount of variables.
 
+This implementation is central to the runtime discussion of chapter~\ref{ch:results}.
 
 \section{Approach with a differential description}
 \label{sec:enc-diff-desc}
+%
+Using the approach in the previous section, we were able to find actual MD4 collisions
+using a SAT solver. A SHA256 implementation followed which obviously lead to worse
+runtime results, because the internal state of SHA-256 is much larger (by a factor
+of at least 2). Can we further improve the runtime of the SAT solver?
 
-TODO: approach with differential desc
+Because we work with bitvectors and apply high-level operations like \boolf{MAJ} or addition,
+we can additionally implement how differences in those operations propagate.
+Magnus Daum's thesis on \enquote{Cryptanalysis of Hash Functions of the
+MD4-Family}~\cite[Table 4.4]{daum} discusses how differences propagate in \boolf{MAJ} and
+\boolf{ITE} functions. Trivially, \boolf{XOR}s propagate differences the way they are.
+
+This approach explicitly models differentiable behavior, which should be deducible
+by the SAT solver itself. However, this lead to a major speedup which can be observed
+in the runtime results of chapter~\ref{ch:results}.
 
 \section{Influencing evaluation order}
 \label{sec:enc-order}
+%
+\begin{prop}
+  Deriving difference values first, followed by actual bit values for the two instances,
+  leads to a speedup.
+\end{prop}
+
+This proposed principle is fundamental to differential cryptanalysis. A previous tool
+at our institute implements propagation of hash algorithm values without SAT solver
+and this strategy is essential to good performance. So basically in terms of SAT solvers
+we want to guess values for differential variables first and furthermore false should
+be assigned first, before guessing for true. This is justified by the desire to find as
+little differences as possible in a hash collision.
+
+The development of lingeling ats1o1 was guided by the desire to influence the evaluation
+order. We explicitly enforced it with the following approach:
+
+Let $\Delta x$ be the difference variable of pair $(x, x')$. We introduce a new boolean
+variable $x^*$. We add clause
+\[ x^* = (\Delta x \land x) \]
+and explicitly tell the SAT solver to guess on $x^*$ before guessing on $\Delta x$, $x$ or $x'$.
+
+The SAT solver will assign $x'=0$ first, because of the evaluation order. So either $\Delta x$
+or $x$ must be false. $\Delta x$ is assigned false, because as difference variable it has a higher
+priority over $x$. Equivalently for $x'=1$ we have $\Delta x$ needs to be true. So we actually
+achieve an early guess on the difference variable.
+
+This another approach evaluates in the results chapter.

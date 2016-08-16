@@ -504,3 +504,7 @@ The SAT solvers have generally been run without any special options, except for
   \item Lingeling has been generally run with \texttt{\textendash{}\textendash{}phase=-1} to prefer false as initial assignment to literals.
     However, lingeling ats1o1 implements this with more forceful strategy.
 \end{itemize}
+
+Preprocessing is a difficult topic on its own. Sometimes preprocessing can provide a speedup,
+before actually solving the problem, but mostly SAT solvers implement preprocessing strategies
+themselves and run them repeatedly when solving the problem.
