@@ -7,7 +7,11 @@
 
 In this chapter we will define hash functions and their desired security
 properties. Followingly we look at SHA256 and MD4 as established hash functions.
-We will represent them with Boolean algebra (in chapter~\ref{ch:enc}) to make
+MD4 unlike SHA256 is practically broken but has a comparably small internal state.
+It therefore allows a good starting point to devise our attacks.
+In a next step we scaled up to SHA-256 which has an internal state size
+at least twice as large.
+In chapter~\ref{ch:enc} we will represent them with Boolean algebra to make
 it possible to reason about states in those hash functions using SAT solvers.
 
 \section{Preliminaries Redux}

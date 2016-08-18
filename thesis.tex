@@ -137,6 +137,7 @@
 \newcommand\set[1]{\left\{#1\right\}}
 \newcommand\boolf[1]{\texttt{#1}}
 \newcommand\satfeature[1]{#1}
+\newcommand\timeout{$\mathcal{T}$}
 
 \DeclareMathOperator\IF{\boolf{IF\,}}
 \DeclareMathOperator\MAJ{\boolf{MAJ\,}}
@@ -302,13 +303,14 @@
   initial values. On the other hand, SAT solvers have no notion of differential
   values and therefore problem encoding becomes an important topic.
 
-  In this thesis we look at differential characteristics and encode
-  them as SAT problem. A SAT solver tells us whether a differential characteristic
-  can represent a hash collision or not. We implemented a framework which allows
-  us to verify differential behavior for integer operations. We then looked at the
-  encoded problems in details and tried to change the encoding to improve the runtime
-  of the SAT solver. We also provide a small CNF analysis library to compare an
-  encoded problem with others.
+  In this thesis we look at differential characteristics representing hash collisions
+  and encode them as SAT problem. A SAT solver tells us whether this characteristic
+  represents a valid hash state. We implemented a framework generating CNFs for
+  these purposes and improved our CNF design to solve MD4 testcases as well as
+  much more difficult SHA-256 testcases. Our greatest achievement was finding a
+  SHA-256 hash collision over 24 rounds.
+  Finally we also provide a small CNF analysis library to compare encoded problems
+  with others.
 
   \vspace{3pt}
   \textbf{Keywords:}
@@ -346,8 +348,8 @@
   Also thanks to Roderick Bloem and Armin Biere who organized a meeting
   one year before submitting this work defining the main approaches involved
   in this thesis. Armin Biere released custom lingeling versions for us,
-  e.g. featuring \enquote{more important} clauses in lingeling.
-  He also provided further analysis for our testcases.
+  which allowed us to influence the guessing strategy in lingeling.
+  He also shared his thoughts about our testcases with us.
 
   And finally I am grateful for the support by Martina,
   who also supported me during good and bad days with this thesis,
@@ -358,10 +360,9 @@
   \indent どもありがとうございました。
 \end{acknowledgements}
 
-All source code is available at \href{http://lukas-prokop.at/proj/megosat}{lukas-prokop.at/proj/megosat}
+All source codes are available at \href{http://lukas-prokop.at/proj/megosat}{lukas-prokop.at/proj/megosat}
 and published under terms and conditions of Free/Libre Open Source Software.
-This document was printed with \LuaLaTeX{} and Linux Libertine Font.
-
+This document was printed with \LuaLaTeX{} in the Linux Libertine typeface.
 
 \tableofcontents
 \mainmatter
@@ -377,9 +378,9 @@ This document was printed with \LuaLaTeX{} and Linux Libertine Font.
 \input{appendix}
 
 \backmatter
-%\listoffigures
-%\listoftables
-\printindex
+\listoffigures
+\listoftables
+%\printindex
 \printbibliography
 
 \end{document}

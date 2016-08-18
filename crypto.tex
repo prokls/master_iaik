@@ -239,7 +239,7 @@ represented using a dash \dnI{-}.
       \dnI{E}        & \no     & \yes    & \yes    & \yes    \\
     \hline \hline
     \end{tabular}
-    \caption{
+    \caption[Differential notation as introduced in~\cite{char-2006}]{
       Differential notation as introduced in~\cite{char-2006}.
       The left-most column specifies a symbol called \enquote{bit condition}
       and right-side columns indicate which bit configurations
@@ -279,9 +279,9 @@ represented using a dash \dnI{-}.
       \dnI{7}         & $(\neg x \lor \neg x^*)$ &
       \dnI{?}         &  \\
     \end{tabular}
-    \caption[Representation of bit conditions as CNF]{
+    \caption[Representation of bit conditions as CNF]{%
       All bit conditions represented as CNF using
-      two boolean variables $x$ and $x^*$ to represent
+      two Boolean variables $x$ and $x^*$ to represent
       two bits.
     }
     \label{tab:simple-eval-clauses}
@@ -319,7 +319,7 @@ Table~\ref{tab:4bit-addition} and \ref{tab:sigma}.
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{1}\dnI{1} \\ \dnI{0}\dnI{0} \\ \hline \dnI{1}\dnI{1} \end{tabular}\end{minipage}
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{1}\dnI{1} \\ \dnI{1}\dnI{1} \\ \hline \dnI{0}\dnI{0} \end{tabular}\end{minipage}
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{1}\dnI{1} \\ \dnI{1}\dnI{1} \\ \hline \dnI{1}\dnI{1} \end{tabular}\end{minipage}
-    \caption{
+    \caption[A simple 1-bit addition example]{%
       A simple 1-bit addition example:
       On the left the differential characteristic is given.
       Two dashes, by definition, denote a missing difference in both input arguments.
@@ -338,7 +338,7 @@ Table~\ref{tab:4bit-addition} and \ref{tab:sigma}.
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{0}\dnI{0} \\ \dnI{1}\dnI{1} \\ \hline \dnI{1}\dnI{1} \end{tabular}\end{minipage}
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{1}\dnI{1} \\ \dnI{0}\dnI{0} \\ \hline \dnI{1}\dnI{1} \end{tabular}\end{minipage}
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{1}\dnI{1} \\ \dnI{1}\dnI{1} \\ \hline \dnI{0}\dnI{0} \end{tabular}\end{minipage}
-    \caption{
+    \caption[Propagation of bit conditions in a differential characteristic]{%
       Like Figure~\ref{tab:1bit-example}, but any difference value for the result bit is possible.
       As such we consider any possible bit configuration, but eventually recognize that only four bit configurations
       are consistent with the behavior of addition. Because all resulting configurations show no bit difference
@@ -404,9 +404,12 @@ Table~\ref{tab:4bit-addition} and \ref{tab:sigma}.
       \end{tabular}
     \end{minipage}
   \end{center}%
-  \caption{
-    The upper line shows valid differential characteristics for 4bit addition
-    whereas the lower line show invalid ones for 4bit addition.
+  \caption[
+    Testcases for 4-bit addition
+  ]{
+    Testcases for 4-bit addition:
+    The upper line shows valid differential characteristics for 4-bit addition
+    whereas the lower line show invalid ones for 4-bit addition.
     The rows are conventionally named using capital letters.
   }
   \label{tab:4bit-addition}
@@ -448,7 +451,7 @@ Table~\ref{tab:4bit-addition} and \ref{tab:sigma}.
       \end{tabular}
     \end{minipage}
   \end{center}
-  \caption{
+  \caption[Differential characteristics for the SHA-2 Sigma function]{
     Differential characteristics for the SHA-2 Sigma function.
     The upper line shows valid states. The lower line shows invalid ones.
   }
@@ -463,7 +466,7 @@ works and how differential characteristics are written down. It is always
 important to keep in mind which function the characteristic illustrates,
 because this is not documented with the characteristic.
 
-Now consider MD4 as defined in section~\ref{sec:dc-md4}. MD4 takes some input
+Now consider MD4 as defined in Section~\ref{sec:dc-md4}. MD4 takes some input
 message (in our case limited to size of one block), the state variables
 are initialized and iteratively new $A_i$ are computed.
 
@@ -480,7 +483,7 @@ is also gives an application of the layout.
   \begin{center}
     \includegraphics[width=0.4\linewidth]{img/md4_layout.pdf}
     \includegraphics[width=0.5\linewidth]{img/sha256_layout.pdf}
-    \caption{Layout of MD4 and SHA256 differential characteristics}
+    \caption{Layout of MD4 and SHA-256 differential characteristics}
     \label{img:char-layouts}
   \end{center}
 \end{figure}
@@ -608,8 +611,11 @@ is also gives an application of the layout.
 \hline
 \end{tabular}
 }
-\caption{
-  One of the original MD4 collision by Wang et al,
+\caption[%
+  One of the original MD4 collisions by Wang et al,
+  with a few bits underspecified and followingly propagated%
+]{%
+  One of the original MD4 collisions by Wang et al,
   with a few bits underspecified (left) and propagated values (right).
   The question marks indicate that any bit configuration for the two bits
   are possible. Dashes indicate that the bits have the same configuration

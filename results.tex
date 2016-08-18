@@ -4,7 +4,7 @@
 \chapter{Results}
 \label{ch:results}
 %
-\section{SAT features results}
+\section{Evaluating SAT features}
 \label{sec:results-features}
 
 TODO: do cryptoproblems distinguish from other problems?
@@ -13,14 +13,55 @@ TODO: do our benchmark distinguish from other problems?
 
 TODO: answer the 8 questions posed previously
 
-\section{Attack results}
+\section{Finding hash collisions}
 \label{sec:results-attacks}
 
 TODO: is simplification worth it?
 
-TODO: discuss runtime and development, tuning by doing difference variables first, diff desc makes a difference
+TODO: discuss runtime and development, tuning by doing difference variables first,
+diff desc makes a difference
 
 Appendix~\ref{app:runtimes} provide a more exhaustive list of runtimes retrieved.
+
+\subsection{Attacking MD4}
+\label{sec:results-md4}
+%
+In Section~\ref{sec:enc-algotocnf} we introduced a basic encoding involving two hash algorithm
+instances and difference variables. Constraints resulting from the hash algorithm description
+and given differential characteristic are added.
+
+We considered MD4 testcases~A, B and C (compare with Appendices~\ref{app:tcA}, \ref{app:tcB} and \ref{app:tcC})
+and generated the corresponding CNF files. The SAT solvers mentioned in Section~\ref{sec:sat-solvers}
+were used to evaluate whether the problem is solvable in reasonably time. For every testcase we
+defined a time limit of at most 1 day (i.e. 86,400 seconds). Some testcases listed have been evaluated
+for a larger time limit.
+
+\begin{table}[!h]
+  \begin{center}
+    \begin{tabular}{lcc}
+      SAT solver                & testcase      & runtime (in seconds) \\
+    \hline
+      minisat~2.2.0             & MD4, A        & 65 \\
+      cryptominisat~4.5.3       & MD4, A        & 24 \\
+      cryptominisat~5.0.0       & MD4, A        & 29 \\
+      glucose~4.0               & MD4, A        & 10 \\
+      glucose-syrup~4.0         & MD4, A        & 31 \\
+      lingeling-ats1            & MD4, A        & TODO \\
+      lingeling-ats1o1          & MD4, A        & 18 \\
+      lingeling-ats1o2          & MD4, A        & TODO \\
+      lingeling-ats1o4          & MD4, A        & 125745 \\
+      plingeling-ats1o1         & MD4, A        & 88 \\
+      treeneling-ats1o1         & MD4, A        & 64
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsection{Improvements with differential description}
+\label{sec:result-diff-desc}
+
+\subsection{Modifying the guessing strategy}
+\label{sec:results-guessing}
+
 
 \section{Related work}
 \label{sec:results-related}

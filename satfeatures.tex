@@ -118,6 +118,7 @@ and \emph{smallest} refers to the minimum element $\min_{1 \leq i \leq n}(x_i)$.
 \section{Suggested SAT features}
 \label{sec:features-suggested}
 %
+\index{cnf-analysis}
 We wrote a tool called cnf-analysis. The evaluated features are partially inspired
 by SATzilla and lingeling. The latter prints basic statistics for every CNF it
 evaluates.
@@ -203,6 +204,8 @@ However, the data evaluated is less accurate compared to Python, because Python 
 In the following section we want to evaluate SAT features and
 compare test cases.
 
+TODO: illustrate memory and runtime comparison with numbers
+
 \section{CNF dataset}
 \label{sec:features-dataset}
 %
@@ -265,3 +268,17 @@ According to my results, an average SAT problem consists of:
   \item The arithmetic mean tells 137 unit clauses per CNF file can be expected, but the median tells it is mostly 0.
   \item The largest variable found was 13,842,706 and 13,829,558~variables were used at most.
 \end{itemize}
+
+\section{Benford's law in CNF files}
+\label{sec:benford}
+%
+Given this huge set of CNF files and therefore integers, we evaluated whether Benford's law holds.
+
+\begin{theorem}
+  Consider arbitrary data from tables, listings or other sources in publications, newspaper
+  and so on and so forth, the digit $1$ occurs in about 30~\% of the time.
+  The first digit is $1$ about $30$~percent of the time
+  and $9$ only about $4.6$~percent of the time.
+\end{theorem}
+  A paper by Theodore P. Hill~\cite{hill1998first} characterizes Benford's Law
+  as the following conjecture:

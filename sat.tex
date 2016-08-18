@@ -247,13 +247,13 @@ those SAT solvers.
 
 %\index{Least significant bit}
 %\index{Most significant bit}
-%We consider 2bit addition as small example. Let $a_{i}$ be the first argument
+%We consider 2-bit addition as small example. Let $a_{i}$ be the first argument
 %where $i$ denotes the binary position. If $i=0$, the \emph{least significant bit}
 %(LSB) is considered. If $i=1$, the \emph{most significant bit} (MSB) is considered.
 
 %Let $b_{i}$ be the second argument and $s_{i}$ be the output value.
 %Furthermore $c_{i}$ is the carry bit, where $c_1$ is left out, because
-%it is not used in 2bit addition. This model of 2bit addition as Boolean
+%it is not used in 2-bit addition. This model of 2-bit addition as Boolean
 %function can be seen in Figure~\ref{fig:intro-2bit-addition}.
 
 %\begin{figure}
@@ -420,16 +420,17 @@ related to this structure:
 \subsection{Boolean constraint propagation (BCP)}
 \label{sec:sat-bcp}
 %
+\index{Boolean constraint propagation}
 One of the most basic techniques to SAT solving is \emph{Boolean Constraint Propagation},
 also called \emph{unit propagation}.
-It is so fundamental that SATzilla, introduced in section~\ref{sec:features-related},
+It is so fundamental that SATzilla, introduced in Section~\ref{sec:features-related},
 applies it immediately before looking at SAT features.
 
 Let $l$ be the literal of a unit clause in a CNF. Remove any clause containing
 $l$ and replace any occurences of $-l$ from the CNF. It is easy to see, that
 the resulting CNF is equisatisfiable, because due to the unit clause $l$ must
 be true. So any clause containing $l$ is satisfied and $-l$ yields false,
-where $A \lor \bot$ is equivalent to $A$ for any boolean function $A$.
+where $A \lor \bot$ is equivalent to $A$ for any Boolean function $A$.
 
 \subsection{Watched literals}
 \label{sec:sat-wl}
@@ -481,7 +482,7 @@ or their good results at previous SAT competitions:
 \end{itemize}
 
 Specifically this means the hash collision attacks we looked have run with
-these SAT solvers. The results are discussed in section~\ref{ch:results}
+these SAT solvers. The results are discussed in Section~\ref{ch:results}
 and provided in Appendix~\ref{app:runtimes}.
 
 lingeling ats1o1, ats1o2 and ats1o4 are non-public releases of lingeling.
@@ -508,3 +509,7 @@ The SAT solvers have generally been run without any special options, except for
 Preprocessing is a difficult topic on its own. Sometimes preprocessing can provide a speedup,
 before actually solving the problem, but mostly SAT solvers implement preprocessing strategies
 themselves and run them repeatedly when solving the problem.
+
+TODO: testcases with lingeling have been run 5 times and mean was taken
+
+TODO: glucose-syrup is glucose in many parallel threads
