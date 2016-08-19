@@ -86,8 +86,18 @@ The SAT solvers of Section~\ref{sec:sat-solvers} we use also compute features th
 when computing a solution. For example CryptoMiniSat 4.5.3 prints the following lines
 
 \begin{verbatim}
-c [features] numVars 56118, numClauses 358991, var_cl_ratio 0.156, binary 0.019, trinary 0.520, horn 0.387, horn_mean 0.000, horn_std 0.000, horn_min 0.000, horn_max 0.000, horn_spread 0.000, vcg_var_mean 0.000, vcg_var_std 0.902, vcg_var_min 0.000, vcg_var_max 0.000, vcg_var_spread -0.000, vcg_cls_mean 0.000, vcg_cls_std 0.237, vcg_cls_min 0.000, vcg_cls_max 0.000, vcg_cls_spread 0.000, pnr_var_mean 0.499, pnr_var_std 0.192, pnr_var_min 0.000, pnr_var_max 0.000, pnr_var_spread 0.000, pnr_cls_mean 0.425, pnr_cls_std 0.530, pnr_cls_min 0.000, pnr_cls_max 0.000, pnr_cls_spread 0.000, avg_confl_size 13.957, confl_size_min 473.000, confl_size_max 473.000, avg_confl_glue 8.407, confl_glue_min 1.000, confl_glue_max 207.000, avg_num_resolutions 13.097, num_resolutions_min 2.000, num_resolutions_max 849.000, learnt_bins_per_confl 0.013, learnt_tris_per_confl 0.102, avg_branch_depth 43.340, branch_depth_min 33.000, branch_depth_max 103.000, avg_trail_depth_delta 30.820, trail_depth_delta_min 5.000, trail_depth_delta_max 147.000, avg_branch_depth_delta 2.580, props_per_confl 0.007, confl_per_restart 155.847, decisions_per_conflict 9.877, irred-glue_distr_mean 536708712.391, irred-glue_distr_var 87053406094090.078, irred-size_distr_mean 4.000, irred-size_distr_var 0.000, irred-uip_use_distr_mean 0.000, irred-uip_use_distr_var 0.000, irred-activity_distr_mean 0.000, irred-activity_distr_var 0.000, red-glue_distr_mean 5.310, red-glue_distr_var 19.534, red-size_distr_mean 10.543, red-size_distr_var 61.630, red-uip_use_distr_mean 0.000, red-uip_use_distr_var 0.000, red-activity_distr_mean 0.000, red-activity_distr_var 0.000, num_gates_found_last 0, num_xors_found_last 20261
+c [features] numVars 56118, numClauses 358991, var_cl_ratio 0.156,
+binary 0.019, trinary 0.520, horn 0.387, horn_mean 0.000, horn_std
+0.000, horn_min 0.000, horn_max 0.000, horn_spread 0.000,
+vcg_var_mean 0.000, vcg_var_std 0.902, vcg_var_min 0.000,
+vcg_var_max 0.000, vcg_var_spread -0.000, vcg_cls_mean 0.000,
+...
 \end{verbatim}
+
+Even though we will partially use equivalent features (like Horn clauses),
+many are actually related to the current state of evaluation like decisions
+per conflicts. We consider this as a property of the evaluation and not the
+SAT problem itself.
 
 \section{Statistical features}
 \label{sec:features-stats}
@@ -211,8 +221,6 @@ However, the data evaluated is less accurate compared to Python, because Python 
 In the following section we want to evaluate SAT features and
 compare test cases.
 
-TODO: illustrate memory and runtime comparison with numbers
-
 \section{CNF dataset}
 \label{sec:features-dataset}
 %
@@ -245,7 +253,7 @@ Some files turned out to be problematic. In SATlib, 3 gzipped files couldn't be 
 contain empty clauses. Empty clauses are assumed to immediately falsify the CNF and are therefore pointless.
 I removed trailing zeros in CNFs. Variants of the DIMACS standard also expect lines with a percent symbol to
 terminate the CNF. Besides those minor issues documented as part of the cnf-analysis project,
-175 gigabytes of CNF files have been evaluated with a total of 68069 CNF files (62251 unique CNF files).
+175 gigabytes of CNF files have been evaluated with a total of 68,069 CNF files (62,251 unique CNF files).
 
 \section{The average SAT problem}
 \label{sec:features-average}
@@ -267,7 +275,7 @@ According to my results, an average SAT problem consists of:
   \item 83,650 clauses in average ranging from 21 to 53,616,734
   \item The longest clause we found had 61,473~literals, but the longest clause of CNFs typically covers 17 literals.
   \item At least 114 up to 150,609,758 literals were found in a CNF.
-  \item The clause-variables ratio lies between 1.5 and 27720 with mean 8.35 and $\sigma = 189$.
+  \item The clause-variables ratio lies between 1.5 and 27,720 with mean 8.35 and $\sigma = 189$.
   \item The average length of a clause is expected to be 3.
   \item In average a CNF file has 67 connected variable components.
   \item In average 31,315 clauses are definite clauses and 29,995 clauses are goal clauses.

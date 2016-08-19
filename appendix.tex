@@ -65,7 +65,12 @@
 \hline
 \end{tabular}
 }
-\caption{One of the original MD4 collision given by Wang, et al.}
+\caption[One of the original MD4 collision given by Wang, et al.]{
+  One of the original MD4 collision given by Wang, et al.
+  We can clearly see how 4 differences are introduced in the message
+  block on the right. They propagate through the intermediate
+  values until those differences cancel out after round~36.
+}
 \label{tab:wang-collision}
 \end{center}
 \end{table}
@@ -116,13 +121,8 @@ throughout the document whereas the second setup is referred to as
 \chapter{Testcases}
 \label{app:tc}
 %
-Figures~\ref{tab:tcA}, \ref{tab:tcB}, \ref{tab:tcC} and \ref{tab:tc4} show testcases used to test performance measures.
-
-%\subsection[Testcase 1]{Testcase 1: A very decent one}
-%\label{tc:xml3}
-%
 \texttt{
-\begin{table}[p]
+\begin{table}[b]
 \begin{center}
 \scalebox{.55}{
 \begin{tabular}{|r|c|c|c|c|}
@@ -184,18 +184,22 @@ Figures~\ref{tab:tcA}, \ref{tab:tcB}, \ref{tab:tcC} and \ref{tab:tc4} show testc
 \hline
 \end{tabular}
 }
-% internal testcase name: 48steps_m0m2m4m8m12_1.xml
-\caption{MD4 testcase C}
-\label{tab:tcC}
+% internal testcase name: 48steps_m0m2m4m8m12_3.xml
+\caption[MD4 testcase A]{
+  MD4 testcase A: We can clearly see that all difference variables
+  are defined. Either they are true (bit condition {\dnCx}) or
+  false (bit condition {\dnCh}), but no variable has an undeciable
+  state like {\dnCq}. At the top we can see bit conditions {\dnCz}
+  and {\dnCo} encoding the MD4 initial vector defined by the hash algorithm.
+  The differences {\dnCx} introduce the hash collision and with
+  round~47 being set of {\dnCh} only, the output is forced to be
+  equal between both hash algorithm instances.
+}
+\label{tab:tcA}
 \end{center}
 \end{table}
 }
 
-TODO: SAT features
-
-%\subsection[Testcase 2]{Testcase 2: A bit more difficult}
-%\label{tc:xml2}
-%
 \texttt{
 \begin{table}[!ht]
 \begin{center}
@@ -259,17 +263,23 @@ TODO: SAT features
 \end{tabular}
 }
 % internal testcase name: 48steps_m0m2m4m8m12_2.xml
-\caption{MD4 2 TODO description}
+\caption[MD4 B testcase]{
+  MD4 B testcase:
+  In this testcase we have less knowledge about the state than in testcase A
+  because many values are encoded with {\dnCq} meaning that neither their
+  difference nor their actual values are known.
+  However, of course some {\dnCx} exists to introduce a hash collision
+  and the last round only consists of dashes to assert no difference
+  in the output.
+  So unlike testcase A, the SAT solver needs to figure out the difference
+  variables in rounds 0--11 increasing its overall runtime in all SAT solver
+  implementations.
+}
 \label{tab:tcB}
 \end{center}
 \end{table}
 }
 
-TODO: SAT features
-
-%\subsection[Testcase 3]{Testcase 3: A serious one}
-%\label{tc:xml1}
-%
 \texttt{
 \begin{table}[!ht]
 \begin{center}
@@ -333,88 +343,17 @@ TODO: SAT features
 \hline
 \end{tabular}
 }
-% internal testcase name: 48steps_m0m2m4m8m12_3.xml
-\caption{MD4 testcase A}
-\label{tab:tcA}
+% internal testcase name: 48steps_m0m2m4m8m12_1.xml
+\caption[MD4 testcase C]{
+  MD4 testcase~C:
+  This testcases introduces a hash collision which is expected to cancel out
+  at round 32. At the same time no information is provided about the intermediate
+  state of the hash algorithm in rounds 0--20.
+}
+\label{tab:tcC}
 \end{center}
 \end{table}
 }
-
-TODO: SAT features
-
-\texttt{
-\begin{table}[!ht]
-\begin{center}
-\scalebox{.55}{
-\begin{tabular}{|r|c|c|c|c|}
-\hline
-  $i$  &      &  $\nabla{S_{i,0}}$  &  $\nabla{S_{i,1}}$  &  $\nabla{S_{i,2}}$ \\
-\hline
-\dnI{-4} & \dnW: & {{\dnCz}{\dnCo}{\dnCo}{\dnCz}{\dnCz}{\dnCo}{\dnCo}{\dnCo}{\dnCz}{\dnCo}{\dnCz}{\dnCz}{\dnCz}{\dnCo}{\dnCz}{\dnCo}{\dnCz}{\dnCz}{\dnCo}{\dnCz}{\dnCz}{\dnCz}{\dnCo}{\dnCo}{\dnCz}{\dnCz}{\dnCz}{\dnCz}{\dnCz}{\dnCz}{\dnCz}{\dnCo}} & & \\
-\dnI{-3} & \dnW: & {{\dnCz}{\dnCz}{\dnCz}{\dnCo}{\dnCz}{\dnCz}{\dnCz}{\dnCz}{\dnCz}{\dnCz}{\dnCo}{\dnCo}{\dnCz}{\dnCz}{\dnCo}{\dnCz}{\dnCz}{\dnCo}{\dnCz}{\dnCo}{\dnCz}{\dnCo}{\dnCz}{\dnCz}{\dnCz}{\dnCo}{\dnCo}{\dnCo}{\dnCz}{\dnCo}{\dnCo}{\dnCz}} & & \\
-\dnI{-2} & \dnW: & {{\dnCo}{\dnCz}{\dnCz}{\dnCo}{\dnCo}{\dnCz}{\dnCz}{\dnCz}{\dnCo}{\dnCz}{\dnCo}{\dnCo}{\dnCo}{\dnCz}{\dnCo}{\dnCz}{\dnCo}{\dnCo}{\dnCz}{\dnCo}{\dnCo}{\dnCo}{\dnCz}{\dnCz}{\dnCo}{\dnCo}{\dnCo}{\dnCo}{\dnCo}{\dnCo}{\dnCo}{\dnCz}} & & \\
-\dnI{-1} & \dnW: & {{\dnCo}{\dnCo}{\dnCo}{\dnCz}{\dnCo}{\dnCo}{\dnCo}{\dnCo}{\dnCo}{\dnCo}{\dnCz}{\dnCz}{\dnCo}{\dnCo}{\dnCz}{\dnCo}{\dnCo}{\dnCz}{\dnCo}{\dnCz}{\dnCo}{\dnCz}{\dnCo}{\dnCo}{\dnCo}{\dnCz}{\dnCz}{\dnCz}{\dnCo}{\dnCz}{\dnCz}{\dnCo}} & & \\
-\dnI{0} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{1} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{2} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{3} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{4} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{5} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{6} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{7} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{8} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{9} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{10} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{11} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{12} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{13} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{14} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{15} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & \dnW[W]{}: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} \\
-\dnI{16} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & & \\
-\dnI{17} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & & \\
-\dnI{18} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & & \\
-\dnI{19} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & & \\
-\dnI{20} & \dnW: & {{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & & \\
-\dnI{21} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{22} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{23} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{24} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{25} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{26} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{27} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{28} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{29} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{30} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{31} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{32} & \dnW: & {{\dnCx}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}{\dnCq}} & & \\
-\dnI{33} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{34} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{35} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{36} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{37} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{38} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{39} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{40} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{41} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{42} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{43} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{44} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{45} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{46} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\dnI{47} & \dnW: & {{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}{\dnCh}} & & \\
-\hline
-\end{tabular}
-}
-\caption{MD4 4 TODO}
-\label{tab:tc4}
-\end{center}
-\end{table}
-}
-
-TODO: SAT features
-
-
-
 
 \texttt{
 \begin{table}[!ht]

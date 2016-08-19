@@ -21,9 +21,10 @@ seemed cumbersome and we switched to the Python binding. With little modificatio
 a working pure-Python implementation, the prototype was working.
 
 However, STP was not fruitful for us, because we needed good control over the SAT encoding
-which we expected to have a major influence on the performance. We use minisat as SAT solver
+which we expected to have a major influence on the performance. We used minisat as SAT solver
 in the backend, but STP allows to exchange it for CryptoMiniSat which is a more modern and
-versatile SAT solver.
+versatile SAT solver. In the end this straight-forward approach worked nicely for MD4,
+but needed a different toolchain for SHA-256.
 
 \section{Two instances and its difference}
 \label{sec:enc-algotocnf}
@@ -40,6 +41,8 @@ Our tool \emph{algotocnf} implements the following strategy:
     Every bit is therefore represented as a boolean variable.
     If you apply addition, operator overloading in python will ensure
     that clauses are generated to describe the addition consisting of \boolf{XOR}s and \boolf{MAJ}s.
+    Every operation is modelled as assignment. Hence an operation operating on a few
+    Boolean variables is also equivalent to a single variable which represents the result.
     Equivalently other operations related to integers are implemented as well.
   \item Constants used in the implementation are automatically converted to unit clauses.
   \item After running the hash algorithm with symbolic variables per instance,
@@ -51,7 +54,7 @@ Our tool \emph{algotocnf} implements the following strategy:
   \item Finally the SAT solver is called. The CNF was mostly solved on a cluster
     specified in Appendix~\ref{app:setup}. Afterwards the program is run again to
     create the exactly same problem instance and the solver's solution replaces
-    symbolic values with boolean values. The resulting differential characteristic
+    symbolic values with Boolean values. The resulting differential characteristic
     is parsed backed and printed out.
 \end{enumerate}
 
@@ -70,13 +73,14 @@ Therefore it should be trivial for a preprocessor to simplify the formula
 appropriately or actually we don't expect runtime differences for the larger
 amount of variables.
 
-This implementation is central to the runtime discussion of chapter~\ref{ch:results}.
+And finally we expect the CNF to inherit a property of hash functions.
+Inputs are provided into the hash algorithm and strongly intermingled
+with other values. This should result in a high diffusion and almost every
+variable is expected to share a clause with another variable.
 
-TODO: all clauses use a a = b op c design, hence e.g. XOR clauses are not possible for diff vars
+This implementation design is fundamental to the runtime discussion of chapter~\ref{ch:results}.
 
-TODO: we expect hash algorithm give a pretty dense CNF description
-
-\section{Approach with a differential description}
+\section{An approach with a differential description}
 \label{sec:enc-diff-desc}
 %
 Using the approach in the previous section, we were able to find actual MD4 collisions

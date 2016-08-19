@@ -52,7 +52,9 @@ Do our generated problems distinguish from these average problems?
 \begin{itemize}
   \item In average our (MD4 and SHA-256 hash collision) problems contain
         84,821 variables and 515,646 clauses meaning that our problems
-        are comparably large.
+        are comparably large. It is important to point out that the
+        problem size does not necessarily correlate with the difficulty
+        of the problem in SAT solving.
 % TODO
 %  \item Due to the cryptographic high diffusion we expected a 
 \end{itemize}
@@ -61,13 +63,13 @@ Do our generated problems distinguish from these average problems?
 
 %TODO: do our benchmark distinguish from other problems?
 
+%TODO: my benchmarks, how do the CNF features behave when transitioning from original to simplificiation or diff-desc?
+
 \section{Finding hash collisions}
 \label{sec:results-attacks}
 
 TODO: is simplification worth it?
 
-TODO: discuss runtime and development, tuning by doing difference variables first,
-diff desc makes a difference
 
 Appendix~\ref{app:runtimes} provide a more exhaustive list of runtimes retrieved.
 
@@ -81,8 +83,8 @@ and given differential characteristic are added.
 We considered MD4 testcases~A, B and C (compare with Appendices~\ref{app:tcA}, \ref{app:tcB} and \ref{app:tcC})
 and generated the corresponding CNF files. The SAT solvers mentioned in Section~\ref{sec:sat-solvers}
 were used to evaluate whether the problem is solvable in reasonably time. For every testcase we
-defined a time limit of at most 1 day (i.e. 86,400 seconds). Some testcases listed have been evaluated
-for a larger time limit.
+defined a time limit of at most 1 day (i.e. 86,400 seconds). A timeout is denoted by \timeout.
+Some testcases listed have been evaluated for a larger time limit.
 
 \begin{table}[!h]
   \begin{center}
@@ -97,27 +99,211 @@ for a larger time limit.
       lingeling-ats1            & MD4, A        & TODO \\
       lingeling-ats1o1          & MD4, A        & 18 \\
       lingeling-ats1o2          & MD4, A        & TODO \\
-      lingeling-ats1o4          & MD4, A        & 125745 \\
+      lingeling-ats1o4          & MD4, A        & 125,745 \\
       plingeling-ats1o1         & MD4, A        & 88 \\
       treeneling-ats1o1         & MD4, A        & 64
     \end{tabular}
+    \caption{Runtimes for MD4 testcase A with various SAT solvers}
+    \label{tab:md4-A-runtimes}
+  \end{center}
+  \begin{center}
+    \begin{tabular}{lcc}
+      SAT solver                & testcase      & runtime (in seconds) \\
+    \hline
+      minisat~2.2.0             & MD4, B        & 7,817 \\
+      cryptominisat~4.5.3       & MD4, B        & \timeout \\
+      cryptominisat~5.0.0       & MD4, B        & 571 \\
+      glucose~4.0               & MD4, B        & \timeout \\
+      glucose-syrup~4.0         & MD4, B        & \timeout \\
+      lingeling-ats1            & MD4, B        & TODO \\
+      lingeling-ats1o1          & MD4, B        & 257 \\
+      lingeling-ats1o2          & MD4, B        & TODO \\
+      lingeling-ats1o4          & MD4, B        & TODO \\
+      plingeling-ats1o1         & MD4, B        & 1,860 \\
+      treeneling-ats1o1         & MD4, B        & 12,574
+    \end{tabular}
+    \caption{Runtimes for MD4 testcase B with various SAT solvers}
+    \label{tab:md4-B-runtimes}
+  \end{center}
+  \begin{center}
+    \begin{tabular}{lcc}
+      SAT solver                & testcase      & runtime (in seconds) \\
+    \hline
+      minisat~2.2.0             & MD4, C        & 19,683 \\
+      cryptominisat~4.5.3       & MD4, C        & \timeout \\
+      cryptominisat~5.0.0       & MD4, C        & 1064 \\
+      glucose~4.0               & MD4, C        & \timeout \\
+      glucose-syrup~4.0         & MD4, C        & \timeout \\
+      lingeling-ats1            & MD4, C        & TODO \\
+      lingeling-ats1o1          & MD4, C        & TODO \\
+      lingeling-ats1o2          & MD4, C        & TODO \\
+      lingeling-ats1o4          & MD4, C        & TODO \\
+      plingeling-ats1o1         & MD4, C        & TODO \\
+      treeneling-ats1o1         & MD4, C        & TODO
+    \end{tabular}
+    \caption{Runtimes for MD4 testcase C with various SAT solvers}
+    \label{tab:md4-C-runtimes}
   \end{center}
 \end{table}
 
+In Table~\ref{tab:md4-A-runtimes} it can be seen that the problem can be tackle
+by all SAT solvers. lingeling-ats1o4 being a outlier can be ignored, because this
+release is majorily concerned with providing debug information. As such it only
+shows that printing information to stdout can make a major performance difference.
+
+In Table~\ref{tab:md4-B-runtimes} we see that CryptoMiniSat~4.5.3, glucose~4.0
+and glucose-syrup~4.0 couldn't solve the problem within the time limit of 1~day.
+However, other SAT solver were still able to find a hash collision. Please recognize
+that Table~\ref{tab:md4-A-runtimes} provides runtime results for the testcase
+given in Table~\ref{tab:tcA}; equivalently Table~\ref{tab:md4-B-runtimes} for
+Table~\ref{tab:tcB} and Table~\ref{tab:md4-C-runtimes} for Table~\ref{tab:tcC}.
+Its caption gives an intuition how testcase B is more difficult than A and
+C is more difficult than B.
+
+We end up with the result, that the hash collision given in Table~\ref{tab:tcC}
+can be solved by a limited set of modern SAT solvers. Of course the cryptanalyst
+needs to figure out good starting points for the hash collision and encode them
+in the differential characteristic, but this task is still considered practical,
+because this task can be easily automated.
+
 \subsection{Improvements with differential description}
 \label{sec:result-diff-desc}
+%
+Our next goal was to scale up to a more difficult problem. We considered SHA-256
+which has a much larger internal state (at least by factor 2). So finding a hash
+collision is more difficult and we considered further strategies.
+
+Consider testcases 18~\ref{tab:18-t9}, 21~\ref{tab:21-t9}, 23~\ref{tab:23-t9}
+and 24~\ref{tab:24-t9}. The number indicates how many steps are covered by this
+testcase. We also tested a 27-round variant, but it is not listed here.
+Most SAT solvers could not solve this problem in feasible time. Therefore we
+excluded it from our list.
+
+\begin{table}[!h]
+  \begin{center}
+    \begin{tabular}{lcc}
+      SAT solver                & testcase      & runtime (in seconds) \\
+    \hline
+      minisat~2.2.0             & SHA-256, 18   & TODO \\
+      cryptominisat~4.5.3       & SHA-256, 18   & TODO \\
+      cryptominisat~5.0.0       & SHA-256, 18   & TODO \\
+      glucose~4.0               & SHA-256, 18   & TODO \\
+      glucose-syrup~4.0         & SHA-256, 18   & TODO \\
+      lingeling-ats1            & SHA-256, 18   & TODO \\
+      lingeling-ats1o1          & SHA-256, 18   & 25 \\
+      lingeling-ats1o2          & SHA-256, 18   & TODO \\
+      lingeling-ats1o4          & SHA-256, 18   & TODO \\
+      plingeling-ats1o1         & SHA-256, 18   & TODO \\
+      treeneling-ats1o1         & SHA-256, 18   & TODO
+    \end{tabular}
+    \caption{Runtimes for SHA-256 testcase 18 with various SAT solvers}
+    \label{tab:SHA-256-18-runtimes}
+  \end{center}
+  \begin{center}
+    \begin{tabular}{lcc}
+      SAT solver                & testcase      & runtime (in seconds) \\
+    \hline
+      minisat~2.2.0             & SHA-256, 21   & TODO \\
+      cryptominisat~4.5.3       & SHA-256, 21   & TODO \\
+      cryptominisat~5.0.0       & SHA-256, 21   & TODO \\
+      glucose~4.0               & SHA-256, 21   & TODO \\
+      glucose-syrup~4.0         & SHA-256, 21   & TODO \\
+      lingeling-ats1            & SHA-256, 21   & TODO \\
+      lingeling-ats1o1          & SHA-256, 21   & 27,511 \\
+      lingeling-ats1o2          & SHA-256, 21   & TODO \\
+      lingeling-ats1o4          & SHA-256, 21   & TODO \\
+      plingeling-ats1o1         & SHA-256, 21   & TODO \\
+      treeneling-ats1o1         & SHA-256, 21   & TODO
+    \end{tabular}
+    \caption{Runtimes for SHA-256 testcase 21 with various SAT solvers}
+    \label{tab:SHA-256-21-runtimes}
+  \end{center}
+  \begin{center}
+    \begin{tabular}{lcc}
+      SAT solver                & testcase      & runtime (in seconds) \\
+    \hline
+      minisat~2.2.0             & SHA-256, 23   & TODO \\
+      cryptominisat~4.5.3       & SHA-256, 23   & TODO \\
+      cryptominisat~5.0.0       & SHA-256, 23   & TODO \\
+      glucose~4.0               & SHA-256, 23   & TODO \\
+      glucose-syrup~4.0         & SHA-256, 23   & TODO \\
+      lingeling-ats1            & SHA-256, 23   & TODO \\
+      lingeling-ats1o1          & SHA-256, 23   & 59,227 \\
+      lingeling-ats1o2          & SHA-256, 23   & TODO \\
+      lingeling-ats1o4          & SHA-256, 23   & TODO \\
+      plingeling-ats1o1         & SHA-256, 23   & TODO \\
+      treeneling-ats1o1         & SHA-256, 23   & TODO
+    \end{tabular}
+    \caption{Runtimes for SHA-256 testcase 23 with various SAT solvers}
+    \label{tab:SHA-256-23-runtimes}
+  \end{center}
+  \begin{center}
+    \begin{tabular}{lcc}
+      SAT solver                & testcase      & runtime (in seconds) \\
+    \hline
+      minisat~2.2.0             & SHA-256, 24   & TODO \\
+      cryptominisat~4.5.3       & SHA-256, 24   & TODO \\
+      cryptominisat~5.0.0       & SHA-256, 24   & TODO \\
+      glucose~4.0               & SHA-256, 24   & TODO \\
+      glucose-syrup~4.0         & SHA-256, 24   & TODO \\
+      lingeling-ats1            & SHA-256, 24   & TODO \\
+      lingeling-ats1o1          & SHA-256, 24   & 65,956 \\
+      lingeling-ats1o2          & SHA-256, 24   & TODO \\
+      lingeling-ats1o4          & SHA-256, 24   & TODO \\
+      plingeling-ats1o1         & SHA-256, 24   & TODO \\
+      treeneling-ats1o1         & SHA-256, 24   & TODO
+    \end{tabular}
+    \caption{Runtimes for SHA-256 testcase 24 with various SAT solvers}
+    \label{tab:SHA-256-24-runtimes}
+  \end{center}
+\end{table}
+
+In Tables~\ref{tab:SHA-256-18-runtimes} to \ref{tab:SHA-256-24-runtimes}
+we see several results which illustrate TODO
+
+
+Followingly we added the clauses which directly encode how differences
+propagate in the hash algorithm; namely \enquote{differential description}
+of Section~\ref{sec:enc-diff-desc}. If we compare the data, we can see
+TODO
+
+We continued by trying the influence the guessing strategy.
 
 \subsection{Modifying the guessing strategy}
 \label{sec:results-guessing}
+%
+As pointed out in Section~\ref{sec:enc-order}, a best practice law of
+differential cryptanalysis states that difference variables should be
+assigned first. Afterwards propagation of actual values for the two
+instances can take place.
 
+To enforce such a strategy, we tried several approaches:
+\begin{enumerate}
+  \item
+    Armin Biere provided us with a custom release of lingeling
+    which enforces that a special set of variables is evaluated
+    first. It is important that the CNF is still solved
+    with usual SAT solver heuristics, because enforcing
+    assignment of one variable after another leads to an increase
+    in backtracking steps and restarts. Hence, we consider this
+    release as a nice tradeoff. Difference variables are assigned
+    \enquote{as early as possible, as late as necessary}.
+  \item
+    Given this custom SAT solver we considered a SAT design which
+    requires the SAT solver to prefer a certain. This particular
+    design with a special Boolean variable is explained in
+    Section~\ref{sec:enc-order}.
+\end{enumerate}
 
 \section{Related work}
 \label{sec:results-related}
 
+TODO
+
 \section{Conclusion}
 \label{sec:conclusion}
 
-TODO: we attacked MD4 and SHA2, but can see the problems with
+We successfully found hash collisions for round-reduced MD4 and SHA-256.
 
 \section{Contributions}
 \label{sec:contributions}
