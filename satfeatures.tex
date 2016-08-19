@@ -82,6 +82,13 @@ Learning to SAT solving imply feature evaluation. SAT features and the resulting
 satisfiability runtime are used as training data for Machine Learning. One example
 using SAT features for algorithm selection is ASlib~\cite{aslib}.
 
+The SAT solvers of Section~\ref{sec:sat-solvers} we use also compute features they use
+when computing a solution. For example CryptoMiniSat 4.5.3 prints the following lines
+
+\begin{verbatim}
+c [features] numVars 56118, numClauses 358991, var_cl_ratio 0.156, binary 0.019, trinary 0.520, horn 0.387, horn_mean 0.000, horn_std 0.000, horn_min 0.000, horn_max 0.000, horn_spread 0.000, vcg_var_mean 0.000, vcg_var_std 0.902, vcg_var_min 0.000, vcg_var_max 0.000, vcg_var_spread -0.000, vcg_cls_mean 0.000, vcg_cls_std 0.237, vcg_cls_min 0.000, vcg_cls_max 0.000, vcg_cls_spread 0.000, pnr_var_mean 0.499, pnr_var_std 0.192, pnr_var_min 0.000, pnr_var_max 0.000, pnr_var_spread 0.000, pnr_cls_mean 0.425, pnr_cls_std 0.530, pnr_cls_min 0.000, pnr_cls_max 0.000, pnr_cls_spread 0.000, avg_confl_size 13.957, confl_size_min 473.000, confl_size_max 473.000, avg_confl_glue 8.407, confl_glue_min 1.000, confl_glue_max 207.000, avg_num_resolutions 13.097, num_resolutions_min 2.000, num_resolutions_max 849.000, learnt_bins_per_confl 0.013, learnt_tris_per_confl 0.102, avg_branch_depth 43.340, branch_depth_min 33.000, branch_depth_max 103.000, avg_trail_depth_delta 30.820, trail_depth_delta_min 5.000, trail_depth_delta_max 147.000, avg_branch_depth_delta 2.580, props_per_confl 0.007, confl_per_restart 155.847, decisions_per_conflict 9.877, irred-glue_distr_mean 536708712.391, irred-glue_distr_var 87053406094090.078, irred-size_distr_mean 4.000, irred-size_distr_var 0.000, irred-uip_use_distr_mean 0.000, irred-uip_use_distr_var 0.000, irred-activity_distr_mean 0.000, irred-activity_distr_var 0.000, red-glue_distr_mean 5.310, red-glue_distr_var 19.534, red-size_distr_mean 10.543, red-size_distr_var 61.630, red-uip_use_distr_mean 0.000, red-uip_use_distr_var 0.000, red-activity_distr_mean 0.000, red-activity_distr_var 0.000, num_gates_found_last 0, num_xors_found_last 20261
+\end{verbatim}
+
 \section{Statistical features}
 \label{sec:features-stats}
 %

@@ -358,8 +358,9 @@ to form a CNF.
 
 Variations of the DIMACS de-facto standard also allow multiline clauses (the
 zero symbol constitutes the end of a clause) or arbitrary whitespace instead of
-spaces. The syntactical details are individually published on a per competition
-basis.
+spaces. Another variant terminates DIMACS files once it encounters a single
+percent sign on a line. The syntactical details are individually published
+on a per competition basis.
 
 \renewcommand{\lstlistingname}{Listing}  % TODO otherwise it's Japanese, WTF
 \begin{lstlisting}[caption={Display~\ref{eq:xor} represented in DIMACS format}]
@@ -371,8 +372,9 @@ a b
 \section{Terminology}
 \label{sec:sat-terminology}
 %
-Given a conjunctive structure of disjunctions, we can define define terms
-related to this structure:
+Given a conjunctive structure of disjunctions, we can define terms
+related to this structure. Those terms will be used in the SAT features
+we suggest in Section~\ref{sec:features-suggested}.
 
 \index{Clause}
 \index{$k$-clause}
@@ -398,7 +400,8 @@ related to this structure:
   its negation does not occur. A \emph{used variable} is a variable which
   occurs at least once in the CNF.
 
-  The \emph{literal frequency} is the number of occurences of a literal in the CNF divided by the number of clauses declared. Equivalently \emph{variable frequency} defines the number of variable occurences divided by the number of clauses declared.
+  The \emph{literal frequency} is the number of occurences of a literal in the CNF divided by the number of clauses declared.
+  Equivalently \emph{variable frequency} defines the number of variable occurences divided by the number of clauses declared.
 \end{defi}
 
 \index{Clause length}
@@ -407,6 +410,10 @@ related to this structure:
   The \emph{clause length of a clause} is the number of literals contained.
   A clause is called \emph{tautological} if a literal and its negated literal occurs in it.
 \end{defi}
+
+A few basic properties hold in terms of satisfiability. For example existential literals
+are interesting, because they can be set to true and make one clause immediately satisfied
+without influencing other clauses.
 
 \section{Basic SAT solving techniques}
 \label{sec:sat-solving}
@@ -437,14 +444,28 @@ where $A \lor \bot$ is equivalent to $A$ for any Boolean function $A$.
 %
 \index{Watched Literals}
 Watched Literals are another fundamental concept in SAT solving. It is very
-expensive to check satisfiability of all clauses for every value of a literal.
-Watched Literals is a neat technique to reduce the number of checks.
+expensive to check satisfiability of all clauses for every assigned value
+of a literal. Watched Literals is a neat technique to reduce the number of checks.
 
-Consider the solver assigns a value for literal $l$. Instead of looking at
-all clauses and testing whether the clause is falsified by $l$, only clauses
-containing $l$ are checked if $l$ is one of the watched literals of the clause.
-This empirical approach was established with the Chaff and zChaff SAT solvers
-and has proven useful in various variants.
+In each clause two unassigned literals are declared to be \enquote{watched}.
+Structurally it is implemented the other way around:
+A clauses watch list is maintained per literal.
+Now as long as at least two literals are unassigned, the clause cannot become
+false (recognize that a clause is false if all literals are false).
+Therefore the clause does not need to be visited as long as at least
+unassigned literals exist. This implies the following decision procedure:
+\begin{itemize}
+  \item If all but one literal is false, propagate the remaining literal to be true.
+  \item If all literals are false, report UNSAT.
+  \item If any literal becomes true, watched literals do not change.
+  \item Else replace the literal on the watch list with a remaining unassigned literal.
+\end{itemize}
+
+%Consider the solver assigns a value for literal $l$. Instead of looking at
+%all clauses and testing whether the clause is falsified by $l$, only clauses
+%containing $l$ are checked if $l$ is one of the watched literals of the clause.
+This empirical approach was established with the Chaff and zChaff SAT
+solvers~\cite{moskewicz2001chaff} and has proven useful in various variants.
 
 \subsection{Remark}
 \label{sec:sat-remark}
@@ -452,7 +473,7 @@ and has proven useful in various variants.
 The previous two techniques shall illustrate basic approaches, but actual SAT
 solving research requires decades of development to tune individual SAT solvers.
 Memory models and concurrency strategies lead to fundamentally different runtime
-behaviours of SAT solvers.
+behaviors of SAT solvers.
 
 As such an initial idea to initiate an individual SAT solver specifically designed for
 solving problems in differential cryptanalysis was dropped, because development time
@@ -476,16 +497,48 @@ or their good results at previous SAT competitions:
       \item lingeling ats1o4
       \item lingeling baz
     \end{itemize}
-  \item CryptoMiniSat 4.5
+  \item CryptoMiniSat 4.5.3
   \item CryptoMiniSat 5
-  \item glucose syrup
+  \item glucose 4.0
+  \item glucose syrup 4.0
 \end{itemize}
 
 Specifically this means the hash collision attacks we looked have run with
 these SAT solvers. The results are discussed in Section~\ref{ch:results}
 and provided in Appendix~\ref{app:runtimes}.
 
-lingeling ats1o1, ats1o2 and ats1o4 are non-public releases of lingeling.
+MiniSat is known as \enquote{Swiss army knife of SAT solving} meaning that
+it includes many well-established techniques that can be built upon.
+SAT competitions 2009, 2011, 2013 and 2014 included a special MiniSat
+hack track where participants are asked to modify MiniSat to prove the
+best performance with as little change to the MiniSat codebase as possible.
+Even though is not one of the fastest SAT solvers today, it provides
+a nice codebase to experiment with.
+
+CryptoMiniSat is a derivative of MiniSat, which was originally modified
+for cryptographic problems. It famously features XOR clauses meaning that
+binary clauses of structure $a \oplus b$ could be added and will be resolved
+using Gaussian elimination. Temporarily development has been given up
+but most recently it was added again. Please recognize that our encoding
+introduced in Section~\ref{sec:enc-algotocnf} uses equivalence to model
+assignment and as such only clauses of structure $r = a \oplus b$ emerge
+rendering this feature impractical to use.
+
+glucose was the gold winner 2011 in the SAT+UNSAT application track.
+Modifications of glucose also ranked high throughout the years of SAT competition.
+glucose is a sequential SAT solver whereas glucose syrup is its parallelized
+version.
+
+lingeling is SAT solver developed by Armin Biere. Lingeling has been the
+winner of several tracks in the SAT competitions 2011 to 2016. For example
+it has won gold in the SAT+UNSAT application track in 2014.
+lingeling has two siblings: plingeling and treengeling. plingeling is a
+parallelized version of lingeling. As such it executes in multiple threads
+and shares units and equivalences between those instances. treengeling
+is a Cube \& Conquer solver meaning it partitions the problem into many
+subproblems and solves them individually.
+
+lingeling releases ats1o1, ats1o2 and ats1o4 are non-public releases of lingeling.
 They have been developed in private communication with Armin Biere.
 Our main goal was to achieve a separation between two sets of variables.
 First all variables of the first need to be assigned in the best possible
@@ -503,13 +556,12 @@ The SAT solvers have generally been run without any special options, except for
 \begin{itemize}
   \item MiniSat was run with \texttt{\textendash{}\textendash{}pre=once} as it is generally recommended to run with the builtin preprocessor.
   \item Lingeling has been generally run with \texttt{\textendash{}\textendash{}phase=-1} to prefer false as initial assignment to literals.
-    However, lingeling ats1o1 implements this with more forceful strategy.
+    However, lingeling ats1o1 implements this with a more forceful strategy.
 \end{itemize}
+
+Testcases with lingeling have all been run 5 times with various seeds (for reference, the default seed is 0).
+Only the mean runtime value is displayed in the results in chapter~\ref{ch:results}.
 
 Preprocessing is a difficult topic on its own. Sometimes preprocessing can provide a speedup,
 before actually solving the problem, but mostly SAT solvers implement preprocessing strategies
 themselves and run them repeatedly when solving the problem.
-
-TODO: testcases with lingeling have been run 5 times and mean was taken
-
-TODO: glucose-syrup is glucose in many parallel threads

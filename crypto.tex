@@ -57,13 +57,13 @@ ideas to satisfiability approaches.
     \end{tabular}
     \caption[Hexadecimal values of one MD4 collisions given in paper~\cite{wang2004}]{
       One of two MD4 hash collisions provided in~\cite{wang2004}.
+      A message represents one block of 512~bits.
+      %The hash value consists of 128~bits.
       Values are given in hexadecimal, message words are enumerated from
       left to right, top to bottom. Differences are highlighted in
       bold for illustration purposes. For comparison the first bits
       of Message 1 are \texttt{11000001\dots} and the last bits are
       \texttt{\dots10011101}.
-      A message represents one block of 512~bits.
-      %The hash value consists of 128~bits.
     }
     \label{tab:wang-md4-collision1}
   \end{center}
@@ -89,7 +89,7 @@ Hash algorithms consume input values as blocks of bits.
 As far as the length of the input must not conform to the block size,
 padding is applied. Now consider such a block of input values
 and another copy of it. We use those two blocks as inputs for two
-hash algorithm implementations, but provide slight modifications in few bits.
+hash algorithm instances, but provide slight modifications in few bits.
 Differential cryptanalysis is based on the idea to consider those execution states
 and tracing those difference to learn about the propagation of message differences.
 Compare this setup with Figure~\ref{tab:collision-attack}.
@@ -98,9 +98,9 @@ Compare this setup with Figure~\ref{tab:collision-attack}.
 At the very beginning only the few defined differences are given. But as the
 hash algorithm progresses in computation, differences are propagated to more
 and more bits. Most likely the final value will differ in many bits, because
-of a desirable hash algorithm property called \emph{Avalanche effect}.
-A small difference in the input should lead to a visually recognizable
-difference in the output.
+of a desirable hash algorithm property called \emph{avalanche effect}.
+A small difference in the input should lead to a significant difference
+in the output (i.e. visually recognizable).
 
 Visualizing those differences helps the cryptanalyst to find modifications
 yielding a small number of differences in the evaluation state. The propagation
@@ -111,11 +111,6 @@ output compared to many differences.
 The cryptanalyst consecutively modifies the input values to eventually
 receive a collision in the output value.
 
-\begin{theorem}
-  Assuming the number of differences in a differential path is small,
-  this path is expected to result in a hash collision with higher probability.
-\end{theorem}
-
 \index{Differential path}
 \index{Differential characteristic}
 \begin{defi}
@@ -124,13 +119,18 @@ receive a collision in the output value.
   a computation is called \emph{differential characteristic}.
 \end{defi}
 
+\begin{theorem}
+  Assuming the number of differences in a differential path is small,
+  this path is expected to result in a hash collision with higher probability.
+\end{theorem}
+
 \begin{figure}[pbt]
   \begin{center}
     \fbox{\includegraphics[width=0.55\textwidth]{img/diff_cryptanalysis.pdf}}
-    \caption[Typical attack setting for a collision attack]{
-      Typical attack setting for a collision attack:
+    \caption[Common attack setting for a collision attack]{
+      Common attack setting for a collision attack:
       Hash function $f$ is applied to two inputs $M$ and $M^*$ which differ
-      by some predefined bits. $\triangle M$ describes the difference between
+      by some predefined bits. $\Delta M$ describes the difference between
       these values. A hash collision is given if and only if output values
       $C$ and $C^*$ show the same value. In differential cryptanalysis we observe
       the differences between two instances applying function $f$
@@ -152,9 +152,9 @@ It was introduced by Christian Rechberger and Christophe de Canni\`ere
 in 2006~\cite[Section 3.2]{char-2006}, inspired by \emph{signed differences} by
 Wang~et al. and is shown in Table~\ref{tab:diff-notation}.
 
-Consider two hash algorithm implementations. Let $x_i$ be some bit
-from the first implementation and let $x_i^*$ be the corresponding bit
-from the second implementation. Differences are computed using a \boolf{XOR}
+Consider two hash algorithm instances. Let $x_i$ be some bit
+from the first instance and let $x_i^*$ be the corresponding bit
+from the second instance. Differences are computed using a \boolf{XOR}
 and commonly denoted as $\Delta x = x_i \oplus x_i^*$.
 Bit conditions allow us to encode possible relations between bits $x_i$ and $x_i^*$.
 
@@ -322,10 +322,10 @@ Table~\ref{tab:4bit-addition} and \ref{tab:sigma}.
     \caption[A simple 1-bit addition example]{%
       A simple 1-bit addition example:
       On the left the differential characteristic is given.
-      Two dashes, by definition, denote a missing difference in both input arguments.
-      The result of the addition also must not show a difference.
+      Two dashes, by definition, denote a missing difference in both arguments.
+      The result of the addition most neither show a difference.
       This yields eight possible bit configurations where two values close to each other denote $(M, M^*)$ of Figure~\ref{tab:collision-attack}.
-      Due to the behavior of addition, we know that configurations 2, 3, 5 and 8 (from left to right) are not possible.
+      Due to the behavior of addition, we know that configurations 2, 3, 5 and 8 (from left to right) are invalid.
     }
     \label{tab:1bit-example}
   \end{center}
