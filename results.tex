@@ -4,14 +4,62 @@
 \chapter{Results}
 \label{ch:results}
 %
+In Section~\ref{ch:features} we looked at SAT features which to some extent characterize
+a SAT problem. In Section~\ref{ch:enc} we discussed problem encoding for our hash collision
+attacks. In this section, we want to look at the feature value results and runtime results
+we retrieved.
+
 \section{Evaluating SAT features}
 \label{sec:results-features}
 
-TODO: do cryptoproblems distinguish from other problems?
+In the introduction of chapter~\ref{ch:features} we posed 8 questions.
+In the following we want to answer them with the data provided by the
+cnf-analysis project.
 
-TODO: do our benchmark distinguish from other problems?
+\begin{description}
+\item[Given an arbitrary literal. What is the percentage it is positive?]
+  We look at every clause and determine the ratio of positive to the total number of literals.
+  We determine the mean per CNF file and the mean among all CNF files
+  and retrieve a value of $0.48$ meaning that 48~\% of the literals are positive.
+\item[What is the variables / clauses ratio?]
+  In average a CNF file has 12,219 variables and 89,541 clauses.
+  Its variables-clauses ratio is 0.1365.
+\item[How many literals occur only once either positive or negative?]
+  In average there are 36 existential literals per CNF file,
+  but its standard deviation of 967 is very high.
+\item[What is the average and longest clause length among CNF benchmarks?]
+  The average clause length is 3.04 with a standard deviation of 0.99
+  and the longest clause length found was 61,473. Long clauses are typically
+  outliers excluding specific assignments.
+\item[How many Horn clauses exist in a CNF?]
+  In average 29,994 goal clauses and 31,315 definite clauses exist
+  with an average number of 83649 clauses in a CNF file.
+\item[Are there any tautological clauses?]
+  In a file, 1679 tautological literals have been found. However,
+  its mean is 0.07 with a standard deviation of $9.63$ meaning that tautological
+  clauses are very rare.
+\item[Are there any CNF files with more than one connected variable component?]
+  Indeed, an average CNF file contains 67.07 connected variable components.
+  However, its median is 1 anyway implying that at least half of the CNF files
+  have only 1 connected variable component.
+\item[How many variables of a CNF are covered by unit clauses?]
+  In average 124 variables are covered by unit clauses. This is an insignificant
+  number compared to 12,219 variables in an average CNF.
+\end{description}
 
-TODO: answer the 8 questions posed previously
+Do our generated problems distinguish from these average problems?
+
+\begin{itemize}
+  \item In average our (MD4 and SHA-256 hash collision) problems contain
+        84,821 variables and 515,646 clauses meaning that our problems
+        are comparably large.
+% TODO
+%  \item Due to the cryptographic high diffusion we expected a 
+\end{itemize}
+
+%TODO: do cryptoproblems distinguish from other problems?
+
+%TODO: do our benchmark distinguish from other problems?
 
 \section{Finding hash collisions}
 \label{sec:results-attacks}
