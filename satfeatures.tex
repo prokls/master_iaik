@@ -12,7 +12,8 @@ our problems distinguish from \enquote{average} problems in any
 way such that we can use this distinction for runtime optimization.
 
 I came up with 8 questions related to basic properties of SAT problems
-we will discuss in depth in this section:
+we will discuss in depth in this section. We will characterize an
+average SAT problem at Section~\ref{sec:features-average}:
 \begin{enumerate}
 \item Given an arbitrary literal. What is the percentage it is positive?
 \item What is the variables / clauses ratio?
@@ -26,8 +27,8 @@ we will discuss in depth in this section:
 
 We will now define the terms used in those questions.
 
-\section{SAT features and CNF analysis}
-\label{sec:features-analysis}
+\section{Definition}
+\label{sec:features-definition}
 %
 \index{SAT feature}
 \index{Feature value}
@@ -206,7 +207,7 @@ A summary of our suggested SAT features is given:
 %
 The resource requirements of those features have been classified:
 \begin{description}
-  \item[Type 1] read the files as bytes, a DIMACS parser is not necessary, constant memory is used
+  \item[Type 1] read the files as bytestring, a DIMACS CNF parser is not necessary, constant memory is used
   \item[Type 2] features understand what a clause is, but still need constant memory
   \item[Type 3] subquadratic runtime and linear memory
   \item[Type 4] unrestricted
@@ -216,40 +217,51 @@ Memory and runtime is always considered in comparison with the filesize.
 
 This classification should support future considerations regarding feature evaluation tools.
 The suggested SAT features above have been explicitly selected to avoid Type 4 implementations to limit the time to compute features.
+Furthermore tools evaluating only a subset of features (like Type~2 features) with better performance characteristics.
+
 The Python implementation triggered MemoryErrors on a computer with 4~GB RAM for a 770~MB CNF file.
 Followingly a much more efficient Go implementation was implemented which requires much less memory and is much faster.
 \texttt{bench\_573.smt2.cnf} took 1 second in Go instead of 2 minutes in Python.
-However, the data evaluated is less accurate compared to Python, because Python unlike Go provide nice implementation of statistical tools in the standard library.
+However, the data evaluated is less accurate compared to Python, because Python unlike Go provides a nice implementation of statistical tools in the standard library. Go algorithms were written on our own.
 
-In the following section we want to evaluate SAT features and
-compare test cases.
+In the following section we define the dataset we consider.
 
 \section{CNF dataset}
 \label{sec:features-dataset}
 %
 To evaluate CNF features of a representative set of CNF files, it was necessary to identify equivalent CNF files in the best possible way.
-Therefore I defined a hashing algorithm standardizing the CNF input provided to a SHA1 instance. Every CNF file is identifiable by its
+Therefore we defined a hashing algorithm standardizing the CNF input provided to a SHA1 instance. Every CNF file is identifiable by its
 \enquote{cnfhash 2.0.0} hash value.
 
 In the next step a complete set of CNF files of previous SAT competitions was collected.
 The following CNF file collections have been considered:
 
-\begin{itemize}
-  \itemsep2pt
-  \item SAT Race 2008
-  \item SAT09 Competition
-  \item SAT-Race 2010
-  \item SAT11 Competition
-  \item SAT Challenge 2012
-  \item SAT Competition 2013
-  \item SAT Competition 2014
-  \item SAT-Race 2015
-  \item SAT Competition 2016
-  \item SATlib
-\end{itemize}
+\begin{center}
+  \begin{minipage}{0.48\linewidth}
+    \begin{itemize}
+      \itemsep2pt
+      \item SAT Race 2008
+      \item SAT09 Competition
+      \item SAT-Race 2010
+      \item SAT11 Competition
+      \item SAT Challenge 2012
+    \end{itemize}
+  \end{minipage}
+  \begin{minipage}{0.48\linewidth}
+    \begin{itemize}
+      \itemsep2pt
+      \item SAT Competition 2013
+      \item SAT Competition 2014
+      \item SAT-Race 2015
+      \item SAT Competition 2016
+      \item SATlib
+    \end{itemize}
+  \end{minipage}
+\end{center}
+
 The benchmarks are mostly contributed by the participants of the associated conferences.
 Others are reused from previous years. Individual projects allow to generate CNF files
-for specific problems in a selectable problem size; such as CNFgen~\ref{cnfgen} by
+for specific problems in a selectable problem size; such as CNFgen~\cite{cnfgen} by
 Massimo Lauria.
 
 Some files turned out to be problematic. In SATlib, 3 gzipped files couldn't be decompressed and several files
@@ -269,22 +281,22 @@ terminate the CNF. Besides those minor issues documented as part of the cnf-anal
 It is important to point out that public benchmark files are specifically chosen
 to be evaluated before a conference is held. Hence they are expected to terminate
 within a given time frame and are therefore not oversized. On the one hand this
-ensures that the problems are actually solvable, however they might not be a
-representative selection. At this point no better data set is available and therefore
+ensures that the problems are feasible, but on the other hand they might be a
+biased selection. At this point no better data set is available and therefore
 we proceeded with this dataset.
 
 According to my results, an average SAT problem consists of:
 \begin{itemize}
-  \item 83,650 clauses in average ranging from 21 to 53,616,734
-  \item The longest clause we found had 61,473~literals, but the longest clause of CNFs typically covers 17 literals.
-  \item At least 114 up to 150,609,758 literals were found in a CNF.
-  \item The clause-variables ratio lies between 1.5 and 27,720 with mean 8.35 and $\sigma = 189$.
-  \item The average length of a clause is expected to be 3.
-  \item In average a CNF file has 67 connected variable components.
-  \item In average 31,315 clauses are definite clauses and 29,995 clauses are goal clauses.
-  \item In average a literal occurs in 1.3~\% of the clauses of the CNF.
-  \item 48~\% of literals in a clause are positive.
-  \item The arithmetic mean tells 137 unit clauses per CNF file can be expected, but the median tells it is mostly 0.
+  \item 83,542 clauses in average ranging from 21 to 53,616,734 (median 430, $\sigma$ 848388)
+  \item The longest clause we found had 61,473~literals, but the longest clause of an average CNF covers 20 literals.
+  \item The number of total literals in a CNF ranges from 60 up to 150,609,758.
+  \item The clause-variables ratio lies between 1.22 and 27,720 with mean 9.54 and $\sigma$ 139.
+  \item The average length of a clause is expected to be 3. The largest clause length mean we found was 19.58 compared to 2.83 as the smallest clause length mean.
+  \item Surprisingly, in average a CNF file has 205 connected literal components and 53 connected variable components. However both corresponding medians are $1$ meaning that at least have of the problems still have only one component.
+  \item In average 32,787 clauses are definite clauses and 35,094 clauses are goal clauses.
+  \item In average a literal occurs in 1.4~\% of the clauses of the CNF.
+  \item 47~\% of literals in a clause are positive.
+  \item The arithmetic mean tells 124 unit clauses per CNF file can be expected, but the median tells it is mostly 0.
   \item The largest variable found was 13,842,706 and 13,829,558~variables were used at most.
 \end{itemize}
 
@@ -293,11 +305,19 @@ According to my results, an average SAT problem consists of:
 %
 Given this huge set of CNF files and therefore integers, we evaluated whether Benford's law holds.
 
+A paper by Theodore P. Hill~\cite{hill1998first} characterizes Benford's Law
+as the following conjecture:
 \begin{theorem}
   Consider arbitrary data from tables, listings or other sources in publications, newspaper
   and so on and so forth, the digit $1$ occurs in about 30~\% of the time.
   The first digit is $1$ about $30$~percent of the time
   and $9$ only about $4.6$~percent of the time.
 \end{theorem}
-  A paper by Theodore P. Hill~\cite{hill1998first} characterizes Benford's Law
-  as the following conjecture:
+We evaluated that the leading digits 1 to 9 occur with probabilities
+28.76~\%, 19.09~\%, 13.56~\%, 10.97~\%, 7.48~\%, 5.76~\%, 5.12~\%, 4.79~\%
+and 4.46~\% respectively. We concluded that:
+\begin{quote}
+  Considering a deviation of 1.34~\% for digit $1$ (expected $30.1$, actual $28.76$) and
+  0.12~\% for digit $9$ (expected $4.58$, actual $4.46$),
+  we claimed the CNF~files considered satisfy Benford's law.
+\end{quote}

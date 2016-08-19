@@ -32,15 +32,14 @@ but we needed a different toolchain for SHA-256.
 \section{algotocnf}
 \label{sec:enc-algotocnf}
 %
-
+We implemented our own library \emph{algotocnf} to achieve greater flexibility in SAT design.
 
 \subsection{Two instances and its difference}
 \label{sec:enc-original}
 %
 \index{algotocnf}
-Our second approach was our own library which generated a CNF for a given hash algorithm
-implementation which is fed with a symbolic variable. Only integer operations have been
-implemented.
+algotocnf generated a CNF for a given hash algorithm implementation which is fed with
+a symbolic variable. Only integer operations have been implemented.
 
 Our tool \emph{algotocnf} implements the following strategy:
 \begin{enumerate}
@@ -98,7 +97,7 @@ variable is expected to share a clause with another variable.
 The design decisions of this encoding are fundamental to the
 resulting runtime discussed in chapter~\ref{ch:results}.
 
-\section{Adding the differential description}
+\subsection{Adding the differential description}
 \label{sec:enc-diff-desc}
 %
 Using the approach in the previous section, we were able to find actual MD4 collisions
@@ -118,7 +117,8 @@ This approach explicitly models differentiable behavior, which should be deducib
 by the SAT solver itself. However, this lead to a major speedup which can be observed
 in the runtime results of chapter~\ref{ch:results}.
 
-\section{Evaluating difference variables first}
+\newpage
+\subsection{Evaluating difference variables first}
 \label{sec:enc-diff-desc-ocnf}
 %
 \begin{prop}
@@ -127,7 +127,7 @@ in the runtime results of chapter~\ref{ch:results}.
 \end{prop}
 
 This proposed principle is fundamental to differential cryptanalysis. A previous tool
-at our institute implements propagation of hash algorithm values without a SAT solver
+at our department implements propagation of hash algorithm values without a SAT solver
 and this strategy is essential to good performance. This strategy was introduced
 in the very early days of differential cryptanalysis and was also used by Wang et
 al.~\cite{wang2004} to find their hash collisions.
@@ -152,7 +152,14 @@ This proposition is justified by the desire to find as little differences as pos
 in a hash collision to increase the probability of values cancelling each other out
 in the later rounds.
 
-\section{Influencing the evaluation order}
+\subsection{A light-weight approach}
+\label{sec:enc-ocnf}
+%
+In this tweak we made a step back and considered the ideas of the previous
+section but neglected the differential description. This approach was interesting
+to see the effect of differential descriptions.
+
+\subsection{Influencing the evaluation order}
 \label{sec:enc-diff-desc-eo}
 %
 We took to idea to influence the evaluation order to the next level,
