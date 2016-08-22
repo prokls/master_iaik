@@ -4,15 +4,27 @@
 \chapter{Results}
 \label{ch:results}
 %
-In Section~\ref{ch:features} we looked at SAT features which to some extent characterize
-a SAT problem. In Section~\ref{ch:enc} we discussed problem encoding for our hash collision
-attacks. In this section, we want to look at the feature value results and runtime results
-we retrieved.
+In Chapter~\ref{ch:sat} we discussed Boolean algebra; in particular we looked at
+satisfiability which is practically covered by SAT solvers. SAT solvers take
+Boolean functions in Conjunctive Normal Form and determine satisfiability.
+In Chapter~\ref{ch:dc} we looked at how we can analyze algorithms by looking
+at the progression of differences between algorithm instances. In particular
+we looked at hash algorithms introduced in Chapter~\ref{ch:hash}.
+
+With this background we designed a attack setting in Chapter~\ref{ch:enc}
+which enables us to verify and also find a hash collision given a differential
+characteristic given as starting point. Our goal is to find hash collisions
+in as little time as possible. Therefore we introduced several approaches
+in Section~\ref{sec:enc-algotocnf}.
+
+In this section we will evaluate those approaches. Furthermore we briefly
+discuss claims we made about average SAT problems. In Section~\ref{ch:features}
+we looked at SAT features which to some extent characterize a SAT problem.
 
 \section{Evaluating SAT features}
 \label{sec:results-features}
-
-In the introduction of chapter~\ref{ch:features} we posed 8 questions.
+%
+In the introduction of Chapter~\ref{ch:features} we posed 8 questions.
 In the following we want to answer them with the data provided by the
 cnf-analysis project.
 
@@ -80,7 +92,7 @@ In Section~\ref{sec:enc-algotocnf} we introduced a basic encoding involving two 
 instances and difference variables. Constraints resulting from the hash algorithm description
 and given differential characteristic are added.
 
-We considered MD4 testcases~A, B and C (compare with Appendices~\ref{tab:tcA}, \ref{tab:tcB} and \ref{tab:tcC})
+We considered MD4 testcases~A, B and C (compare with Appendices~\ref{fig:tcA}, \ref{fig:tcB} and \ref{fig:tcC})
 and generated the corresponding CNF files. The SAT solvers mentioned in Section~\ref{sec:sat-solvers}
 were used to evaluate whether the problem is solvable in reasonably time. For every testcase we
 defined a time limit of at most 1 day (i.e. 86,400 seconds). A timeout is denoted by \timeout.
@@ -155,16 +167,20 @@ In Table~\ref{tab:md4-B-runtimes} we see that CryptoMiniSat~4.5.3, glucose~4.0
 and glucose-syrup~4.0 couldn't solve the problem within the time limit of 1~day.
 However, other SAT solver were still able to find a hash collision. Please recognize
 that Table~\ref{tab:md4-A-runtimes} provides runtime results for the testcase
-given in Table~\ref{tab:tcA}; equivalently Table~\ref{tab:md4-B-runtimes} for
-Table~\ref{tab:tcB} and Table~\ref{tab:md4-C-runtimes} for Table~\ref{tab:tcC}.
+given in Table~\ref{fig:tcA}; equivalently Table~\ref{tab:md4-B-runtimes} for
+Table~\ref{fig:tcB} and Table~\ref{tab:md4-C-runtimes} for Table~\ref{fig:tcC}.
 Its caption gives an intuition how testcase B is more difficult than A and
 C is more difficult than B.
 
-We end up with the result, that the hash collision given in Table~\ref{tab:tcC}
+We end up with the result, that the hash collision given in Table~\ref{fig:tcC}
 can be solved by a limited set of modern SAT solvers. Of course the cryptanalyst
 needs to figure out good starting points for the hash collision and encode them
 in the differential characteristic, but this task is still considered practical,
 because this task can be easily automated.
+
+TODO: is phase -1 worth it?
+
+TODO: simplification runtime is not part of runtime
 
 \subsection{Improvements with differential description}
 \label{sec:result-diff-desc}
@@ -335,7 +351,7 @@ At the following website, any results part of this project are collected:
 Several subprojects are part of this master thesis:
 \begin{description}
 \item[algotocnf]\hfill{} \\
-  A python library implementing the encoding described in chapter~\ref{ch:enc}. \\[4pt]
+  A python library implementing the encoding described in Chapter~\ref{ch:enc}. \\[4pt]
   \textbf{Python3 library and program:} \url{https://github.com/prokls/algotocnf}
 \item[cnf-hash]\hfill{} \\
   A standardized way to produce a unique hash for CNF files \\[4pt]

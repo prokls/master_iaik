@@ -7,8 +7,9 @@
 Boolean algebra allows us to describe functions over two-valued variables.
 Satisfiability is the question for an assignment such that a function
 evaluates to true. Satisfiability problems are solved by SAT~solvers.
-We discuss the basic theory behind satisfiability. We will learn that any
-computation can be represented as satisfiability problem. In Chapter~\ref{ch:enc}
+We discuss the basic theory behind satisfiability. Because any computation
+can be represented as satisfiability problem, we are able to verify intermediate
+states of algorithms. In Chapter~\ref{ch:enc}
 we will represent a differential cryptanalysis problem such that it is
 solvable iff the corresponding SAT~problem is satisfiable.
 
@@ -209,75 +210,15 @@ SAT research is heavily concerned with finding good heuristics to find some mode
 for a given SAT problem as fast as possible. Biyearly
 \href{http://satcompetition.org/}{SAT competitions} take place to challenge
 SAT solvers in a set of benchmarks. The committee evaluates the most successful
-SAT solvers solving the most problems within a given time frame.
+SAT solvers defined by solving the most problems within a given time frame.
 
 SAT~2016 is currently ongoing, but in 2014 lingeling by Armin Biere has won first prize in
 the Application benchmarks track and second prize in the Hard Combinatorial benchmarks
 track for SAT and UNSAT instances respectively. Its parallelized sibling plingeling
 and Cube \& Conquer sibling treengeling have won prizes in parallel settings.
 
-In chapter~\ref{ch:results} we will look at runtime results shown by (but not limited to)
+In Chapter~\ref{ch:results} we will look at runtime results shown by (but not limited to)
 those SAT solvers.
-
-%\section{Satisfiability of hash algorithm states}
-%\label{sec:intro-algo-sat}
-%%
-%We discussed Boolean functions and satisfiability. At the same time we looked
-%at basic properties of hash algorithms. But the question remains how we can
-%link those areas together? This section is dedicated to this question.
-
-%\index{Algorithm}
-%\index{I/O Algorithm}
-%\begin{defi}
-%  An \emph{algorithm} is a step-wise set of instructions to solve a problem.
-%  An \emph{I/O algorithm} transforms given input values to output values.
-%\end{defi}
-
-%Hash algorithms are one example of I/O algorithms.
-
-%I/O algorithms can be implemented as a sequence of instructions for computers.
-%At the same time I/O algorithms can be represented as combination of Boolean
-%functions. This claim is backed in more detail in Section~\ref{sec:sat-dimacs}
-%with Theorem~\ref{thm:all-cnf}. It follows immediately that we can represent
-%I/O algorithms such as hash algorithms entirely as Boolean function.
-
-%\begin{theorem}
-%  Every algorithm can be represented as Boolean function.
-%\end{theorem}
-
-%\index{Least significant bit}
-%\index{Most significant bit}
-%We consider 2-bit addition as small example. Let $a_{i}$ be the first argument
-%where $i$ denotes the binary position. If $i=0$, the \emph{least significant bit}
-%(LSB) is considered. If $i=1$, the \emph{most significant bit} (MSB) is considered.
-
-%Let $b_{i}$ be the second argument and $s_{i}$ be the output value.
-%Furthermore $c_{i}$ is the carry bit, where $c_1$ is left out, because
-%it is not used in 2-bit addition. This model of 2-bit addition as Boolean
-%function can be seen in Figure~\ref{fig:intro-2bit-addition}.
-
-%\begin{figure}
-%  \begin{center}
-%    \begin{tabular}{lrcc}
-%      1st arg: &   & $a_{1}$ & $a_{0}$ \\
-%      2nd arg: & + & $b_{1}$ & $b_{0}$ \\
-%    \hline
-%      carry:   &   &         & $c_0$ \\
-%      sum:     & = & $s_{1}$ & $s_0$
-%    \end{tabular}
-%    \hspace{10pt}~$\leadsto$\hspace{10pt}%
-%    \begin{minipage}{50pt}%
-%      \begin{flalign*}
-%        s_0 &= \boolf{XOR}(a_0, b_0) &\\
-%        c_0 &= a_0 \land b_0 &\\
-%        s_1 &= \boolf{XOR}(a_0, b_0, c_0) &
-%      \end{flalign*}
-%    \end{minipage}
-%  \end{center}
-%  \caption{Modelling 2bit addition (left) as Boolean function (right)}
-%  \label{fig:intro-2bit-addition}
-%\end{figure}
-
 
 \section{The DIMACS de-facto standard}
 \label{sec:sat-dimacs}
@@ -362,7 +303,7 @@ spaces. Another variant terminates DIMACS files once it encounters a single
 percent sign on a line. The syntactical details are individually published
 on a per competition basis.
 
-\renewcommand{\lstlistingname}{Listing}  % TODO otherwise it's Japanese, WTF
+\renewcommand{\lstlistingname}{Listing}  % REMARK otherwise it's Japanese, WTF
 \begin{lstlisting}[caption={Display~\ref{eq:xor} represented in DIMACS format}]
 p cnf 2 2
 a b
@@ -560,7 +501,7 @@ The SAT solvers have generally been run without any special options, except for
 \end{itemize}
 
 Testcases with lingeling have all been run 5 times with various seeds (for reference, the default seed is 0).
-Only the mean runtime value is displayed in the results in chapter~\ref{ch:results}.
+Only the mean runtime value is displayed in the results in Chapter~\ref{ch:results}.
 
 Preprocessing is a difficult topic on its own. Sometimes preprocessing can provide a speedup,
 before actually solving the problem, but mostly SAT solvers implement preprocessing strategies

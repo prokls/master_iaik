@@ -9,6 +9,13 @@ We also sketched how hash algorithm properties got broken using
 differential cryptanalysis. In this section we combine those
 subjects and describe how we designed an attack setting.
 
+We designed a basic prototype with the STP SMT solver. Followingly
+we wanted to tweak the CNF used by the SAT solver and wrote
+our own library \emph{algotocnf} to generate CNFs for differential
+purposes; as illustrated in Section~\ref{ch:dc}.
+There we distinguished 5 different tweaks. We evaluate
+the performance of those tweaks in Chapter~\ref{ch:results}.
+
 Every section represents a major approach whereas subsections
 represent derivatives of this approach with minor tweaks.
 
@@ -39,11 +46,12 @@ the corresponding bitvector of the second hash algorithm instance to \texttt{bv1
 We claim \texttt{ASSERT(diff = BVXOR(bv1, bv2))} to ensure that \texttt{diff}
 represents the difference between \texttt{bv1} and \texttt{bv2}. Given the bitconditions
 for a bitvector from a differential characteristic, we require \texttt{diff} to enforce
-those particular differences.
+those particular differences. This corresponds to the idea of differential cryptanalysis
+introduces in Chapter~\ref{ch:dc}.
 
-It is now trivial to consider a differential characteristic such as Testcase~\ref{tab:tcA}
+It is now trivial to consider a differential characteristic such as Testcase~\ref{fig:tcA}
 and generate the corresponding CVC~input for STP. STP solves this particular problem within
-a second. Testcase~\ref{tab:tcB} already provides a more complex example taking
+a second. Testcase~\ref{fig:tcB} already provides a more complex example taking
 40 minutes to solve. We used minisat as SAT solver in the backend, even though STP
 allows to exchange it for CryptoMiniSat which is a more modern and versatile SAT solver.
 
@@ -61,7 +69,7 @@ As a next step, we wanted to improve the evaluation performance to tackle more d
 problems. We considered this design as a working prototype of a basic approach to be
 improved upon.
 
-STP was not fruitful for next goal, because we wanted to tweak the SAT design generated
+STP was not fruitful for our next goal, because we wanted to tweak the SAT design generated
 for the SAT solver and needed good control over the SAT encoding
 which we expected to have a major influence on the performance.
 
@@ -86,7 +94,7 @@ because of its implementation of differential logic.
 To model our CNF \emph{algotocnf} implements the following strategy:
 \begin{enumerate}
   \item Take a differential characteristic and the hash algorithm as input.
-  \item Every bit is therefore represented as a boolean variable.
+  \item Every bit is therefore represented as a Boolean variable.
     If you apply addition, operator overloading in python will ensure
     that clauses are generated to describe the addition consisting of
     \boolf{XOR}s and \boolf{MAJ}s. Every operation is modelled as assignment.
@@ -114,11 +122,11 @@ To model our CNF \emph{algotocnf} implements the following strategy:
 
 When adding clauses resulting from
 the differential characteristic as constraints, the question arises how those
-bit conditions are encoded. Essentially, we have only boolean values available,
+bit conditions are encoded. Essentially, we have only Boolean values available,
 but bit conditions tell constraints such as \enquote{a difference is given,
 but the actual value is unknown}.
 
-It seemed trivial to add a \emph{difference variable} for every pair of boolean
+It seemed trivial to add a \emph{difference variable} for every pair of Boolean
 values representing a bit in the two instances. Furthermore the difference
 variable $\Delta x$ is connected by a XOR with the variables of the pair $(x, x')$.
 \[ \Delta x = x \oplus x' \]
@@ -132,8 +140,9 @@ with other values. This should result in a high diffusion and almost every
 variable is expected to share a clause with another variable.
 
 The difference variables design corresponds to \texttt{diff} bit vectors
-in the STP. The design decisions of this encoding are fundamental to the
-resulting runtime discussed in chapter~\ref{ch:results}.
+in the STP and therefore designs the difference described in Chapter~\ref{ch:dc}.
+The design decisions of this encoding are fundamental to the resulting
+runtime discussed in Chapter~\ref{ch:results}.
 
 \subsection{Adding the differential description}
 \label{sec:enc-diff-desc}
@@ -164,7 +173,7 @@ We also model the second behavior:
 This approach explicitly models differentiable behavior, which should be deducible
 by the SAT solver itself based on the clauses we added before.
 However, this lead to a major speedup which can be observed in the runtime results
-of chapter~\ref{ch:results}.
+of Chapter~\ref{ch:results}.
 
 \newpage
 \subsection{Evaluating difference variables first}
@@ -206,7 +215,7 @@ in the later rounds.
 %
 In this tweak we made a step back and considered the ideas of the previous
 section but neglected the differential description. This approach was interesting
-to see the effect of differential descriptions.
+to recognize the effect introduced by adding the differential description.
 
 \subsection{Influencing the evaluation order}
 \label{sec:enc-diff-desc-eo}
@@ -214,7 +223,7 @@ to see the effect of differential descriptions.
 We took to idea to influence the evaluation order to the next level,
 by applying the following design:
 
-Let $\Delta x$ be the difference variable of pair $(x, x')$. We introduce a new boolean
+Let $\Delta x$ be the difference variable of pair $(x, x')$. We introduce a new Boolean
 variable $x^*$. We add clause
 \[ x^* = (\Delta x \land x) \]
 and explicitly tell the SAT solver to guess on $x^*$ before guessing on $\Delta x$, $x$ or $x'$.

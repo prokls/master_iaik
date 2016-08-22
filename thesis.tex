@@ -1,5 +1,5 @@
 \documentclass[11pt,a4paper,final,openright]{book}
-% TODO final, not draft
+% TODO: publish black/white version
 \usepackage{luatextra}
 \usepackage[utf8x]{luainputenc}
 
@@ -133,7 +133,7 @@
 
 \newcommand\concat{\,\|\,}
 \newcommand\yes{$✓$}
-\newcommand\no{$✗$}  % TODO not supported by any loaded font, but missing character looks visually fine
+\newcommand\no{$✗$}  % REMARK not supported by any loaded font, but missing character looks visually fine
 \newcommand\set[1]{\left\{#1\right\}}
 \newcommand\boolf[1]{\texttt{#1}}
 \newcommand\satfeature[1]{#1}
@@ -308,7 +308,7 @@
   represents a valid hash state. We implemented a framework generating CNFs for
   these purposes and improved our CNF design to solve MD4 testcases as well as
   much more difficult SHA-256 testcases. Our greatest achievement was finding a
-  SHA-256 hash collision over 24 rounds.
+  MD4 full round hash collision and a SHA-256 hash collision over 27 rounds.
   Finally we also provide a small CNF analysis library to compare encoded problems
   with others.
 
@@ -328,7 +328,7 @@
 %  thesis dissertation.
 
 %  %\rule[0.5em]{5em}{0.5pt} \hfill{} \rule[0.5em]{5em}{0.5pt} \\
-%  %Date \hfill{} Digital signature % TODO
+%  %Date \hfill{} Digital signature
 %  \vspace{120pt}
 %  \hfill{}\raggedright{(digital signature)}
 %\end{declaration}

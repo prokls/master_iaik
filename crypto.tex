@@ -5,7 +5,7 @@
 \chapter{Differential cryptanalysis}
 \label{ch:dc}
 %
-In chapter~\ref{ch:hash} we defined two hash functions. In this chapter
+In Chapter~\ref{ch:hash} we defined two hash functions. In this chapter
 we consider such functions from a differential perspective. Differential
 considerations will turn out to yield successful collision attacks on hash
 functions. We introduce a notation to easily represent differential
@@ -297,15 +297,15 @@ We start with 1-bit addition as most basic exercise to the reader. Consider a ma
 two input rows and one output row. The values of the first two rows are added such that
 the bit difference at the third row is created.
 
-Figure~\ref{tab:1bit-example} illustrates this example. Remember that symbols such as
+Figure~\ref{tab:1-bit-example} illustrates this example. Remember that symbols such as
 \dnI{-} and \dnI{0} underlie semantics defined in Table~\ref{tab:diff-notation}.
 It is also interesting to see how propagation of values can work. In
-Figure~\ref{tab:1bit-deduction} we see how an underspecified value \dnI{?} can be
+Figure~\ref{tab:1-bit-deduction} we see how an underspecified value \dnI{?} can be
 strengthened once we have checked which values can be taken. Recognize that the
 system is constrained by the function in use and the definition of the differential symbols.
 
 Finally we can extend our testcases to 4~bits and retrieve testcases such as
-Table~\ref{tab:4bit-addition} and \ref{tab:sigma}.
+Table~\ref{tab:4-bit-addition} and \ref{tab:sigma}.
 
 \begin{table}[p]
   \begin{center}
@@ -327,7 +327,7 @@ Table~\ref{tab:4bit-addition} and \ref{tab:sigma}.
       This yields eight possible bit configurations where two values close to each other denote $(M, M^*)$ of Figure~\ref{tab:collision-attack}.
       Due to the behavior of addition, we know that configurations 2, 3, 5 and 8 (from left to right) are invalid.
     }
-    \label{tab:1bit-example}
+    \label{tab:1-bit-example}
   \end{center}
 \end{table}
 \begin{table}[p]
@@ -339,13 +339,13 @@ Table~\ref{tab:4bit-addition} and \ref{tab:sigma}.
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{1}\dnI{1} \\ \dnI{0}\dnI{0} \\ \hline \dnI{1}\dnI{1} \end{tabular}\end{minipage}
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{1}\dnI{1} \\ \dnI{1}\dnI{1} \\ \hline \dnI{0}\dnI{0} \end{tabular}\end{minipage}
     \caption[Propagation of bit conditions in a differential characteristic]{%
-      Like Figure~\ref{tab:1bit-example}, but any difference value for the result bit is possible.
+      Like Figure~\ref{tab:1-bit-example}, but any difference value for the result bit is possible.
       As such we consider any possible bit configuration, but eventually recognize that only four bit configurations
       are consistent with the behavior of addition. Because all resulting configurations show no bit difference
       in the output bit, we can strengthen \dnI{?} by replacing it with \dnI{-}. This illustrates how
       knowledge about differential states can be propagated.
     }
-    \label{tab:1bit-deduction}
+    \label{tab:1-bit-deduction}
   \end{center}
 \end{table}
 
@@ -412,7 +412,7 @@ Table~\ref{tab:4bit-addition} and \ref{tab:sigma}.
     whereas the lower line show invalid ones for 4-bit addition.
     The rows are conventionally named using capital letters.
   }
-  \label{tab:4bit-addition}
+  \label{tab:4-bit-addition}
 \end{table}
 
 \begin{table}[p]
