@@ -25,7 +25,7 @@ we looked at SAT features which to some extent characterize a SAT problem.
 \label{sec:results-features}
 %
 In the introduction of Chapter~\ref{ch:features} we posed 8 questions.
-In the following we want to answer them with the data provided by the
+In the following, we want to answer them with the data provided by the
 cnf-analysis project.
 
 \begin{description}
@@ -33,9 +33,9 @@ cnf-analysis project.
   We look at every clause and determine the ratio of positive to the total number of literals.
   We determine the mean per CNF file and the mean among all CNF files
   and retrieve a value of $0.48$ meaning that 48~\% of the literals are positive.
-\item[What is the variables / clauses ratio?]
+\item[What is the clauses / variables ratio?]
   In average a CNF file has 12,219 variables and 89,541 clauses.
-  Its variables-clauses ratio is 0.1365.
+  Its clauses-variables ratio is 7.328.
 \item[How many literals occur only once either positive or negative?]
   In average there are 36 existential literals per CNF file,
   but its standard deviation of 967 is very high.
@@ -59,12 +59,75 @@ cnf-analysis project.
   number compared to 12,219 variables in an average CNF.
 \end{description}
 
-Do cryptoproblems distinguish from average problems?
+The clauses/variables ratio was thoroughly studied by the SAT
+community~\cite{nudelman2004understanding}.
+A strong correlation between the instance's hardness and the ratio of number
+of clauses to number variables exists~\cite{selman1996generating}
+though it is important to point out that this result holds for randomly
+generated SAT instances, which does not hold for our benchmarks.
+
+Existential literals are interesting to discover, because they allow
+to remove a clause immediately. Consider a clause with literals
+$(l_1, l_2, \ldots, l_n)$. If a guarantee exists such that the variable
+of any literal $l_i$ does not occur in any other clause, we can claim
+$l_i$ true rendering the clause satisfied.
+
+Tautological clauses obviously also render clauses satisfied.
+
+Connected variable components are interesting, because they split the
+SAT problem into several small subproblems which can be independently.
+Consider two sets of variables $A$ and $B$. Now consider some clauses
+using only variables of $A$ and some clauses using only variables of $B$.
+The overall CNF is satisfiable iff both clause sets are satisfiable.
+The overall CNF is falsifiable iff any clause set is falsifiable.
+Hence if we know the connected variable components, we could easily
+create two parallel SAT solver instances and solve the problems
+independently.
+
+These properties represent very fundamental properties of the SAT problem.
+But for us the question arises whether we can distinguish our cryptoproblems
+from average problems?
+
+\begin{itemize}
+\item We looked at 36 files classified as cryptographic problems.
+  They are considered cryptographic, because their file or folder name
+  indicated they are related to hash functions or general cryptographic
+  applications like AES. The specific selection can be identified by
+  the crypto tag annotated to these CNF files as part of the cnf-analysis
+  project.
+\item 62,533 clauses and 8,279 variables in average yield a variables-clauses
+  ratio of 7.55.
+\item The 36 cryptographic SAT instances give a standard deviation of 0
+  for clause length meaning that all clauses had the same length.
+\item Whereas the number of connected variable components has a mean
+  of 52.73 ($\sigma$ 1,225, median 1) for general problems,
+  Our cryptographic problems considered had a mean of 1 ($\sigma$ 0, median 1).
+\item The number of definite clauses is half its value for general problems
+  (16,687 versus 32,787) and the number of goal clauses is 16~\% of its
+  value for general problems (5,767 versus 35,094).
+\end{itemize}
+
+No other value has been found to be significantly different from
+average problems (or its difference follows immediately by the
+non-uniform clause length). The number of connected variable
+components seems interesting because it might indicate diffusion
+in cryptographic problems. Diffusion means that variables strongly
+interact with many different variables due to the repetitive
+structure of cryptographic primitives. And finally the other
+differences can be explained by a certain SAT design which
+reoccurs in this benchmarks, because 36 is an exceptionally small
+number compared to 62,251 unique CNF problems.
+
+Comparing our average problem with cryptographic problems did
+not yield any useful data. Particularly a more thorough discussion
+of the SAT designs might be more valuable than high-level features.
+Do average SAT problems distinguish from \emph{our} CNF benchmarks?
 
 TODO
 
-Do our generated problems distinguish from these average problems?
 
+In general we were not able to identify features
+which can be used
 \begin{itemize}
   \item In average our (MD4 and SHA-256 hash collision) problems contain
         84,821 variables and 515,646 clauses meaning that our problems
