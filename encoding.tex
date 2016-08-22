@@ -12,22 +12,58 @@ subjects and describe how we designed an attack setting.
 Every section represents a major approach whereas subsections
 represent derivatives of this approach with minor tweaks.
 
-\section{STP approach}
+\section{Basic approach}
 \label{sec:enc-stp}
 %
-Our first approach started with STP~\cite{stp} initially written by Vijay Ganesh and David L. Dill.
+Our first approach started with Simple Theorem Prover (STP)~\cite{stp}
+initially written by Vijay Ganesh and David L. Dill.
 It is currently maintained by Mate Soos.
 
-First we wrote an implementation using the CVC language to model the MD4 hash algorithm.
-Reimplementing hash algorithms in CVC language (i.e. generating the corresponding code)
-seemed cumbersome and we switched to the Python binding. With little modifications to
-a working pure-Python MD4 implementation, the prototype was working.
+STP is an SMT solver which allows to declare bitvectors. A bitvector is an array of
+Boolean variables providing high-level constructs such as additions or right-shift
+through an interface. Writing all clauses individually to model a hash algorithm
+is too cumbersome to be done in practice and STP simplifies this process.
+STP is recommendable as a tool to model arithmetic and bitwise functions.
 
-However, STP was not fruitful for us, because we needed good control over the SAT encoding
-which we expected to have a major influence on the performance. We used minisat as SAT solver
-in the backend, but STP allows to exchange it for CryptoMiniSat which is a more modern and
-versatile SAT solver. In the end this straight-forward approach worked nicely for MD4,
-but we needed a different toolchain for SHA-256.
+First we wrote an implementation using the CVC language to model the MD4 hash algorithm.
+We provide a bitvector to the hash algorithm instance. When applying the corresponding
+arithmetic operations we generate expressions such as \texttt{ASSERT(y = 0bin00000101);}
+to model the assignment of a constant. Here the desired constant is assigned variable
+\texttt{y}, because of equivalence. \texttt{y} is required to have the constant
+after this expression as value. Whereas we generate the \texttt{ASSERT} statement,
+it is STP's task to generate the CNF formula and solve it with a SAT solver.
+
+We take two hash algorithm instances and an additional bitvector \texttt{diff}
+for every pair of bitvectors (\texttt{bv1}, \texttt{bv2}) where \texttt{bv2} represents
+the corresponding bitvector of the second hash algorithm instance to \texttt{bv1}.
+We claim \texttt{ASSERT(diff = BVXOR(bv1, bv2))} to ensure that \texttt{diff}
+represents the difference between \texttt{bv1} and \texttt{bv2}. Given the bitconditions
+for a bitvector from a differential characteristic, we require \texttt{diff} to enforce
+those particular differences.
+
+It is now trivial to consider a differential characteristic such as Testcase~\ref{tab:tcA}
+and generate the corresponding CVC~input for STP. STP solves this particular problem within
+a second. Testcase~\ref{tab:tcB} already provides a more complex example taking up to
+TODO seconds to solve. We used minisat as SAT solver in the backend, even though STP
+allows to exchange it for CryptoMiniSat which is a more modern and versatile SAT solver.
+
+Even though STP allows to come to useful results pretty quickly,
+it seems cumbersome to model all hash algorithms in the CVC language.
+STP provides a python interface meaning that pure Python implementations
+of hash algorithms can be taken with little modifications to model the
+hash algorithm itself. We add code to declare the difference bitvectors
+\texttt{diff} and finally add the constraints resulting from the differential
+characteristic.
+
+This interface switch introduces no significant performance difference.
+
+As a next step, we wanted to improve the evaluation performance to tackle more difficult
+problems. We considered this design as a working prototype of a basic approach to be
+improved upon.
+
+STP was not fruitful for next goal, because we wanted to tweak the SAT design generated
+for the SAT solver and needed good control over the SAT encoding
+which we expected to have a major influence on the performance.
 
 \section{algotocnf}
 \label{sec:enc-algotocnf}
@@ -38,17 +74,19 @@ We implemented our own library \emph{algotocnf} to achieve greater flexibility i
 \label{sec:enc-original}
 %
 \index{algotocnf}
-algotocnf generated a CNF for a given hash algorithm implementation which is fed with
-a symbolic variable. Only integer operations have been implemented.
+Similar to STP, algotocnf generates a CNF for a given hash algorithm implementation.
+Besides modelling bitvectors, it also implements differential bitvectors which
+inherently handle the difference bitvectors \texttt{diff} which contain difference
+variables. It can also directly operate with differential characteristics.
+Similarly to STP, it implements arithmetic and bitwise operations.
 
-Our tool \emph{algotocnf} implements the following strategy:
+We think \emph{algotocnf} mainly differs from other SMT tools like STP
+because of its implementation of differential logic.
+
+To model our CNF \emph{algotocnf} implements the following strategy:
 \begin{enumerate}
   \item Take a differential characteristic and the hash algorithm as input.
-  \item For two instances of the hash algorithm, initialize symbolic variables
-    (implemented as bitvectors) representing the bytes used to compute
-    the hash value.
-
-    Every bit is therefore represented as a boolean variable.
+  \item Every bit is therefore represented as a boolean variable.
     If you apply addition, operator overloading in python will ensure
     that clauses are generated to describe the addition consisting of
     \boolf{XOR}s and \boolf{MAJ}s. Every operation is modelled as assignment.
@@ -74,8 +112,7 @@ Our tool \emph{algotocnf} implements the following strategy:
     where expectedly many bit conditions have been strengthened.
 \end{enumerate}
 
-We think \emph{algotocnf} mainly differs from other SAT abstraction tools because
-of its implementation of differential logic. When adding clauses resulting from
+When adding clauses resulting from
 the differential characteristic as constraints, the question arises how those
 bit conditions are encoded. Essentially, we have only boolean values available,
 but bit conditions tell constraints such as \enquote{a difference is given,
@@ -94,28 +131,40 @@ Inputs are provided into the hash algorithm and strongly intermingled
 with other values. This should result in a high diffusion and almost every
 variable is expected to share a clause with another variable.
 
-The design decisions of this encoding are fundamental to the
+The difference variables design corresponds to \texttt{diff} bit vectors
+in the STP. The design decisions of this encoding are fundamental to the
 resulting runtime discussed in chapter~\ref{ch:results}.
 
 \subsection{Adding the differential description}
 \label{sec:enc-diff-desc}
 %
 Using the approach in the previous section, we were able to find actual MD4 collisions
-using a SAT solver. A SHA256 implementation followed which obviously lead to worse
-runtime results, because the internal state of SHA-256 is much larger (by a factor
-of at least 2). Can we further improve the runtime of the SAT solver?
+using a SAT solver (please refer to Section~\ref{sec:results-md4}).
+A SHA256 implementation followed which obviously lead to worse
+runtime results, because the internal state of SHA-256 is much larger
+(by a factor of at least 2). Can we further improve the runtime of the SAT solver?
 
 Because we work with bitvectors and apply high-level operations like \boolf{MAJ} or addition,
 we can additionally implement how differences in those operations propagate.
 Magnus Daum's thesis on \enquote{Cryptanalysis of Hash Functions of the
-MD4-Family}~\cite[Table 4.4]{daum2005cryptanalysis} discusses how differences propagate in \boolf{MAJ} and
-\boolf{ITE} functions. Trivially, \boolf{XOR}s propagate differences the way they are~\footnote{
+MD4-Family}~\cite[Table 4.4]{daum2005cryptanalysis} discusses how differences propagate in
+Boolean functions. Trivially, \boolf{XOR}s propagate differences the way they are~\footnote{
 A difference in the arguments of two \boolf{XOR} instances remains the same difference
-after applying \boolf{XOR} to each instance}.
+after applying \boolf{XOR} to each instance}. Another example is \boolf{MAJ}:
+Let $a$, $b$ and $c$ be difference variables and \boolf{MAJ} is applied to both corresponding
+hash algorithm instances. $r$ is the difference variable of the result.
+Then its differential behavior states that
+\[ (0, 1, 1) \implies 1 \qquad (0, 0, 0) \implies 0 \]
+where $(\text{IN}) \implies \text{OUT}$ denotes an input-output relation.
+Because of this behavior we add clauses to explicit describe this behavior:
+\[ (\neg a \land b \land c) \implies r \quad \iff \quad a \lor \neg b \lor \neg c \lor r \]
+We also model the second behavior:
+\[ (\neg a \land \neg b \land \neg c) \implies \neg r \quad \iff \quad a \lor b \lor c \lor \neg r \]
 
 This approach explicitly models differentiable behavior, which should be deducible
-by the SAT solver itself. However, this lead to a major speedup which can be observed
-in the runtime results of chapter~\ref{ch:results}.
+by the SAT solver itself based on the clauses we added before.
+However, this lead to a major speedup which can be observed in the runtime results
+of chapter~\ref{ch:results}.
 
 \newpage
 \subsection{Evaluating difference variables first}
