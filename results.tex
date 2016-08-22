@@ -100,8 +100,8 @@ from average problems?
 \item The 36 cryptographic SAT instances give a standard deviation of 0
   for clause length meaning that all clauses had the same length.
 \item Whereas the number of connected variable components has a mean
-  of 52.73 ($\sigma$ 1,225, median 1) for general problems,
-  Our cryptographic problems considered had a mean of 1 ($\sigma$ 0, median 1).
+  of 52.73 ($\sigma = 1225$, median $= 1$) for general problems,
+  Our cryptographic problems considered had a mean of 1 ($\sigma = 0$, median $= 1$).
 \item The number of definite clauses is half its value for general problems
   (16,687 versus 32,787) and the number of goal clauses is 16~\% of its
   value for general problems (5,767 versus 35,094).
@@ -130,8 +130,8 @@ Do average SAT problems distinguish from \emph{our} CNF benchmarks?
     always the same size.
     However, adding the differential description described in
     Section~\ref{sec:enc-diff-desc} increases the number of clauses
-    by about 47~\% ($\sigma$ 0.0005) for MD4 instances and
-    by about 43~\% ($\sigma$ 0.0008) for SHA-256 instances.
+    by about 47~\% ($\sigma = 0.0005$) for MD4 instances and
+    by about 43~\% ($\sigma = 0.0008$) for SHA-256 instances.
 
     \begin{table}[!h]
       \begin{center}
@@ -162,13 +162,43 @@ write our own SAT solver dedicated to solving differential cryptanalysis problem
 \section{Finding hash collisions}
 \label{sec:results-attacks}
 
-TODO: is simplification worth it?
-
-Appendix~\ref{app:runtimes} provide a more exhaustive list of runtimes retrieved.
+In this section we look at our benchmark results of Testcases provided in
+Appendix~\ref{app:tc}.
 
 \subsection{Attacking MD4}
 \label{sec:results-md4}
 %
+In our attack setting we started off with Testcase~\ref{sec:tcA}. It serves
+rather as a verification example to test our encoding is modelled correctly
+(an invalid encoding is expected to result in unsatisfiability). This particular
+testcase can be solved easily with all major SAT solvers as can be seen in
+Table~\ref{tab:tcA-results}.
+
+\begin{table}[!h]
+  \begin{center}
+    \begin{tabular}{cc}
+      data & missing
+    \end{tabular}
+    \caption{Runtimes of testcase~\ref{sec:tcA}}
+  \end{center}
+\end{table}
+
+In the following, we make various propositions and support with the runtime results:
+
+\begin{prop}
+  Simplification as preprocessing step does not significantly improve the runtime of SAT solvers.
+\end{prop}
+
+\begin{prop}
+  Using \texttt{\textendash{}\textendash{}phase=-1} does not significantly
+  improve the runtime of lingeling
+\end{prop}
+
+
+TODO: is simplification worth it?
+
+Appendix~\ref{app:runtimes} provide a more exhaustive list of runtimes retrieved.
+
 In Section~\ref{sec:enc-algotocnf} we introduced a basic encoding involving two hash algorithm
 instances and difference variables. Constraints resulting from the hash algorithm description
 and given differential characteristic are added.
