@@ -64,7 +64,7 @@ community~\cite{nudelman2004understanding}.
 A strong correlation between the instance's hardness and the ratio of number
 of clauses to number variables exists~\cite{selman1996generating}
 though it is important to point out that this result holds for randomly
-generated SAT instances, which does not hold for our benchmarks.
+generated SAT instances, which our benchmarks are not classified as.
 
 Existential literals are interesting to discover, because they allow
 to remove a clause immediately. Consider a clause with literals
@@ -119,27 +119,45 @@ reoccurs in this benchmarks, because 36 is an exceptionally small
 number compared to 62,251 unique CNF problems.
 
 Comparing our average problem with cryptographic problems did
-not yield any useful data. Particularly a more thorough discussion
-of the SAT designs might be more valuable than high-level features.
+not draw any useful conclusions. Particularly a more thorough discussion
+of the SAT designs might be more valuable than our high-level features.
+We now specificall look at a SAT design we are familiar with:
 Do average SAT problems distinguish from \emph{our} CNF benchmarks?
 
-TODO
-
-
-In general we were not able to identify features
-which can be used
 \begin{itemize}
-  \item In average our (MD4 and SHA-256 hash collision) problems contain
-        84,821 variables and 515,646 clauses meaning that our problems
-        are comparably large. It is important to point out that the
-        problem size does not necessarily correlate with the difficulty
-        of the problem in SAT solving.
-  \item TODO
-% TODO
-%  \item Due to the cryptographic high diffusion we expected a 
+  \item For all MD4 testcases we have the same number of variables,
+    because the internal state of the hash algorithm instances are
+    always the same size.
+    However, adding the differential description described in
+    Section~\ref{sec:enc-diff-desc} increases the number of clauses
+    by about 47~\% ($\sigma$ 0.0005) for MD4 instances and
+    by about 43~\% ($\sigma$ 0.0008) for SHA-256 instances.
+
+    \begin{table}[!h]
+      \begin{center}
+        \begin{tabular}{rc|rc}
+          MD4~C & 253,984 / 48,704 & MD4~C diff-desc & 373,920 / 48,704 \\
+          MD4~B & 254,210 / 48,704 & MD4~B diff-desc & 374,146 / 48,704 \\
+          MD4~A & 254,656 / 48,704 & MD4~A diff-desc & 374,592 / 48,704 \\
+          SHA-256 18 & 590,953 / 107,839 & SHA-256 18 diff-desc & 846,487 / 107,839 \\
+          SHA-256 21 & 636,838 / 116,800 & SHA-256 21 diff-desc & 911,629 / 116,800 \\
+          SHA-256 23 & 667,438 / 122,774 & SHA-256 23 diff-desc & 955,067 / 122,774 \\
+          SHA-256 24 & 682,722 / 125,761 & SHA-256 24 diff-desc & 976,770 / 125,761
+        \end{tabular}
+        \caption{Our testcases and their number of clauses / variables}
+      \end{center}
+    \end{table}
+
+    Compared to 83,542 clauses and 12,219 variables for our average SAT problem,
+    we consider our benchmark to be noticeably large. It is important to
+    point out that the problem size does not necessarily correlate with
+    the hardness of the SAT problem.
 \end{itemize}
 
-TODO: illustrate in our benchmarks, how do the CNF features behave when transitioning from original to simplificiation or diff-desc
+TODO extend statistics (e.g. simplification)
+
+In general we were not able to identify features which would justify to
+write our own SAT solver dedicated to solving differential cryptanalysis problems.
 
 \section{Finding hash collisions}
 \label{sec:results-attacks}
