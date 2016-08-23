@@ -192,36 +192,49 @@ the effort.
 \label{sec:results-attacks}
 
 In this section we look at our benchmark results of Testcases provided in
-Appendix~\ref{app:tc}.
+Appendix~\ref{app:tc}. We make various propositions and substantiate them
+with runtime results. Runtimes are always provided in seconds.
 
 \subsection{Attacking MD4}
 \label{sec:results-md4}
 %
+\begin{prop}
+  Testcase~\ref{sec:tcA} in the encoding described in Section~\ref{sec:enc-original}
+  can be solved within one minute by all considered SAT solvers.
+\end{prop}
+
 In our attack setting we started off with Testcase~\ref{sec:tcA}. It serves
-rather as a verification example to test our encoding is modelled correctly
-(an invalid encoding is expected to result in unsatisfiability). This particular
-testcase can be solved easily with all major SAT solvers as can be seen in
-Table~\ref{tab:tcA-results}.
+rather as a toy example to verify correctness of our implementation than
+as an actual runtime benchmark. Be aware that invalid implementations either
+result in unsatisfiability for satisfiable testcases or runtime results are
+unexpected because the SAT solver could not take advantage of our SAT design
+implementations. This particular testcase can be solved easily with all major
+SAT solvers as can be seen in Table~\ref{tab:tcA-results}.
 
 \begin{table}[!h]
   \begin{center}
-    \begin{tabular}{cc}
-      data & missing
+    \begin{tabular}{cccccc}
+      \textbf{solver} & \textbf{version} & \textbf{propagations} & \textbf{decisions} & \textbf{restarts} & \textbf{runtime} \\
+    \hline
+      MiniSat       & 2.2.0   & 3,813,726    & 250,759   & \unknown & 3 \\
+      CryptoMiniSat & 4.5.3   & 140,000      & 2,441,566 & 539      & 26 \\
+                    & 5       & \unknown     & 2,428,824 & 637      & 37 \\
+      Lingeling     & ats1    & 6,586,770    & 436,621   & 980      & 23 \\
+      Glucose       & 4.0     & 14,727,839   & 990,491   & 272      & 8 \\
+      Glucose Syrup & 4.0     & \unknown     & 629,363   & 201      & 14
     \end{tabular}
-    \caption{Runtimes of testcase~\ref{sec:tcA}}
+    \caption{Testcase~\ref{sec:tcA} can be solved within 1 minute by all SAT solvers}
     \label{tab:tcA-results}
   \end{center}
 \end{table}
 
-In the following, we make various propositions and support with the runtime results:
-
 \begin{prop}
-  Simplification reduces the problem size (number of variables, number of clauses).
+  Simplification reduces the problem size (number of variables and clauses).
 \end{prop}
 
-First we look at simplification in terms of problem size. Consider for example
-Testcase~\ref{sec:tc18} in the basic encoding introduced in Section~\ref{sec:enc-original}.
-Then simplification will reduce the problem size down by 57--77~\% of its original size:
+Consider for example Testcase~\ref{sec:tc18} in the basic encoding introduced
+in Section~\ref{sec:enc-original}. Then simplification will reduce the problem
+size down by 57--77~\% of its original size (compare with Table~\ref{tab:simpl-size}).
 
 \begin{table}[!h]
   \begin{center}
@@ -234,19 +247,25 @@ Then simplification will reduce the problem size down by 57--77~\% of its origin
            lingeling &    344544 &/& 107839  & (58.30~\% / 100.00~\%) \\
              minisat &    391134 &/& 61845   & (66.19~\% / 57.35~\%)
     \end{tabular}
+    \caption{
+        Problem sizes of Testcase~\ref{sec:tc18} in the encoding of
+        Section~\ref{sec:enc-original} after simplification
+    }
+    \label{tab:simpl-size}
   \end{center}
 \end{table}
-
-\begin{prop}
-  Using \texttt{\textendash{}\textendash{}phase=-1} does not significantly
-  improve the runtime of lingeling
-\end{prop}
 
 \begin{prop}
   Simplification as preprocessing step does not significantly improve the runtime of SAT solvers.
 \end{prop}
 
 TODO: is simplification worth it?
+
+\begin{prop}
+  Using \texttt{\textendash{}\textendash{}phase=-1} does not significantly
+  improve the runtime of lingeling
+\end{prop}
+
 
 Appendix~\ref{app:runtimes} provide a more exhaustive list of runtimes retrieved.
 
