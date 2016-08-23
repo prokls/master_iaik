@@ -156,12 +156,37 @@ Do average SAT problems distinguish from \emph{our} CNF benchmarks?
     we consider our benchmark to be noticeably large. It is important to
     point out that the problem size does not necessarily correlate with
     the hardness of the SAT problem.
+
+  \item The variables of clauses of average SAT problems
+    have a standard deviation of 3,337 in average ($\sigma=$1,261, median $=$3,643).
+    Our average SAT problem has a standard deviation of 1,004 in average
+    ($\sigma=$13,992, median $=22$). Hence variables which got created at very
+    points during the CNF generation are shared within one clause.
+    The general statement, that variable enumeration is arbitrary
+    and therefore this standard deviation has no meaning, holds but we need
+    to consider that practically speaking variables created close to each
+    other share close variable indices.
+    Under these assumptions a large $\sigma$ indicates variables are reused.
+    We assume this is another indicator for high diffusion in cryptographic
+    algorithms. Values are intermingled over and over throughout the repetitive
+    structure of hash algorithms.
+
+  \item Connected variables components are 129 for MD4 problems and 2 for SHA-256
+    problems. We couldn't explain where those components come from and the
+    component size would help us to identify their source. We did not investigate
+    further, because this number is constant with an increasing problem size.
+
+  \item An average literal frequency of $3.5\cdot 10^{-5}$ for our benchmarks
+    is much lower than 0.014 for average problems. We explain this with the
+    larger problem size. Literal frequency is divided by the number of clauses
+    of the CNF and is therefore smaller the larger the problem is.
 \end{itemize}
 
-TODO extend statistics (e.g. simplification)
-
-In general we were not able to identify features which would justify to
-write our own SAT solver dedicated to solving differential cryptanalysis problems.
+In general we were not able to identify features which allows us to solve
+differential cryptanalysis problems more efficiently compared to
+general-purpose SAT problems. We concluded writing your own SAT solver
+dedicated to solving differential cryptanalysis problems is not worth
+the effort.
 
 \section{Finding hash collisions}
 \label{sec:results-attacks}
@@ -191,14 +216,35 @@ Table~\ref{tab:tcA-results}.
 In the following, we make various propositions and support with the runtime results:
 
 \begin{prop}
-  Simplification as preprocessing step does not significantly improve the runtime of SAT solvers.
+  Simplification reduces the problem size (number of variables, number of clauses).
 \end{prop}
+
+First we look at simplification in terms of problem size. Consider for example
+Testcase~\ref{sec:tc18} in the basic encoding introduced in Section~\ref{sec:enc-original}.
+Then simplification will reduce the problem size down by 57--77~\% of its original size:
+
+\begin{table}[!h]
+  \begin{center}
+    \begin{tabular}{rcccc}
+      simplification & variables &/& clauses & (variables left / clauses left) \\
+    \hline
+                none &    590953 &/& 107839  & (100~\% / 100~\%) \\
+            satelite &    457972 &/& 69670   & (77.50~\% / 64.61~\%) \\
+               cmsat &    342139 &/& 61789   & (57.90~\% / 57.30~\%) \\
+           lingeling &    344544 &/& 107839  & (58.30~\% / 100.00~\%) \\
+             minisat &    391134 &/& 61845   & (66.19~\% / 57.35~\%)
+    \end{tabular}
+  \end{center}
+\end{table}
 
 \begin{prop}
   Using \texttt{\textendash{}\textendash{}phase=-1} does not significantly
   improve the runtime of lingeling
 \end{prop}
 
+\begin{prop}
+  Simplification as preprocessing step does not significantly improve the runtime of SAT solvers.
+\end{prop}
 
 TODO: is simplification worth it?
 
