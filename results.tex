@@ -82,7 +82,8 @@ The overall CNF is satisfiable iff both clause sets are satisfiable.
 The overall CNF is falsifiable iff any clause set is falsifiable.
 Hence if we know the connected variable components, we could easily
 create two parallel SAT solver instances and solve the problems
-independently.
+independently. 4,607 out of 62,251 CNF files contained more than 1
+connected variable component.
 
 These properties represent very fundamental properties of the SAT problem.
 But for us the question arises whether we can distinguish our cryptoproblems
@@ -183,6 +184,7 @@ Table~\ref{tab:tcA-results}.
       data & missing
     \end{tabular}
     \caption{Runtimes of testcase~\ref{sec:tcA}}
+    \label{tab:tcA-results}
   \end{center}
 \end{table}
 
@@ -303,8 +305,8 @@ Our next goal was to scale up to a more difficult problem. We considered SHA-256
 which has a much larger internal state (at least by factor 2). So finding a hash
 collision is more difficult and we considered further strategies.
 
-Consider testcases 18~\ref{tab:18-t9}, 21~\ref{tab:21-t9}, 23~\ref{tab:23-t9}
-and 24~\ref{tab:24-t9}. The number indicates how many steps are covered by this
+Consider testcases 18~\ref{fig:tc18}, 21~\ref{fig:tc21}, 23~\ref{fig:tc23}
+and 24~\ref{fig:tc24}. The number indicates how many steps are covered by this
 testcase. We also tested a 27-round variant, but it is not listed here.
 Most SAT solvers could not solve this problem in feasible time. Therefore we
 excluded it from our list.
