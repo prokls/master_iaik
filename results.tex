@@ -193,7 +193,14 @@ the effort.
 
 In this section we look at our benchmark results of Testcases provided in
 Appendix~\ref{app:tc}. We make various propositions and substantiate them
-with runtime results. Runtimes are always provided in seconds.
+with runtime results. Runtimes are always provided in seconds and \timeout{}
+denotes a timeout (solving takes more than 1 day).
+
+% We considered MD4 testcases~A, B and C (compare with Appendices~\ref{fig:tcA}, \ref{fig:tcB} and \ref{fig:tcC})
+% and generated the corresponding CNF files. The SAT solvers mentioned in Section~\ref{sec:sat-solvers}
+% were used to evaluate whether the problem is solvable in reasonably time. For every testcase we
+% defined a time limit of at most 1 day (i.e. 86,400 seconds). A timeout is denoted by \timeout.
+% Some testcases listed have been evaluated for a larger time limit.
 
 \subsection{Attacking MD4}
 \label{sec:results-md4}
@@ -211,6 +218,12 @@ unexpected because the SAT solver could not take advantage of our SAT design
 implementations. This particular testcase can be solved easily with all major
 SAT solvers as can be seen in Table~\ref{tab:tcA-results}.
 
+We end up with the result, that the hash collision given in Table~\ref{fig:tcC}
+can be solved by a limited set of modern SAT solvers. Of course the cryptanalyst
+needs to figure out good starting points for the hash collision and encode them
+in the differential characteristic, but this task is still considered practical,
+because this task can be easily automated.
+
 \begin{table}[!h]
   \begin{center}
     \begin{tabular}{cccccc}
@@ -220,13 +233,21 @@ SAT solvers as can be seen in Table~\ref{tab:tcA-results}.
       CryptoMiniSat & 4.5.3   & 140,000      & 2,441,566 & 539      & 26 \\
                     & 5       & \unknown     & 2,428,824 & 637      & 37 \\
       Lingeling     & ats1    & 6,586,770    & 436,621   & 980      & 23 \\
+      plingeling    & ats1    & 452,630,440  & 3,275,498 & \unknown & 88 \\
       Glucose       & 4.0     & 14,727,839   & 990,491   & 272      & 8 \\
-      Glucose Syrup & 4.0     & \unknown     & 629,363   & 201      & 14
+      Glucose Syrup & 4.0     & \unknown     & 629,363   & 201      & 14 \\
     \end{tabular}
+    % TODO: treengeling?
     \caption{Testcase~\ref{sec:tcA} can be solved within 1 minute by all SAT solvers}
     \label{tab:tcA-results}
   \end{center}
 \end{table}
+
+\subsection{Evaluating simplification}
+\label{sec:results-simplification}
+%
+As a next approach, we looked at CNF simplifiers. Those simplifiers consume a
+CNF file and transform the CNF file to an equisatisfiable CNF file.
 
 \begin{prop}
   Simplification reduces the problem size (number of variables and clauses).
@@ -235,11 +256,14 @@ SAT solvers as can be seen in Table~\ref{tab:tcA-results}.
 Consider for example Testcase~\ref{sec:tc18} in the basic encoding introduced
 in Section~\ref{sec:enc-original}. Then simplification will reduce the problem
 size down by 57--77~\% of its original size (compare with Table~\ref{tab:simpl-size}).
+We verified these data for all simplified files and got similar results.
+Therefore the proposition holds considering the problem size gets reduced to
+approximately half of its size.
 
 \begin{table}[!h]
   \begin{center}
     \begin{tabular}{rcccc}
-      simplification & variables &/& clauses & (variables left / clauses left) \\
+      \textbf{simplification} & \textbf{variables} &/& \textbf{clauses} & \textbf{(variables left / clauses left)} \\
     \hline
                 none &    590953 &/& 107839  & (100~\% / 100~\%) \\
             satelite &    457972 &/& 69670   & (77.50~\% / 64.61~\%) \\
@@ -258,110 +282,51 @@ size down by 57--77~\% of its original size (compare with Table~\ref{tab:simpl-s
 \begin{prop}
   Simplification as preprocessing step does not significantly improve the runtime of SAT solvers.
 \end{prop}
+%
+We look at Testcase~\ref{sec:tcC} which is a more difficult MD4 problem
+compared to Testcase~\ref{sec:tcA}. Simplification runtime results depend on the
+SAT solver, which applies certain simplifications while trying to solve the
+CNF, and the simplifier used. Table~\ref{tab:simplification-results}
+lists runtimes depending on the simplification used.
 
-TODO: is simplification worth it?
+\begin{description}
+\item[none] refers to the unsimplified CNF
+\item[cmsat] refers to simplification applied with Cryptominisat version~5: \texttt{./cryptominisat5 -p1 file.cnf simplified.cnf}
+\item[lingeling] refers to simplification with lingeling version ats1: \texttt{./lingeling -s file.cnf -o simplified.cnf}
+\item[minisat] also simplifies CNF file with the following command line: \texttt{./minisat file.cnf -dimacs=simplified.cnf}
+\item[satelite] is specifically designed to simplify CNF files: \texttt{./satelite file.cnf simplified.cnf}
+\end{description}
 
-\begin{prop}
-  Using \texttt{\textendash{}\textendash{}phase=-1} does not significantly
-  improve the runtime of lingeling
-\end{prop}
+It is worth pointing out that simplification time is not part of the listed
+runtime. Simplification can take very long. Especially simplifications with
+lingeling have sometimes taken several hours without result.
 
-
-Appendix~\ref{app:runtimes} provide a more exhaustive list of runtimes retrieved.
-
-In Section~\ref{sec:enc-algotocnf} we introduced a basic encoding involving two hash algorithm
-instances and difference variables. Constraints resulting from the hash algorithm description
-and given differential characteristic are added.
-
-We considered MD4 testcases~A, B and C (compare with Appendices~\ref{fig:tcA}, \ref{fig:tcB} and \ref{fig:tcC})
-and generated the corresponding CNF files. The SAT solvers mentioned in Section~\ref{sec:sat-solvers}
-were used to evaluate whether the problem is solvable in reasonably time. For every testcase we
-defined a time limit of at most 1 day (i.e. 86,400 seconds). A timeout is denoted by \timeout.
-Some testcases listed have been evaluated for a larger time limit.
+In conclusion, simplification leads to a slight improvement of the runtime,
+but in general we cannot recommend simplifying every CNF file before running it.
 
 \begin{table}[!h]
   \begin{center}
-    \begin{tabular}{lcc}
-      SAT solver                & testcase      & runtime (in seconds) \\
+    \begin{tabular}{cc|ccccc}
+      \textbf{solver} & \textbf{version} & \textbf{none} & \textbf{cmsat} & \textbf{lingeling} & \textbf{minisat} & \textbf{satelite} \\
     \hline
-      minisat~2.2.0             & MD4, A        & 65 \\
-      cryptominisat~4.5.3       & MD4, A        & 24 \\
-      cryptominisat~5.0.0       & MD4, A        & 29 \\
-      glucose~4.0               & MD4, A        & 10 \\
-      glucose-syrup~4.0         & MD4, A        & 31 \\
-      lingeling-ats1            & MD4, A        & TODO \\
-      lingeling-ats1o1          & MD4, A        & 18 \\
-      lingeling-ats1o2          & MD4, A        & TODO \\
-      lingeling-ats1o4          & MD4, A        & 125,745 \\
-      plingeling-ats1o1         & MD4, A        & 88 \\
-      treeneling-ats1o1         & MD4, A        & 64
+      MiniSat       & 2.2.0              & 4,519    & 7,649    & \unknown & 1,476 & 1,293 \\
+      CryptoMiniSat & 4.5.3              & \unknown & \unknown & \unknown & \unknown & \unknown \\
+                    & 5                  & 1,064    & 973      & \unknown & 4,470    & 3,920 \\
+      Lingeling     & ats1               & 1,492    & 906      & \unknown & 860      & 1,297 \\
+      Treengeling   & ats1               & 1,281    & 13,401   & \unknown & 13,790   & 10,840 \\
+      plingeling    & ats1               & 2,310    & 1,232    & \unknown & 1,384    & 2,030 \\
+      Glucose       & 4.0                & \unknown & \unknown & \unknown & \unknown & \unknown \\
+      Glucose Syrup & 4.0                & \unknown & \unknown & \unknown & \unknown & \unknown
     \end{tabular}
-    \caption{Runtimes for MD4 testcase A with various SAT solvers}
-    \label{tab:md4-A-runtimes}
-  \end{center}
-  \begin{center}
-    \begin{tabular}{lcc}
-      SAT solver                & testcase      & runtime (in seconds) \\
-    \hline
-      minisat~2.2.0             & MD4, B        & 7,817 \\
-      cryptominisat~4.5.3       & MD4, B        & \timeout \\
-      cryptominisat~5.0.0       & MD4, B        & 571 \\
-      glucose~4.0               & MD4, B        & \timeout \\
-      glucose-syrup~4.0         & MD4, B        & \timeout \\
-      lingeling-ats1            & MD4, B        & TODO \\
-      lingeling-ats1o1          & MD4, B        & 257 \\
-      lingeling-ats1o2          & MD4, B        & TODO \\
-      lingeling-ats1o4          & MD4, B        & TODO \\
-      plingeling-ats1o1         & MD4, B        & 1,860 \\
-      treeneling-ats1o1         & MD4, B        & 12,574
-    \end{tabular}
-    \caption{Runtimes for MD4 testcase B with various SAT solvers}
-    \label{tab:md4-B-runtimes}
-  \end{center}
-  \begin{center}
-    \begin{tabular}{lcc}
-      SAT solver                & testcase      & runtime (in seconds) \\
-    \hline
-      minisat~2.2.0             & MD4, C        & 19,683 \\
-      cryptominisat~4.5.3       & MD4, C        & \timeout \\
-      cryptominisat~5.0.0       & MD4, C        & 1064 \\
-      glucose~4.0               & MD4, C        & \timeout \\
-      glucose-syrup~4.0         & MD4, C        & \timeout \\
-      lingeling-ats1            & MD4, C        & TODO \\
-      lingeling-ats1o1          & MD4, C        & TODO \\
-      lingeling-ats1o2          & MD4, C        & TODO \\
-      lingeling-ats1o4          & MD4, C        & TODO \\
-      plingeling-ats1o1         & MD4, C        & TODO \\
-      treeneling-ats1o1         & MD4, C        & TODO
-    \end{tabular}
-    \caption{Runtimes for MD4 testcase C with various SAT solvers}
-    \label{tab:md4-C-runtimes}
+    % algotocnf_1.cnf
+    %
+    % not listed in runtime results folder contained:
+    %    lingeling-ats1:   74.3 seconds, 49.2 MB
+    %    treengeling-ats1:  1955 100% scheduled jobs  1281.49 seconds, 2468 MB
+    \caption{Runtimes of Testcase~\ref{sec:tcC} after CNF files have been simplified}
+    \label{tab:simplification-results}
   \end{center}
 \end{table}
-
-In Table~\ref{tab:md4-A-runtimes} it can be seen that the problem can be tackle
-by all SAT solvers. lingeling-ats1o4 being a outlier can be ignored, because this
-release is majorily concerned with providing debug information. As such it only
-shows that printing information to stdout can make a major performance difference.
-
-In Table~\ref{tab:md4-B-runtimes} we see that CryptoMiniSat~4.5.3, glucose~4.0
-and glucose-syrup~4.0 couldn't solve the problem within the time limit of 1~day.
-However, other SAT solver were still able to find a hash collision. Please recognize
-that Table~\ref{tab:md4-A-runtimes} provides runtime results for the testcase
-given in Table~\ref{fig:tcA}; equivalently Table~\ref{tab:md4-B-runtimes} for
-Table~\ref{fig:tcB} and Table~\ref{tab:md4-C-runtimes} for Table~\ref{fig:tcC}.
-Its caption gives an intuition how testcase B is more difficult than A and
-C is more difficult than B.
-
-We end up with the result, that the hash collision given in Table~\ref{fig:tcC}
-can be solved by a limited set of modern SAT solvers. Of course the cryptanalyst
-needs to figure out good starting points for the hash collision and encode them
-in the differential characteristic, but this task is still considered practical,
-because this task can be easily automated.
-
-TODO: is phase -1 worth it?
-
-TODO: simplification runtime is not part of runtime
 
 \subsection{Improvements with differential description}
 \label{sec:result-diff-desc}
@@ -370,105 +335,82 @@ Our next goal was to scale up to a more difficult problem. We considered SHA-256
 which has a much larger internal state (at least by factor 2). So finding a hash
 collision is more difficult and we considered further strategies.
 
-Consider testcases 18~\ref{fig:tc18}, 21~\ref{fig:tc21}, 23~\ref{fig:tc23}
-and 24~\ref{fig:tc24}. The number indicates how many steps are covered by this
-testcase. We also tested a 27-round variant, but it is not listed here.
-Most SAT solvers could not solve this problem in feasible time. Therefore we
-excluded it from our list.
+\begin{prop}
+  A differential description encoding (Section~\ref{sec:enc-diff-desc})
+  improves the runtime compared to a missing differential description.
+\end{prop}
+
+Consider testcase~C for MD4 (Appendix~\ref{sec:tcA}) and testcases
+testcases~18, 21 and 23 (Appendices~\ref{sec:tc18}, \ref{sec:tc21} and
+\ref{sec:tc23}) for SHA-256. We evaluate the
+runtimes with or without differential description.
+
+Recall that differential description explicitly encode in the CNF
+how differences in arithmetic and bitwise operations propagate.
+We discussed \boolf{XOR} and \boolf{MAJ} in Section~\ref{sec:enc-diff-desc}.
+
+The data corresponds to even larger testcases, namely a 27-rounds
+variant we looked at, but did not list. This 27-rounds testcase
+could not be solved in many cases within our time limit and
+is therefore excluded from our lists.
+
+In Table~\ref{tab:diff-desc-results} we randomly picked SAT solvers
+and we can clearly see a significant improvement of the runtimes.
+
+We continued by trying the influence the guessing strategy.
 
 \begin{table}[!h]
   \begin{center}
-    \begin{tabular}{lcc}
-      SAT solver                & testcase      & runtime (in seconds) \\
+    \begin{tabular}{c|cccc}
+                        & \multicolumn{2}{c}{\textbf{CryptoMiniSat~5}} & \multicolumn{2}{c}{\textbf{lingeling-ats1}} \\
+      \textbf{testcase} & \textbf{w/o dd} & \textbf{w/ dd} & \textbf{w/o dd} & \textbf{w/ dd} \\
     \hline
-      minisat~2.2.0             & SHA-256, 18   & TODO \\
-      cryptominisat~4.5.3       & SHA-256, 18   & TODO \\
-      cryptominisat~5.0.0       & SHA-256, 18   & TODO \\
-      glucose~4.0               & SHA-256, 18   & TODO \\
-      glucose-syrup~4.0         & SHA-256, 18   & TODO \\
-      lingeling-ats1            & SHA-256, 18   & TODO \\
-      lingeling-ats1o1          & SHA-256, 18   & 25 \\
-      lingeling-ats1o2          & SHA-256, 18   & TODO \\
-      lingeling-ats1o4          & SHA-256, 18   & TODO \\
-      plingeling-ats1o1         & SHA-256, 18   & TODO \\
-      treeneling-ats1o1         & SHA-256, 18   & TODO
+      MD4, C            &       1,064 &        231 &      798 &   \unknown \\
+      SHA-256, 18       &          37 &         37 &       31 &        160 \\
+      SHA-256, 21       &    \unknown &      7,855 &   28,621 &      5,513 \\
+      SHA-256, 23       &    \unknown &     26,212 &   76,196 &      1,450
     \end{tabular}
-    \caption{Runtimes for SHA-256 testcase 18 with various SAT solvers}
-    \label{tab:SHA-256-18-runtimes}
-  \end{center}
-  \begin{center}
-    \begin{tabular}{lcc}
-      SAT solver                & testcase      & runtime (in seconds) \\
-    \hline
-      minisat~2.2.0             & SHA-256, 21   & TODO \\
-      cryptominisat~4.5.3       & SHA-256, 21   & TODO \\
-      cryptominisat~5.0.0       & SHA-256, 21   & TODO \\
-      glucose~4.0               & SHA-256, 21   & TODO \\
-      glucose-syrup~4.0         & SHA-256, 21   & TODO \\
-      lingeling-ats1            & SHA-256, 21   & TODO \\
-      lingeling-ats1o1          & SHA-256, 21   & 27,511 \\
-      lingeling-ats1o2          & SHA-256, 21   & TODO \\
-      lingeling-ats1o4          & SHA-256, 21   & TODO \\
-      plingeling-ats1o1         & SHA-256, 21   & TODO \\
-      treeneling-ats1o1         & SHA-256, 21   & TODO
-    \end{tabular}
-    \caption{Runtimes for SHA-256 testcase 21 with various SAT solvers}
-    \label{tab:SHA-256-21-runtimes}
-  \end{center}
-  \begin{center}
-    \begin{tabular}{lcc}
-      SAT solver                & testcase      & runtime (in seconds) \\
-    \hline
-      minisat~2.2.0             & SHA-256, 23   & TODO \\
-      cryptominisat~4.5.3       & SHA-256, 23   & TODO \\
-      cryptominisat~5.0.0       & SHA-256, 23   & TODO \\
-      glucose~4.0               & SHA-256, 23   & TODO \\
-      glucose-syrup~4.0         & SHA-256, 23   & TODO \\
-      lingeling-ats1            & SHA-256, 23   & TODO \\
-      lingeling-ats1o1          & SHA-256, 23   & 59,227 \\
-      lingeling-ats1o2          & SHA-256, 23   & TODO \\
-      lingeling-ats1o4          & SHA-256, 23   & TODO \\
-      plingeling-ats1o1         & SHA-256, 23   & TODO \\
-      treeneling-ats1o1         & SHA-256, 23   & TODO
-    \end{tabular}
-    \caption{Runtimes for SHA-256 testcase 23 with various SAT solvers}
-    \label{tab:SHA-256-23-runtimes}
-  \end{center}
-  \begin{center}
-    \begin{tabular}{lcc}
-      SAT solver                & testcase      & runtime (in seconds) \\
-    \hline
-      minisat~2.2.0             & SHA-256, 24   & TODO \\
-      cryptominisat~4.5.3       & SHA-256, 24   & TODO \\
-      cryptominisat~5.0.0       & SHA-256, 24   & TODO \\
-      glucose~4.0               & SHA-256, 24   & TODO \\
-      glucose-syrup~4.0         & SHA-256, 24   & TODO \\
-      lingeling-ats1            & SHA-256, 24   & TODO \\
-      lingeling-ats1o1          & SHA-256, 24   & 65,956 \\
-      lingeling-ats1o2          & SHA-256, 24   & TODO \\
-      lingeling-ats1o4          & SHA-256, 24   & TODO \\
-      plingeling-ats1o1         & SHA-256, 24   & TODO \\
-      treeneling-ats1o1         & SHA-256, 24   & TODO
-    \end{tabular}
-    \caption{Runtimes for SHA-256 testcase 24 with various SAT solvers}
-    \label{tab:SHA-256-24-runtimes}
+    \caption{Runtimes for various testcases with or without differential description with CryptoMiniSat and lingeling}
+    \label{tab:diff-desc-results}
   \end{center}
 \end{table}
-
-In Tables~\ref{tab:SHA-256-18-runtimes} to \ref{tab:SHA-256-24-runtimes}
-we see several results which illustrate TODO
-
-
-Followingly we added the clauses which directly encode how differences
-propagate in the hash algorithm; namely \enquote{differential description}
-of Section~\ref{sec:enc-diff-desc}. If we compare the data, we can see
-TODO
-
-We continued by trying the influence the guessing strategy.
 
 \subsection{Modifying the guessing strategy}
 \label{sec:results-guessing}
 %
+\newcommand\mone[1][-1]{\texttt{\textendash{}\,\textendash{}phase=#1}}
+\begin{prop}
+  Using \mone{} improves the runtime of lingeling for our testcases.
+\end{prop}
+%
+Option \mone{} of lingeling is described as default phase set to
+$-1$ (negative), $0$ (Jeroslow-Wang strategy~\cite{JeroslowWang})
+or $1$ (positive). Per default a strategy engineered by
+Jeroslow-Wang~\cite{JeroslowWang} is used, but considering
+Proposition~\ref{prop:false-first} at page~\pageref{prop:false-first}
+we expect \mone{} to provide better runtime results.
+
+Indeed our results consistently indicate a small improvement.
+This can be recognized in Table~\ref{tab:phase-results}.
+
+\begin{table}[!h]
+  \begin{center}
+    \begin{tabular}{c|cc cc cc cc}
+      \textbf{testcase} & \multicolumn{2}{c}{18} & \multicolumn{2}{c}{21} & \multicolumn{2}{c}{23} & \multicolumn{2}{c}{24} \\
+    \hline
+      \textbf{phase}    &       0 &      1 &       0 &      1 &       0 &      1 &       0 &      1 \\
+    \hline
+      \textbf{runtime}  &      31 &     22 &  28,621 & 19,717 &  76,196 & 71,677 &  85774  & 70,259 \\
+    \end{tabular}
+    \caption{lingeling-ats1 results for SHA-256 comparing \mone{} with \mone[0]{}}
+    \label{tab:phase-results}
+  \end{center}
+\end{table}
+
+
+
+
+
 As pointed out in Section~\ref{sec:enc-diff-desc-ocnf}, a best practice law of
 differential cryptanalysis states that difference variables should be
 assigned first. Afterwards propagation of actual values for the two
@@ -514,8 +456,18 @@ TODO justify: differential description improves runtime
 
 \section{Conclusion}
 \label{sec:conclusion}
-
-We successfully found hash collisions for round-reduced MD4 and SHA-256.
+%
+We successfully found full-round hash collisions for MD4
+using SAT solvers mentioned in Section~\ref{sec:sat-solvers}.
+We applied tweaks to the lingeling SAT solver to improve our
+runtime results further and found 24-round hash collisions
+for SHA-256. Our attack starting points for MD4 ---
+Testcases~\ref{fig:tcA}, \ref{fig:tcB} and \ref{fig:tcC} ---
+were found by Yusuke Naito, Yu Sasaki, Noboru Kunihiro and
+Kazuo Ohta~\cite{sasaki2007new}. Our starting points for SHA-256
+--- Testcases~\ref{fig:tc18}, \ref{fig:tc21}, \ref{fig:tc23}
+and \ref{fig:tc24} --- were found by Ivica Nikoli{\'c} and
+Alex Biryukov~\cite{nikolic2008collisions}.
 
 \section{Contributions}
 \label{sec:contributions}
