@@ -100,23 +100,28 @@ from average problems?
 \item In average these problems have 116,398 clauses and 27,407 variables.
   The average clauses-variables ratio is 5.58.
 \item The 36 cryptographic SAT instances give a standard deviation of 0.7
-  for clause length meaning that most clause lengths are very close to
+  for clause length meaning that most clause lengths are close to
   the mean 3.4.
 \item The number of definite clauses is twice its value for general problems
   (62,457 versus 31,315) and the number of goal clauses is 26~\% of its
   value for general problems (7,761 versus 29,994).
+\item The number of connected variable components is 2,236 in average
+  ($\sigma =$ 10,060), but the median is $1$ again.
 \end{itemize}
 
 No other value has been found to be significantly different from
 average problems (or its difference follows immediately by the
-non-uniform clause length). The number of connected variable
-components seems interesting, because it might indicate diffusion
+non-uniform clause length).
+
+The number of connected variable components seems interesting in
+cryptographic problem, because it might indicate diffusion
 in cryptographic problems. Diffusion means that variables strongly
 interact with many different variables due to the repetitive
 structure of cryptographic primitives. And finally the other
 differences can be explained by a certain SAT design which
 reoccurs in these testcases, because 36 is an exceptionally small
-number compared to 62,251 unique CNF problems.
+number compared to 62,251 unique CNF problems. It is expected
+the cryptographic problems were designed by a small set of authors.
 
 Comparing our average problem with cryptographic problems did
 not draw any useful conclusions. Particularly a more thorough discussion
@@ -133,7 +138,7 @@ Do average SAT problems distinguish from \emph{our} CNF testcases?
     by about 47~\% ($\sigma = 0.0005$) for MD4 instances and
     by about 43~\% ($\sigma = 0.0008$) for SHA-256 instances.
     For SHA-256 problems, this is illustrated in Table~\ref{tab:problem-sizes}.
-    The additional variable introduced in Section~\ref{sec:enc-diff-desc-eo}
+    The preference variable introduced in Section~\ref{sec:enc-diff-desc-eo}
     increases the number of variables by about 80~\%
     and the number of clauses by factor 2.
 
@@ -172,9 +177,11 @@ Do average SAT problems distinguish from \emph{our} CNF testcases?
     structure of hash algorithms.
 
   \item Connected variables components are 129 for MD4 problems and 2 for SHA-256
-    problems. We couldn't explain where those components come from and the
-    component size would help us to identify their source. We did not investigate
-    further, because this number is constant with an increasing problem size.
+    problems. For SHA-256 problems, a unit clause is given as existential literal
+    and for MD4 problems, all components except one are of size 3.
+    We did not investigate further, because this number is constant
+    with an increasing problem size and all other variables are strongly
+    correlated due to a high diffusion.
 
   \item An average literal frequency of $3.5\cdot 10^{-5}$ for our testcases
     is much lower than 0.014 for average problems. We explain this with the
@@ -202,14 +209,14 @@ and generated the corresponding CNF files. The SAT solvers mentioned
 in Section~\ref{sec:sat-solvers} were used to evaluate whether the problem
 is solvable within the time limit.
 
-\begin{table}
+\begin{table}[!h]
   \begin{center}
-    \begin{tabular}{cccc}
-      \textbf{hash algorithm} & \textbf{testcase} & \textbf{rounds} & \textbf{differential characteristic} \\
+    \begin{tabular}{cccccc}
+      \textbf{algorithm} & \textbf{testcase} & \textbf{rounds} & \textbf{diff. characteristic} & \textbf{clauses} & \textbf{variables} \\
     \hline
-      MD4                     & A                 & 48              & Appendix~\ref{fig:tcA} \\
-      MD4                     & B                 & 48              & Appendix~\ref{fig:tcB} \\
-      MD4                     & C                 & 48              & Appendix~\ref{fig:tcC} \\
+      MD4                & A                 & 48              & Appendix~\ref{fig:tcA}        & 254,656          & 48,704 \\
+      MD4                & B                 & 48              & Appendix~\ref{fig:tcB}        & 254,210          & 48,704 \\
+      MD4                & C                 & 48              & Appendix~\ref{fig:tcC}        & 253,984          & 48,704
     \end{tabular}
     \caption{MD4 testcases considered}
     \label{tab:md4-tcs}
@@ -219,22 +226,12 @@ is solvable within the time limit.
 \subsection{Attacking MD4}
 \label{sec:results-md4}
 %
-\begin{table}[!h]
-  \begin{center}
-    \begin{tabular}{rc|rc}
-      MD4~A: & 254,656 / 48,704 & MD4~A diff-desc: & 374,592 / 48,704 \\
-      MD4~B: & 254,210 / 48,704 & MD4~B diff-desc: & 374,146 / 48,704 \\
-      MD4~C: & 253,984 / 48,704 & MD4~C diff-desc: & 373,920 / 48,704 \\
-    \end{tabular}
-    \caption{Our testcases and their number of clauses / variables}
-  \end{center}
-\end{table}
 \begin{prop}
-  Testcase~\ref{sec:tcA} in the encoding described in Section~\ref{sec:enc-original}
+  Testcase~A in the encoding described in Section~\ref{sec:enc-original}
   can be solved within one minute by all considered SAT solvers.
 \end{prop}
 
-In our attack setting we started off with Testcase~\ref{sec:tcA}. It serves
+In our attack setting we started off with Testcase~A. It serves
 rather as a toy example to verify correctness of our implementation than
 as an actual benchmark. Be aware that invalid implementations either
 result in unsatisfiability for satisfiable testcases or runtime results are
@@ -255,26 +252,14 @@ because this task can be easily automated.
     \hline
       MiniSat       & 2.2.0   & 3,813,726    & 250,759    & \unknown & 3 \\
       CryptoMiniSat & 4.5.3   & 140,000      & 2,441,566  & 539      & 26 \\
-                    & 5       & \unknown     & 2,428,824  & 637      & 37 \\
+                    & 5       & 32,163,801   & 2,178,965  & 598      & 29 \\
       Lingeling     & ats1    & 6,586,770    & 436,621    & 980      & 23 \\
       Plingeling    & ats1    & 452,630,440  & 3,275,498  & \unknown & 88 \\
-      Treengeling   & ats1    & 271,970,951  & 18,426,013 & \unknown & 1995 \\
+      Treengeling   & ats1    & 18,629,811   & 1,640,289  & \unknown & 64 \\
       Glucose       & 4.0     & 14,727,839   & 990,491    & 272      & 8 \\
-      Glucose Syrup & 4.0     & \unknown     & 629,363    & 201      & 14 \\
+      Glucose Syrup & 4.0     & 37,021,496   & 629,363    & 201      & 14 \\
     \end{tabular}
-    % not listed in folder directory:
-    %  treengeling, ats1, algotocnf_1.cnf:
-    %   3269623 conflicts, 1639 conflicts per second
-    %   18426013 decisions, 9236 decisions per second
-    %   271970951 propagations, 0.1 million propagations per second
-    %
-    %        65   2% lookaheads        26.10 seconds    1%
-    %       423  16% splits            98.01 seconds    5%
-    %       878  33% simplifications 1633.21 seconds   82%
-    %       903  34% searches         237.04 seconds   12%
-    %   ======================================================
-    %      2627 100% scheduled jobs  1994.94 seconds, 3337 MB
-    \caption{Testcase~\ref{sec:tcA} can be solved within 1 minute by all SAT solvers}
+    \caption{Testcase~A can be solved within 1 minute by all SAT solvers}
     \label{tab:tcA-results}
   \end{center}
 \end{table}
@@ -290,9 +275,35 @@ Those simplified CNF files might be subject to performance improvements.
   Simplification reduces the problem size (number of variables and clauses).
 \end{prop}
 
-Consider for example Testcase~18 (Appendix \ref{sec:tc18}) in the basic encoding
+%Consider for example Testcase~18 (Appendix \ref{sec:tc18}) in the basic encoding
+%introduced in Section~\ref{sec:enc-original}. Then simplification will reduce the problem
+%size down by 57--77~\% of its original size (as illustrated in Table~\ref{tab:simpl-size}).
+%We verified these data for all simplified files and got similar results.
+%Therefore the claim holds considering the problem size gets reduced to
+%approximately half of its size.
+%
+%\begin{table}[!h]
+%  \begin{center}
+%    \begin{tabular}{rcccc}
+%      \textbf{simplification} & \textbf{variables} &/& \textbf{clauses} & \textbf{(variables left / clauses left)} \\
+%    \hline
+%                none &    590953 &/& 107839  & (100~\% / 100~\%) \\
+%            satelite &    457972 &/& 69670   & (77.50~\% / 64.61~\%) \\
+%               cmsat &    342139 &/& 61789   & (57.90~\% / 57.30~\%) \\
+%           lingeling &    344544 &/& 107839  & (58.30~\% / 100.00~\%) \\
+%             minisat &    391134 &/& 61845   & (66.19~\% / 57.35~\%)
+%    \end{tabular}
+%    \caption{
+%        Problem sizes of Testcase 18 in the encoding of
+%        Section~\ref{sec:enc-original} after simplification
+%    }
+%    \label{tab:simpl-size}
+%  \end{center}
+%\end{table}
+
+Consider for example Testcase~C (Appendix \ref{sec:tcC}) in the basic encoding
 introduced in Section~\ref{sec:enc-original}. Then simplification will reduce the problem
-size down by 57--77~\% of its original size (as illustrated in Table~\ref{tab:simpl-size}).
+size down to 42.9~\% or more of its original size (as illustrated in Table~\ref{tab:simpl-size}).
 We verified these data for all simplified files and got similar results.
 Therefore the claim holds considering the problem size gets reduced to
 approximately half of its size.
@@ -300,17 +311,19 @@ approximately half of its size.
 \begin{table}[!h]
   \begin{center}
     \begin{tabular}{rcccc}
-      \textbf{simplification} & \textbf{variables} &/& \textbf{clauses} & \textbf{(variables left / clauses left)} \\
+      \textbf{simplification} & \textbf{variables} & \textbf{percent of none} &\textbf{clauses} & \textbf{percent of none} \\
     \hline
-                none &    590953 &/& 107839  & (100~\% / 100~\%) \\
-            satelite &    457972 &/& 69670   & (77.50~\% / 64.61~\%) \\
-               cmsat &    342139 &/& 61789   & (57.90~\% / 57.30~\%) \\
-           lingeling &    344544 &/& 107839  & (58.30~\% / 100.00~\%) \\
-             minisat &    391134 &/& 61845   & (66.19~\% / 57.35~\%)
+           none &    48,704 & 100~\%   & 253,984 & 100~\% \\
+          cmsat &    24,503 & 50.31~\% & 111,931 & 44.07~\% \\
+      lingeling &    48,704 & 100~\%   & 106,626 & 41.98~\% \\
+        minisat &    20,895 & 42.90~\% & 118,236 & 46.55~\% \\
+       satelite &    27,495 & 56.45~\% & 153,262 & 60.34~\%
     \end{tabular}
     \caption{
-        Problem sizes of Testcase 18 in the encoding of
-        Section~\ref{sec:enc-original} after simplification
+        Problem sizes of Testcase~C in the encoding of
+        Section~\ref{sec:enc-original} after simplification.
+        lingeling maintains the same number of variables
+        according to the CNF header.
     }
     \label{tab:simpl-size}
   \end{center}
@@ -323,8 +336,12 @@ approximately half of its size.
 We look at Testcase~C which is a more difficult MD4 problem
 compared to Testcase~A. Simplification runtime results depend on the
 SAT solver, which applies certain simplifications while trying to solve the
-CNF, and the simplifier used. Table~\ref{tab:simplification-results}
-lists runtimes depending on the simplification used.
+CNF, and the simplifier used. A small number of variables or clauses does
+not necessarily lead to better performance. But an equisatisfiable encoding
+of the same problem is worth considering.
+
+Table~\ref{tab:simplification-results} lists runtimes depending
+on the simplification used.
 
 \begin{description}
 \item[none]
