@@ -64,7 +64,7 @@ community~\cite{nudelman2004understanding}.
 A strong correlation between the instance's hardness and the ratio of number
 of clauses to number variables exists~\cite{selman1996generating}
 though it is important to point out that this result holds for randomly
-generated SAT instances, which our benchmarks are not classified as.
+generated SAT instances, which our testcases are not classified as.
 
 Existential literals are interesting to discover, because they allow
 to remove a clause immediately. Consider a clause with literals
@@ -117,14 +117,14 @@ in cryptographic problems. Diffusion means that variables strongly
 interact with many different variables due to the repetitive
 structure of cryptographic primitives. And finally the other
 differences can be explained by a certain SAT design which
-reoccurs in this benchmarks, because 36 is an exceptionally small
+reoccurs in these testcases, because 36 is an exceptionally small
 number compared to 62,251 unique CNF problems.
 
 Comparing our average problem with cryptographic problems did
 not draw any useful conclusions. Particularly a more thorough discussion
 of the SAT designs might be more valuable than our high-level features.
 We now specifically look at a SAT design we are familiar with:
-Do average SAT problems distinguish from \emph{our} CNF benchmarks?
+Do average SAT problems distinguish from \emph{our} CNF testcases?
 
 \begin{itemize}
   \item For all MD4 testcases we have the same number of variables,
@@ -141,20 +141,20 @@ Do average SAT problems distinguish from \emph{our} CNF benchmarks?
     \begin{table}[!h]
       \begin{center}
         \begin{tabular}{rc|rc}
-          MD4~C & 253,984 / 48,704 & MD4~C diff-desc & 373,920 / 48,704 \\
-          MD4~B & 254,210 / 48,704 & MD4~B diff-desc & 374,146 / 48,704 \\
-          MD4~A & 254,656 / 48,704 & MD4~A diff-desc & 374,592 / 48,704 \\
-          SHA-256 18 & 590,953 / 107,839 & SHA-256 18 diff-desc & 846,487 / 107,839 \\
-          SHA-256 21 & 636,838 / 116,800 & SHA-256 21 diff-desc & 911,629 / 116,800 \\
-          SHA-256 23 & 667,438 / 122,774 & SHA-256 23 diff-desc & 955,067 / 122,774 \\
-          SHA-256 24 & 682,722 / 125,761 & SHA-256 24 diff-desc & 976,770 / 125,761
+          MD4~A: & 254,656 / 48,704 & MD4~A diff-desc: & 374,592 / 48,704 \\
+          MD4~B: & 254,210 / 48,704 & MD4~B diff-desc: & 374,146 / 48,704 \\
+          MD4~C: & 253,984 / 48,704 & MD4~C diff-desc: & 373,920 / 48,704 \\
+          SHA-256 18: & 590,953 / 107,839 & SHA-256 18 diff-desc: & 846,487 / 107,839 \\
+          SHA-256 21: & 636,838 / 116,800 & SHA-256 21 diff-desc: & 911,629 / 116,800 \\
+          SHA-256 23: & 667,438 / 122,774 & SHA-256 23 diff-desc: & 955,067 / 122,774 \\
+          SHA-256 24: & 682,722 / 125,761 & SHA-256 24 diff-desc: & 976,770 / 125,761
         \end{tabular}
         \caption{Our testcases and their number of clauses / variables}
       \end{center}
     \end{table}
 
     Compared to 83,542 clauses and 12,219 variables for our average SAT problem,
-    we consider our benchmark to be noticeably large. However, it is important to
+    we consider our testcases to be noticeably large. However, it is important to
     point out that the problem size does not necessarily correlate with
     the hardness of the SAT problem.
 
@@ -177,7 +177,7 @@ Do average SAT problems distinguish from \emph{our} CNF benchmarks?
     component size would help us to identify their source. We did not investigate
     further, because this number is constant with an increasing problem size.
 
-  \item An average literal frequency of $3.5\cdot 10^{-5}$ for our benchmarks
+  \item An average literal frequency of $3.5\cdot 10^{-5}$ for our testcases
     is much lower than 0.014 for average problems. We explain this with the
     larger problem size. Literal frequency is divided by the number of clauses
     of the CNF and is therefore smaller the larger the problem is.
@@ -191,8 +191,8 @@ the effort.
 
 \section{Finding hash collisions}
 \label{sec:results-attacks}
-
-In this section, we look at our benchmark results of Testcases provided in
+%
+In this section, we look at our runtime results of Testcases provided in
 Appendix~\ref{app:tc}. We make various claims and substantiate them
 with runtime results. Runtimes are always provided in seconds. Therefore
 smaller runtimes are better. \timeout{} denotes a timeout (solving took
@@ -214,7 +214,7 @@ more than 1 day) and \unknown{} denotes unavailable data.
 
 In our attack setting we started off with Testcase~\ref{sec:tcA}. It serves
 rather as a toy example to verify correctness of our implementation than
-as an actual runtime benchmark. Be aware that invalid implementations either
+as an actual benchmark. Be aware that invalid implementations either
 result in unsatisfiability for satisfiable testcases or runtime results are
 unexpected because the SAT solver could not take advantage of our SAT design
 implementations. This particular testcase can be solved easily with all major
