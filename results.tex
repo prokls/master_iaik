@@ -4,29 +4,29 @@
 \chapter{Results}
 \label{ch:results}
 %
-In Chapter~\ref{ch:sat} we discussed Boolean algebra; in particular we looked at
+In Chapter~\ref{ch:sat}, we discussed Boolean algebra; in particular we looked at
 satisfiability which is practically covered by SAT solvers. SAT solvers take
 Boolean functions in Conjunctive Normal Form and determine satisfiability.
-In Chapter~\ref{ch:dc} we looked at how we can analyze algorithms by looking
-at the progression of differences between algorithm instances. In particular
+In Chapter~\ref{ch:dc}, we looked at how we can analyze algorithms by looking
+at the progression of differences between algorithm instances. In particular,
 we looked at hash algorithms introduced in Chapter~\ref{ch:hash}.
 
 With this background we designed an attack setting in Chapter~\ref{ch:enc}
 which enables us to verify and also find a hash collision given a differential
 characteristic as starting point. Our goal is to find hash collisions
-in as little time as possible. Therefore we introduced several performance
-tweaks in Section~\ref{sec:enc-algotocnf}.
+in practical time which we define by 1~day (86,400~seconds).
+Therefore, we designed several approaches to improve our runtime results.
 
-In this section we will evaluate those approaches. Furthermore we briefly
-discuss claims we made about average SAT problems. In Section~\ref{ch:features}
+In this section, we will evaluate those approaches. Furthermore, we briefly
+discuss claims we made about average SAT problems. In Section~\ref{ch:features},
 we looked at SAT features which to some extent characterize a SAT problem.
 
 \section{Evaluating SAT features}
 \label{sec:results-features}
 %
-In the introduction of Chapter~\ref{ch:features} we posed 8 questions.
-In the following, we want to answer them with the data provided by the
-cnf-analysis project.
+In Chapter~\ref{ch:features}, we posed 8 questions.
+In the following, we want to answer them with the data
+provided by the cnf-analysis project.
 
 \begin{description}
 \item[Given an arbitrary literal. What is the percentage it is positive?]
@@ -47,7 +47,7 @@ cnf-analysis project.
   In average 29,994 goal clauses and 31,315 definite clauses exist
   with an average number of 83,649 clauses in a CNF file.
 \item[Are there any tautological clauses?]
-  In a file, 1679 tautological literals have been found. However,
+  In one file, 1679 tautological literals have been found. However,
   its mean is 0.07 with a standard deviation of $9.63$ meaning that tautological
   clauses are very rare.
 \item[Are there any CNF files with more than one connected variable component?]
@@ -81,7 +81,7 @@ Consider two sets of variables $A$ and $B$. Now consider some clauses
 using only variables of $A$ and some clauses using only variables of $B$.
 The overall CNF is satisfiable iff both clause sets are satisfiable.
 The overall CNF is falsifiable iff any clause set is falsifiable.
-Hence if we know the connected variable components, we could easily
+Hence, if we know the connected variable components, we could easily
 create two parallel SAT solver instances and solve the problems
 independently. 4,607 out of 62,251 CNF files contained more than 1
 connected variable component.
@@ -112,7 +112,7 @@ from average problems?
 No other value has been found to be significantly different from
 average problems (or its difference follows immediately by the
 non-uniform clause length). The number of connected variable
-components seems interesting because it might indicate diffusion
+components seems interesting, because it might indicate diffusion
 in cryptographic problems. Diffusion means that variables strongly
 interact with many different variables due to the repetitive
 structure of cryptographic primitives. And finally the other
@@ -130,7 +130,7 @@ Do average SAT problems distinguish from \emph{our} CNF benchmarks?
   \item For all MD4 testcases we have the same number of variables,
     because the internal state of the hash algorithm instances are
     always the same size.
-    However, adding the differential description described in
+    However, adding the differential description as described in
     Section~\ref{sec:enc-diff-desc} increases the number of clauses
     by about 47~\% ($\sigma = 0.0005$) for MD4 instances and
     by about 43~\% ($\sigma = 0.0008$) for SHA-256 instances.
@@ -154,17 +154,17 @@ Do average SAT problems distinguish from \emph{our} CNF benchmarks?
     \end{table}
 
     Compared to 83,542 clauses and 12,219 variables for our average SAT problem,
-    we consider our benchmark to be noticeably large. It is important to
+    we consider our benchmark to be noticeably large. However, it is important to
     point out that the problem size does not necessarily correlate with
     the hardness of the SAT problem.
 
   \item The variables of clauses of average SAT problems
     have a standard deviation of 3,337 in average ($\sigma=$1,261, median $=$3,643).
     Our average SAT problem has a standard deviation of 1,004 in average
-    ($\sigma=$13,992, median $=22$). Hence variables which got created at very
-    points during the CNF generation are shared within one clause.
+    ($\sigma=$13,992, median $=22$). Hence variables which got created at every
+    point during the CNF generation are shared within one clause.
     The general statement, that variable enumeration is arbitrary
-    and therefore this standard deviation has no meaning, holds but we need
+    and therefore this standard deviation has no meaning holds, but we need
     to consider that practically speaking variables created close to each
     other share close variable indices.
     Under these assumptions a large $\sigma$ indicates variables are reused.
@@ -192,8 +192,8 @@ the effort.
 \section{Finding hash collisions}
 \label{sec:results-attacks}
 
-In this section we look at our benchmark results of Testcases provided in
-Appendix~\ref{app:tc}. We make various propositions and substantiate them
+In this section, we look at our benchmark results of Testcases provided in
+Appendix~\ref{app:tc}. We make various claims and substantiate them
 with runtime results. Runtimes are always provided in seconds. Therefore
 smaller runtimes are better. \timeout{} denotes a timeout (solving took
 more than 1 day) and \unknown{} denotes unavailable data.
@@ -271,7 +271,7 @@ Consider for example Testcase~\ref{sec:tc18} in the basic encoding introduced
 in Section~\ref{sec:enc-original}. Then simplification will reduce the problem
 size down by 57--77~\% of its original size (compare with Table~\ref{tab:simpl-size}).
 We verified these data for all simplified files and got similar results.
-Therefore the proposition holds considering the problem size gets reduced to
+Therefore the claim holds considering the problem size gets reduced to
 approximately half of its size.
 
 \begin{table}[!h]
@@ -414,7 +414,7 @@ Option \mone{} of lingeling is described as default phase set to
 $-1$ (negative), $0$ (Jeroslow-Wang strategy~\cite{JeroslowWang})
 or $1$ (positive). Per default a strategy engineered by
 Jeroslow-Wang~\cite{JeroslowWang} is used, but considering
-Proposition~\ref{prop:false-first} at page~\pageref{prop:false-first}
+Claim~\ref{prop:false-first} at page~\pageref{prop:false-first}
 we expect \mone{} to provide better runtime results.
 
 Indeed our results consistently indicate a small improvement.
@@ -425,7 +425,7 @@ This can be recognized in Table~\ref{tab:phase-results}.
     \begin{tabular}{c|cc cc cc cc}
       \textbf{testcase} & \multicolumn{2}{c}{18} & \multicolumn{2}{c}{21} & \multicolumn{2}{c}{23} & \multicolumn{2}{c}{24} \\
     \hline
-      \textbf{phase}    &       0 &      1 &       0 &      1 &       0 &      1 &       0 &      1 \\
+      \textbf{phase}    &       0 &     -1 &       0 &     -1 &       0 &     -1 &       0 &     -1 \\
     \hline
       \textbf{runtime}  &      31 &     22 &  28,621 & 19,717 &  76,196 & 71,677 & 85,774  & 70,259 \\
     \end{tabular}
