@@ -193,8 +193,9 @@ the effort.
 
 In this section we look at our benchmark results of Testcases provided in
 Appendix~\ref{app:tc}. We make various propositions and substantiate them
-with runtime results. Runtimes are always provided in seconds and \timeout{}
-denotes a timeout (solving takes more than 1 day).
+with runtime results. Runtimes are always provided in seconds. Therefore
+smaller runtimes are better. \timeout{} denotes a timeout (solving took
+more than 1 day).
 
 % We considered MD4 testcases~A, B and C (compare with Appendices~\ref{fig:tcA}, \ref{fig:tcB} and \ref{fig:tcC})
 % and generated the corresponding CNF files. The SAT solvers mentioned in Section~\ref{sec:sat-solvers}
@@ -229,15 +230,27 @@ because this task can be easily automated.
     \begin{tabular}{cccccc}
       \textbf{solver} & \textbf{version} & \textbf{propagations} & \textbf{decisions} & \textbf{restarts} & \textbf{runtime} \\
     \hline
-      MiniSat       & 2.2.0   & 3,813,726    & 250,759   & \unknown & 3 \\
-      CryptoMiniSat & 4.5.3   & 140,000      & 2,441,566 & 539      & 26 \\
-                    & 5       & \unknown     & 2,428,824 & 637      & 37 \\
-      Lingeling     & ats1    & 6,586,770    & 436,621   & 980      & 23 \\
-      plingeling    & ats1    & 452,630,440  & 3,275,498 & \unknown & 88 \\
-      Glucose       & 4.0     & 14,727,839   & 990,491   & 272      & 8 \\
-      Glucose Syrup & 4.0     & \unknown     & 629,363   & 201      & 14 \\
+      MiniSat       & 2.2.0   & 3,813,726    & 250,759    & \unknown & 3 \\
+      CryptoMiniSat & 4.5.3   & 140,000      & 2,441,566  & 539      & 26 \\
+                    & 5       & \unknown     & 2,428,824  & 637      & 37 \\
+      Lingeling     & ats1    & 6,586,770    & 436,621    & 980      & 23 \\
+      Plingeling    & ats1    & 452,630,440  & 3,275,498  & \unknown & 88 \\
+      Treengeling   & ats1    & 271,970,951  & 18,426,013 & \unknown & 1995 \\
+      Glucose       & 4.0     & 14,727,839   & 990,491    & 272      & 8 \\
+      Glucose Syrup & 4.0     & \unknown     & 629,363    & 201      & 14 \\
     \end{tabular}
-    % TODO: treengeling?
+    % not listed in folder directory:
+    %  treengeling, ats1, algotocnf_1.cnf:
+    %   3269623 conflicts, 1639 conflicts per second
+    %   18426013 decisions, 9236 decisions per second
+    %   271970951 propagations, 0.1 million propagations per second
+    %
+    %        65   2% lookaheads        26.10 seconds    1%
+    %       423  16% splits            98.01 seconds    5%
+    %       878  33% simplifications 1633.21 seconds   82%
+    %       903  34% searches         237.04 seconds   12%
+    %   ======================================================
+    %      2627 100% scheduled jobs  1994.94 seconds, 3337 MB
     \caption{Testcase~\ref{sec:tcA} can be solved within 1 minute by all SAT solvers}
     \label{tab:tcA-results}
   \end{center}
@@ -309,12 +322,12 @@ but in general we cannot recommend simplifying every CNF file before running it.
     \begin{tabular}{cc|ccccc}
       \textbf{solver} & \textbf{version} & \textbf{none} & \textbf{cmsat} & \textbf{lingeling} & \textbf{minisat} & \textbf{satelite} \\
     \hline
-      MiniSat       & 2.2.0              & 4,519    & 7,649    & \unknown & 1,476 & 1,293 \\
+      MiniSat       & 2.2.0              & 4,519    & 7,649    & \unknown & 1,476    & 1,293 \\
       CryptoMiniSat & 4.5.3              & \unknown & \unknown & \unknown & \unknown & \unknown \\
-                    & 5                  & 1,064    & 973      & \unknown & 4,470    & 3,920 \\
-      Lingeling     & ats1               & 1,492    & 906      & \unknown & 860      & 1,297 \\
+                    & 5                  & 1,064    & 973      & 1,201    & 4,470    & 3,920 \\
+      Lingeling     & ats1               & 1,492    & 906      & 356      & 860      & 1,297 \\
       Treengeling   & ats1               & 1,281    & 13,401   & \unknown & 13,790   & 10,840 \\
-      plingeling    & ats1               & 2,310    & 1,232    & \unknown & 1,384    & 2,030 \\
+      Plingeling    & ats1               & 2,310    & 1,232    & 955      & 1,384    & 2,030 \\
       Glucose       & 4.0                & \unknown & \unknown & \unknown & \unknown & \unknown \\
       Glucose Syrup & 4.0                & \unknown & \unknown & \unknown & \unknown & \unknown
     \end{tabular}
@@ -323,6 +336,8 @@ but in general we cannot recommend simplifying every CNF file before running it.
     % not listed in runtime results folder contained:
     %    lingeling-ats1:   74.3 seconds, 49.2 MB
     %    treengeling-ats1:  1955 100% scheduled jobs  1281.49 seconds, 2468 MB
+    %    cmsat5, ling-simplified 1.cnf:     c Total time               : 1201.19
+    %    plingeling, ling-simplified 1.cnf:     c 954.7 seconds, 719.9 MB
     \caption{Runtimes of Testcase~\ref{sec:tcC} after CNF files have been simplified}
     \label{tab:simplification-results}
   \end{center}
@@ -370,6 +385,17 @@ We continued by trying the influence the guessing strategy.
       SHA-256, 21       &    \unknown &      7,855 &   28,621 &      5,513 \\
       SHA-256, 23       &    \unknown &     26,212 &   76,196 &      1,450
     \end{tabular}
+    % not contained in folder structure:
+    % SHA256-18, lingeling-ats1, with dd
+    %   1805652 decisions, 30042.1 decisions/sec
+    %   188760 conflicts, 3140.6 conflicts/sec
+    %   47432866 propagations, 0.8 megaprops/sec
+    %   60.1 seconds, 79.4 MB
+    % MD4-C, lingeling-ats1, w/o dd
+    %   18835161 decisions, 12588.8 decisions/sec
+    %   9364054 conflicts, 6258.6 conflicts/sec
+    %   830017204 propagations, 0.6 megaprops/sec
+    %   1496.2 seconds, 147.4 MB
     \caption{Runtimes for various testcases with or without differential description with CryptoMiniSat and lingeling}
     \label{tab:diff-desc-results}
   \end{center}
@@ -400,16 +426,81 @@ This can be recognized in Table~\ref{tab:phase-results}.
     \hline
       \textbf{phase}    &       0 &      1 &       0 &      1 &       0 &      1 &       0 &      1 \\
     \hline
-      \textbf{runtime}  &      31 &     22 &  28,621 & 19,717 &  76,196 & 71,677 &  85774  & 70,259 \\
+      \textbf{runtime}  &      31 &     22 &  28,621 & 19,717 &  76,196 & 71,677 & 85,774  & 70,259 \\
     \end{tabular}
     \caption{lingeling-ats1 results for SHA-256 comparing \mone{} with \mone[0]{}}
     \label{tab:phase-results}
   \end{center}
 \end{table}
 
+\subsection{Evaluating the lightweight approach}
+\label{sec:lightweight-results}
+%
+\begin{prop}
+  Evaluating difference variables first and with Boolean value false improves the runtime.
+\end{prop}
+%
+The lightweight approach mentioned in Section~\ref{sec:enc-lightweight}
+evaluates difference variables first with Boolean value false,
+but neglects the differential description.
+This approach is justified by the assumption that a low number of differences,
+leading to a sparse differential path, is more likely to cancel out differences
+ending in a hash collision.
+
+Table~\ref{tab:diff-first-false-results} reveals a nice improvement (the runtime
+becomes 0.85~\%) of its original runtime in average.
+
+\begin{table}[!h]
+  \begin{center}
+    \begin{tabular}{c|c|cccc}
+      \textbf{testcase}                   & \textbf{C} & \textbf{18} & \textbf{21} & \textbf{23} & \textbf{24} \\
+    \hline
+      \textbf{basic approach}      (ats1) &        798 &          31 &      28,621 &      76,196 &      85,774 \\
+      \textbf{diff-first-false}  (ats1o1) &        652 &          29 &      27,599 &      59,312 &      66,052
+    \end{tabular}
+    \caption[Difference variables first (with Boolean value false) results]{
+      lingeling-ats1o1 and lingeling-ats1 results
+      comparing a difference variables (with Boolean value false) first approach
+      with the basic approach
+    }
+    \label{tab:diff-first-false-results}
+  \end{center}
+\end{table}
+
+\subsection{Using preference variables}
+\label{sec:preference-variables}
+%
+\begin{prop}
+  Adding preference variables lead to a performance improvement.
+\end{prop}
+%
+Section~\ref{sec:enc-diff-desc-eo} introduces preference variables
+which enforce the idea that difference variables are evaluated first.
+Preference variables only add additional clauses, but do not provide
+a runtime improvement per se. Evaluating them with false first
+and 
+If preference variables are evaluated first, it requires that
 
 
 
+\begin{table}[!h]
+  \begin{center}
+    \begin{tabular}{c|ccc}
+      \textbf{testcase}                                & \textbf{A} &  \textbf{B} &  \textbf{C} \\
+    \hline
+      \textbf{CNF with differential description}       &         11 &         133 &       155 \\
+      \textbf{additionally with preference variables}  &          8 &          50 &        62 \\
+    \end{tabular}
+    \caption{
+      lingeling-ats1o1 testcases comparing an approach
+      with differential description with additional preference variables
+    }
+    \label{tab:pref-vars-results}
+  \end{center}
+\end{table}
+
+
+\newpage
 
 As pointed out in Section~\ref{sec:enc-diff-desc-ocnf}, a best practice law of
 differential cryptanalysis states that difference variables should be
@@ -433,6 +524,18 @@ To enforce such a strategy, we tried several approaches:
     design with a special Boolean variable is explained in
     Section~\ref{sec:enc-diff-desc-eo}.
 \end{enumerate}
+
+
+\section{Combined results}
+%
+
+
+TODO cmp (basic approach) (diff-first-false with diff-desc)
+
+
+
+
+
 
 \section{Related work}
 \label{sec:results-related}

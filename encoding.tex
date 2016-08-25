@@ -211,8 +211,8 @@ This proposition is justified by the desire to find as little differences as pos
 in a hash collision to increase the probability of values cancelling each other out
 in the later rounds.
 
-\subsection{A light-weight approach}
-\label{sec:enc-ocnf}
+\subsection{A lightweight approach}
+\label{sec:enc-lightweight}
 %
 In this tweak we made a step back and considered the ideas of the previous
 section but neglected the differential description. This approach was interesting
@@ -221,11 +221,11 @@ to recognize the effect introduced by adding the differential description.
 \subsection{Influencing the evaluation order}
 \label{sec:enc-diff-desc-eo}
 %
-We took to idea to influence the evaluation order to the next level,
-by applying the following design:
+To take the idea to influence the evaluation order to the next level,
+we enforced the evaluation order even stronger by applying the following SAT~design:
 
 Let $\Delta x$ be the difference variable of pair $(x, x')$. We introduce a new Boolean
-variable $x^*$. We add clause
+variable $x^*$ called \emph{preference variable}. We add clause
 \[ x^* = (\Delta x \land x) \]
 and explicitly tell the SAT solver to guess on $x^*$ before guessing on $\Delta x$, $x$ or $x'$.
 
@@ -233,5 +233,3 @@ The SAT solver will assign $x'=0$ first, because of the evaluation order. So eit
 or $x$ must be false. $\Delta x$ is assigned false, because as difference variable it has a higher
 priority over $x$. Equivalently for $x'=1$ we have $\Delta x$ needs to be true. So we actually
 achieve an early guess on the difference variable.
-
-This another approach evaluates in the results chapter.
