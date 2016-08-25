@@ -97,16 +97,14 @@ from average problems?
   applications like AES. The specific selection can be identified by
   the crypto tag annotated to these CNF files as part of the cnf-analysis
   project.
-\item 62,533 clauses and 8,279 variables in average yield a variables-clauses
-  ratio of 7.55.
-\item The 36 cryptographic SAT instances give a standard deviation of zero
-  for clause length meaning that all clauses had the same length.
-\item Whereas the number of connected variable components has a mean
-  of 52.73 ($\sigma = 1225$, median $= 1$) for general problems,
-  Our cryptographic problems considered had a mean of 1 ($\sigma = 0$, median $= 1$).
-\item The number of definite clauses is half its value for general problems
-  (16,687 versus 32,787) and the number of goal clauses is 16~\% of its
-  value for general problems (5,767 versus 35,094).
+\item In average these problems have 116,398 clauses and 27,407 variables.
+  The average clauses-variables ratio is 5.58.
+\item The 36 cryptographic SAT instances give a standard deviation of 0.7
+  for clause length meaning that most clause lengths are very close to
+  the mean 3.4.
+\item The number of definite clauses is twice its value for general problems
+  (62,457 versus 31,315) and the number of goal clauses is 26~\% of its
+  value for general problems (7,761 versus 29,994).
 \end{itemize}
 
 No other value has been found to be significantly different from
@@ -134,24 +132,25 @@ Do average SAT problems distinguish from \emph{our} CNF testcases?
     Section~\ref{sec:enc-diff-desc} increases the number of clauses
     by about 47~\% ($\sigma = 0.0005$) for MD4 instances and
     by about 43~\% ($\sigma = 0.0008$) for SHA-256 instances.
+    For SHA-256 problems, this is illustrated in Table~\ref{tab:problem-sizes}.
     The additional variable introduced in Section~\ref{sec:enc-diff-desc-eo}
     increases the number of variables by about 80~\%
     and the number of clauses by factor 2.
 
-    \begin{table}[!h]
-      \begin{center}
-        \begin{tabular}{rc|rc}
-          MD4~A: & 254,656 / 48,704 & MD4~A diff-desc: & 374,592 / 48,704 \\
-          MD4~B: & 254,210 / 48,704 & MD4~B diff-desc: & 374,146 / 48,704 \\
-          MD4~C: & 253,984 / 48,704 & MD4~C diff-desc: & 373,920 / 48,704 \\
-          SHA-256 18: & 590,953 / 107,839 & SHA-256 18 diff-desc: & 846,487 / 107,839 \\
-          SHA-256 21: & 636,838 / 116,800 & SHA-256 21 diff-desc: & 911,629 / 116,800 \\
-          SHA-256 23: & 667,438 / 122,774 & SHA-256 23 diff-desc: & 955,067 / 122,774 \\
-          SHA-256 24: & 682,722 / 125,761 & SHA-256 24 diff-desc: & 976,770 / 125,761
-        \end{tabular}
-        \caption{Our testcases and their number of clauses / variables}
-      \end{center}
-    \end{table}
+    %\begin{table}[!h]
+    %  \begin{center}
+    %    \begin{tabular}{rc|rc}
+    %      MD4~A: & 254,656 / 48,704 & MD4~A diff-desc: & 374,592 / 48,704 \\
+    %      MD4~B: & 254,210 / 48,704 & MD4~B diff-desc: & 374,146 / 48,704 \\
+    %      MD4~C: & 253,984 / 48,704 & MD4~C diff-desc: & 373,920 / 48,704 \\
+    %      SHA-256 18: & 590,953 / 107,839 & SHA-256 18 diff-desc: & 846,487 / 107,839 \\
+    %      SHA-256 21: & 636,838 / 116,800 & SHA-256 21 diff-desc: & 911,629 / 116,800 \\
+    %      SHA-256 23: & 667,438 / 122,774 & SHA-256 23 diff-desc: & 955,067 / 122,774 \\
+    %      SHA-256 24: & 682,722 / 125,761 & SHA-256 24 diff-desc: & 976,770 / 125,761
+    %    \end{tabular}
+    %    \caption{Our testcases and their number of clauses / variables}
+    %  \end{center}
+    %\end{table}
 
     Compared to 83,542 clauses and 12,219 variables for our average SAT problem,
     we consider our testcases to be noticeably large. However, it is important to
@@ -192,21 +191,44 @@ the effort.
 \section{Finding hash collisions}
 \label{sec:results-attacks}
 %
-In this section, we look at our runtime results of Testcases provided in
+In this section, we look at our runtime results of testcases provided in
 Appendix~\ref{app:tc}. We make various claims and substantiate them
 with runtime results. Runtimes are always provided in seconds. Therefore
 smaller runtimes are better. \timeout{} denotes a timeout (solving took
 more than 1 day) and \unknown{} denotes unavailable data.
 
-% We considered MD4 testcases~A, B and C (compare with Appendices~\ref{fig:tcA}, \ref{fig:tcB} and \ref{fig:tcC})
-% and generated the corresponding CNF files. The SAT solvers mentioned in Section~\ref{sec:sat-solvers}
-% were used to evaluate whether the problem is solvable in reasonably time. For every testcase we
-% defined a time limit of at most 1 day (i.e. 86,400 seconds). A timeout is denoted by \timeout.
-% Some testcases listed have been evaluated for a larger time limit.
+We considered MD4 testcases~A, B and C (listed in Table~\ref{tab:md4-tcs})
+and generated the corresponding CNF files. The SAT solvers mentioned
+in Section~\ref{sec:sat-solvers} were used to evaluate whether the problem
+is solvable within the time limit.
+
+\begin{table}
+  \begin{center}
+    \begin{tabular}{cccc}
+      \textbf{hash algorithm} & \textbf{testcase} & \textbf{rounds} & \textbf{differential characteristic} \\
+    \hline
+      MD4                     & A                 & 48              & Appendix~\ref{fig:tcA} \\
+      MD4                     & B                 & 48              & Appendix~\ref{fig:tcB} \\
+      MD4                     & C                 & 48              & Appendix~\ref{fig:tcC} \\
+    \end{tabular}
+    \caption{MD4 testcases considered}
+    \label{tab:md4-tcs}
+  \end{center}
+\end{table}
 
 \subsection{Attacking MD4}
 \label{sec:results-md4}
 %
+\begin{table}[!h]
+  \begin{center}
+    \begin{tabular}{rc|rc}
+      MD4~A: & 254,656 / 48,704 & MD4~A diff-desc: & 374,592 / 48,704 \\
+      MD4~B: & 254,210 / 48,704 & MD4~B diff-desc: & 374,146 / 48,704 \\
+      MD4~C: & 253,984 / 48,704 & MD4~C diff-desc: & 373,920 / 48,704 \\
+    \end{tabular}
+    \caption{Our testcases and their number of clauses / variables}
+  \end{center}
+\end{table}
 \begin{prop}
   Testcase~\ref{sec:tcA} in the encoding described in Section~\ref{sec:enc-original}
   can be solved within one minute by all considered SAT solvers.
@@ -357,6 +379,21 @@ but in general we cannot recommend simplifying every CNF file before running it.
 \subsection{Improvements with differential description}
 \label{sec:result-diff-desc}
 %
+    \begin{table}[!h]
+      \begin{center}
+        \begin{tabular}{rc|rc}
+          MD4~A: & 254,656 / 48,704 & MD4~A diff-desc: & 374,592 / 48,704 \\
+          MD4~B: & 254,210 / 48,704 & MD4~B diff-desc: & 374,146 / 48,704 \\
+          MD4~C: & 253,984 / 48,704 & MD4~C diff-desc: & 373,920 / 48,704 \\
+          SHA-256 18: & 590,953 / 107,839 & SHA-256 18 diff-desc: & 846,487 / 107,839 \\
+          SHA-256 21: & 636,838 / 116,800 & SHA-256 21 diff-desc: & 911,629 / 116,800 \\
+          SHA-256 23: & 667,438 / 122,774 & SHA-256 23 diff-desc: & 955,067 / 122,774 \\
+          SHA-256 24: & 682,722 / 125,761 & SHA-256 24 diff-desc: & 976,770 / 125,761
+        \end{tabular}
+        \caption{Problem sizes of our SHA-256 testcases (clauses / variables)}
+        \label{tab:problem-sizes}
+      \end{center}
+    \end{table}
 Our next goal was to scale up to a more difficult problem. We considered SHA-256
 which has a much larger internal state (at least by factor 2). So finding a hash
 collision is more difficult and we considered further strategies.
