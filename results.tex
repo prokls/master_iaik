@@ -52,7 +52,7 @@ provided by the cnf-analysis project.
   clauses are very rare.
 \item[Are there any CNF files with more than one connected variable component?]
   Indeed, an average CNF file contains 67.07 connected variable components.
-  However, its median is 1 anyway implying that at least half of the CNF files
+  However, its median is 1 implying that at least half of the CNF files
   have only 1 connected variable component.
 \item[How many variables of a CNF are covered by unit clauses?]
   In average 124 variables are covered by unit clauses. This is an insignificant
@@ -62,7 +62,7 @@ provided by the cnf-analysis project.
 The clauses/variables ratio was thoroughly studied by the SAT
 community~\cite{nudelman2004understanding}.
 A strong correlation between the instance's hardness and the ratio of number
-of clauses to number variables exists~\cite{selman1996generating}
+of clauses to number of variables exists~\cite{selman1996generating}
 though it is important to point out that this result holds for randomly
 generated SAT instances, which our testcases are not classified as.
 
@@ -83,10 +83,10 @@ The overall CNF is satisfiable iff both clause sets are satisfiable.
 The overall CNF is falsifiable iff any clause set is falsifiable.
 Hence, if we know the connected variable components, we could easily
 create two parallel SAT solver instances and solve the problems
-independently. 4,607 out of 62,251 CNF files contained more than 1
+independently. 4,607 out of 62,251 CNF files contained more than one
 connected variable component.
 
-These properties represent very fundamental properties of the SAT problem.
+These features represent very fundamental properties of the SAT problem.
 But for us the question arises whether we can distinguish our cryptoproblems
 from average problems?
 
@@ -99,7 +99,7 @@ from average problems?
   project.
 \item 62,533 clauses and 8,279 variables in average yield a variables-clauses
   ratio of 7.55.
-\item The 36 cryptographic SAT instances give a standard deviation of 0
+\item The 36 cryptographic SAT instances give a standard deviation of zero
   for clause length meaning that all clauses had the same length.
 \item Whereas the number of connected variable components has a mean
   of 52.73 ($\sigma = 1225$, median $= 1$) for general problems,
@@ -180,10 +180,10 @@ Do average SAT problems distinguish from \emph{our} CNF testcases?
   \item An average literal frequency of $3.5\cdot 10^{-5}$ for our testcases
     is much lower than 0.014 for average problems. We explain this with the
     larger problem size. Literal frequency is divided by the number of clauses
-    of the CNF and is therefore smaller the larger the problem is.
+    of the CNF and is therefore smaller, the larger the problem is.
 \end{itemize}
 
-In general we were not able to identify features which allows us to solve
+In general we were not able to identify features allowing us to solve
 differential cryptanalysis problems more efficiently compared to
 general-purpose SAT problems. We concluded writing your own SAT solver
 dedicated to solving differential cryptanalysis problems is not worth
@@ -217,11 +217,11 @@ rather as a toy example to verify correctness of our implementation than
 as an actual benchmark. Be aware that invalid implementations either
 result in unsatisfiability for satisfiable testcases or runtime results are
 unexpected because the SAT solver could not take advantage of our SAT design
-implementations. This particular testcase can be solved easily with all major
+improvements. This particular testcase can be solved easily with all major
 SAT solvers as can be seen in Table~\ref{tab:tcA-results}.
 
-We end up with the result, that the hash collision given in Table~\ref{fig:tcC}
-can be solved by a limited set of modern SAT solvers. Of course the cryptanalyst
+We end up with the result, that the hash collision given in Testcase~C
+can be solved by the majority of modern SAT solvers. Of course the cryptanalyst
 needs to figure out good starting points for the hash collision and encode them
 in the differential characteristic, but this task is still considered practical,
 because this task can be easily automated.
@@ -262,14 +262,15 @@ because this task can be easily automated.
 %
 As a next approach, we looked at CNF simplifiers. Those simplifiers consume a
 CNF file and transform the CNF file to an equisatisfiable CNF file.
+Those simplified CNF files might be subject to performance improvements.
 
 \begin{prop}
   Simplification reduces the problem size (number of variables and clauses).
 \end{prop}
 
-Consider for example Testcase~\ref{sec:tc18} in the basic encoding introduced
-in Section~\ref{sec:enc-original}. Then simplification will reduce the problem
-size down by 57--77~\% of its original size (compare with Table~\ref{tab:simpl-size}).
+Consider for example Testcase~18 (Appendix \ref{sec:tc18}) in the basic encoding
+introduced in Section~\ref{sec:enc-original}. Then simplification will reduce the problem
+size down by 57--77~\% of its original size (as illustrated in Table~\ref{tab:simpl-size}).
 We verified these data for all simplified files and got similar results.
 Therefore the claim holds considering the problem size gets reduced to
 approximately half of its size.
@@ -286,7 +287,7 @@ approximately half of its size.
              minisat &    391134 &/& 61845   & (66.19~\% / 57.35~\%)
     \end{tabular}
     \caption{
-        Problem sizes of Testcase~\ref{sec:tc18} in the encoding of
+        Problem sizes of Testcase 18 in the encoding of
         Section~\ref{sec:enc-original} after simplification
     }
     \label{tab:simpl-size}
@@ -297,22 +298,31 @@ approximately half of its size.
   Simplification as preprocessing step does not significantly improve the runtime of SAT solvers.
 \end{prop}
 %
-We look at Testcase~\ref{sec:tcC} which is a more difficult MD4 problem
-compared to Testcase~\ref{sec:tcA}. Simplification runtime results depend on the
+We look at Testcase~C which is a more difficult MD4 problem
+compared to Testcase~A. Simplification runtime results depend on the
 SAT solver, which applies certain simplifications while trying to solve the
 CNF, and the simplifier used. Table~\ref{tab:simplification-results}
 lists runtimes depending on the simplification used.
 
 \begin{description}
-\item[none] refers to the unsimplified CNF
-\item[cmsat] refers to simplification applied with Cryptominisat version~5: \texttt{./cryptominisat5 -p1 file.cnf simplified.cnf}
-\item[lingeling] refers to simplification with lingeling version ats1: \texttt{./lingeling -s file.cnf -o simplified.cnf}
-\item[minisat] also simplifies CNF file with the following command line: \texttt{./minisat file.cnf -dimacs=simplified.cnf}
-\item[satelite] is specifically designed to simplify CNF files: \texttt{./satelite file.cnf simplified.cnf}
+\item[none]
+  refers to the unsimplified CNF
+\item[cmsat]
+  refers to simplification applied with Cryptominisat version~5: \\
+  \texttt{./cryptominisat5 -p1 file.cnf simplified.cnf}
+\item[lingeling]
+  refers to simplification with lingeling version ats1: \\
+  \texttt{./lingeling -s file.cnf -o simplified.cnf}
+\item[minisat]
+  also simplifies CNF file with the following command line: \\
+  \texttt{./minisat file.cnf -dimacs=simplified.cnf}
+\item[satelite]
+  is specifically designed to simplify CNF files: \\
+  \texttt{./satelite file.cnf simplified.cnf}
 \end{description}
 
-It is worth pointing out that simplification time is not part of the listed
-runtime. Simplification can take very long. Especially simplifications with
+It is worth pointing out that simplification time is not part of the runtime
+listed. Simplification can take very long. Especially simplifications with
 lingeling have sometimes taken several hours without result.
 
 In conclusion, simplification leads to a slight improvement of the runtime,
@@ -397,7 +407,11 @@ We continued by trying the influence the guessing strategy.
     %   9364054 conflicts, 6258.6 conflicts/sec
     %   830017204 propagations, 0.6 megaprops/sec
     %   1496.2 seconds, 147.4 MB
-    \caption{Runtimes for various testcases with or without differential description with CryptoMiniSat and lingeling}
+    \caption{
+      Runtimes for various testcases with or without differential
+      description with CryptoMiniSat and lingeling. Testcase~C
+      has been added for reference.
+    }
     \label{tab:diff-desc-results}
   \end{center}
 \end{table}
@@ -407,7 +421,7 @@ We continued by trying the influence the guessing strategy.
 %
 \newcommand\mone[1][-1]{\texttt{-{}-phase=#1}}
 \begin{prop}
-  Using \mone{} improves the runtime of lingeling for our testcases.
+  Lingeling option \mone{} improves its runtime for our testcases.
 \end{prop}
 %
 Option \mone{} of lingeling is described as default phase set to
