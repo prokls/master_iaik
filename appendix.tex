@@ -2,23 +2,26 @@
 \chapter{Hardware setup}
 \label{app:setup}
 %
-In the following we introduce two hardware setups used for evaluating
-data of this master thesis. The first setup is referred to as
-\enquote{Thinkpad x220} throughout this thesis whereas the second
-setup is referred to as \enquote{cluster}. Thinkpad x220 was used
-to simplify CNF files and evaluate SAT feature. The cluster was used
-for running SAT solvers and retrieve runtime results.
+We introduce two hardwarde setups used in this master thesis.
+%In the following we introduce two hardware setups used for evaluating
+%data of this master thesis. The first setup is referred to as
+%\enquote{Thinkpad x220} throughout this thesis whereas the second
+%setup is referred to as \enquote{cluster}.
+Thinkpad x220 was used
+to simplify CNF files and evaluate SAT features. The cluster was used
+for running SAT solvers and retrieving runtime results.
 
 %\subsection{Thinkpad x220 Tablet}
 %
+\newcommand\caches[1][L3]{L1--#1 cache~sizes}
 \begin{table}[!ht]
   \begin{center}
     \begin{tabular}{rc}
       \hline
-      \emph{Type model}     & Thinkpad Lenovo x220 tablet, 4299-2P6 \\
-      \emph{Processor}      & Intel i5-2520M, 2.50~GHz, dual-core, Hyperthreaded \\
-      \emph{L3 cache size}  & 3072~KB \\
-      \emph{RAM}            & 16~GB (extension to common retail setup) \\
+      \emph{Model type}            & Thinkpad Lenovo x220 tablet, 4299-2P6 \\
+      \emph{Processor}             & Intel i5-2520M, 2.50~GHz, dual-core, Hyperthreaded \\
+      \emph{RAM}                   & 16~GB (extension to common retail setup) \\
+      \emph{\caches{}}             & 32~KB / 256~KB / 3,072~KB \\
       \hline
     \end{tabular}
     \caption{Thinkpad x220 Tablet specification~\cite{thinkpadx220}}
@@ -28,20 +31,31 @@ for running SAT solvers and retrieve runtime results.
 
 \begin{table}[!ht]
   \begin{center}
-    \begin{tabular}{rc}
+    \begin{tabular}{rl}
       \hline
-      \emph{Processor}     & Intel Xeon X5690, 3.47~GHz, 6 cores, Hyperthreaded \\
-      \emph{RAM}           & 192~GB \\
-      \emph{L3 cache size} & 12288~KB \\
+        \multicolumn{2}{c}{\emph{Cluster node nehalem192g0 specification~\cite{intelX5690}}} \\
+      \hline
+        \emph{Processor}            & Intel Xeon X5690, 3.47~GHz, 6 cores, Hyperthreaded \\
+        \emph{RAM}                  & 192~GB \\
+        \emph{\caches{}}            & 32~KB / 256~KB / 12,288~KB \\
+      \hline
+        \multicolumn{2}{c}{\emph{Cluster node nehalem72g0 specification}} \\
+      \hline
+        \emph{Processor}            & Intel Xeon X5550, 2.67~GHz, 4 cores, Hyperthreaded \\
+        \emph{RAM}                  & 72~GB \\
+        \emph{\caches{}}            & 32~KB / 256~KB / 8,192~KB \\
+      \hline
+        \multicolumn{2}{c}{\emph{Cluster node xeon64g* specification}} \\
+      \hline
+        \emph{Processor}            & Intel Xeon E5430, 2.66~GHz, 4 cores, Hyperthreaded \\
+        \emph{RAM}                  & 72~GB \\
+        \emph{\caches{}}            & 32~KB / 6144~KB \\
       \hline
     \end{tabular}
-    \caption{Cluster node nehalem192g0 specification~\cite{intelX5690}}
+    \caption{One node nehalem192g0, one node nehalem72g0 and four nodes xeon64g* were used for evaluating runtimes}
     \label{setup:cluster}
   \end{center}
 \end{table}
-
-TODO: other cluster cores
-
 
 \chapter{Testcases}
 \label{app:tc}

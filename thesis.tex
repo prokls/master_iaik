@@ -173,7 +173,7 @@
 
 \declaretheorem[thmbox={style=L,bodystyle=\noindent\normalfont\setlength{\parskip}{0.3\baselineskip}},style=plain,name={Theorem}]{theorem}
 \declaretheorem[thmbox={style=L,bodystyle=\noindent\normalfont\setlength{\parskip}{0.3\baselineskip}},style=plain,name={Definition}]{defi}
-\declaretheorem[thmbox={style=L,bodystyle=\noindent\normalfont\setlength{\parskip}{0.3\baselineskip}},style=plain,name={Proposition}]{prop}
+\declaretheorem[thmbox={style=L,bodystyle=\noindent\normalfont\setlength{\parskip}{0.3\baselineskip}},style=plain,name={Claim}]{prop}
 \declaretheorem[thmbox={style=L,bodystyle=\noindent\normalfont\setlength{\parskip}{0.3\baselineskip}},style=plain,name={Properties}]{pro}
 %\newtheorem{theorem}{Theorem}
 %\newtheorem{defi}{Definition}
@@ -285,33 +285,28 @@
   to break collision resistance in hash functions. Over the years advanced attacks based on those
   differential approaches have been developed.
 
-  To find collisions like Wang et al., a cryptanalyst needs to specify a differential characteristic.
-  Looking at the differential behavior of the underlying operations of the hash algorithm
-  shows how differential values propagate in the algorithm. The goal is to find a differential
-  characteristic whose differences cancel out in the output. Once such a differential characteristic
-  was discovered, in a second step the actual values for those differences are defined
-  yielding an actual hash collision.
+  To find collisions like Wang et al., a cryptanalyst needs to specify a differential
+  characteristic as starting point. This characteristic has a huge impact on the runtime.
+  The goal is to find a differential characteristic whose differences cancel out in the output.
+  Once such a differential characteristic was discovered, in a second step the actual values
+  for those differences are defined yielding an actual hash collision.
 
-  Finding a differential characteristic can be a cumbersome and tedious task.
-  Whereas propagation can be automated using dedicated tools,
-  finding an initial differential characteristic is a difficult task
-  as it can be specified with arbitrary levels of granularity.
+  Evaluating differential characteristics can be a cumbersome and tedious task.
+  Dedicated tools can implement search heuristics. Performance shortcuts
+  can be made by studying the hash algorithm's differential behavior.
 
-  SAT solvers inherently implement both tasks.
-  They consecutively propagate values which narrow the search space.
-  The probability to find a satisfiable assignment increases if the narrowed search
-  space has many satisfiable assignments. And finally the assignment reveals
-  initial values. On the other hand, SAT solvers have no notion of differential
-  values and therefore problem encoding becomes an important topic.
+  SAT solvers inherently implement a search heuristic and should derive those shortcuts
+  on their own. In this thesis we use SAT solvers to solve differential cryptanalysis
+  problems. We show that SAT solvers are not able to derive those shortcuts on their
+  own, but on the other hand we introduce tweaks which significantly improve the runtime.
+  SAT design remains an important topic.
 
-  In this thesis we look at differential characteristics representing hash collisions
-  and encode them as SAT problem. A SAT solver tells us whether this characteristic
-  represents a valid hash state. We implemented a framework generating CNFs for
-  these purposes and improved our CNF design to solve MD4 testcases as well as
-  much more difficult SHA-256 testcases. Our greatest achievement was finding a
-  MD4 full round hash collision and a SHA-256 hash collision over 27 rounds.
+  We wrote a library generating CNFs for differential characteristics and
+  optionally introduced SAT design tweaks to this CNF. Those tweaks
+  allowed a significant runtime improvement helping us to solve full-rounds
+  hash collisions in MD4 and 24-rounds hash collisions in SHA-256.
   Finally we also provide a small CNF analysis library to compare encoded problems
-  with others.
+  with each other.
 
   \vspace{3pt}
   \textbf{Keywords:}
@@ -379,9 +374,9 @@ This document was printed with \LuaLaTeX{} in the Linux Libertine typeface.
 \input{appendix}
 
 \backmatter
-\listoffigures
-\listoftables
-%\printindex
 \printbibliography
+%\listoffigures
+%\listoftables
+%\printindex
 
 \end{document}
