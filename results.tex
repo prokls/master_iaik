@@ -366,17 +366,19 @@ lingeling have sometimes taken several hours without result.
 
 In conclusion, simplification leads to a slight improvement of the runtime,
 but in general we cannot recommend simplifying every CNF file before running it.
+Because technically speaking, SAT solvers internally apply simplification
+algorithms on their own.
 
 \begin{table}[!h]
   \begin{center}
     \begin{tabular}{cc|ccccc}
       \textbf{solver} & \textbf{version} & \textbf{none} & \textbf{cmsat} & \textbf{lingeling} & \textbf{minisat} & \textbf{satelite} \\
     \hline
-      MiniSat       & 2.2.0              & 4,519    & 7,649    & \unknown & 1,476    & 1,293 \\
+      MiniSat       & 2.2.0              & 4,519    & 7,649    & 1,337    & 1,476    & 1,293 \\
       CryptoMiniSat & 4.5.3              & \unknown & \unknown & \unknown & \unknown & \unknown \\
                     & 5                  & 1,064    & 973      & 1,201    & 4,470    & 3,920 \\
       Lingeling     & ats1               & 1,492    & 906      & 356      & 860      & 1,297 \\
-      Treengeling   & ats1               & 1,281    & 13,401   & \unknown & 13,790   & 10,840 \\
+      Treengeling   & ats1               & 1,281    & 13,401   & 20,903   & 13,790   & 10,840 \\
       Plingeling    & ats1               & 2,310    & 1,232    & 955      & 1,384    & 2,030 \\
       Glucose       & 4.0                & \unknown & \unknown & \unknown & \unknown & \unknown \\
       Glucose Syrup & 4.0                & \unknown & \unknown & \unknown & \unknown & \unknown
@@ -388,42 +390,46 @@ but in general we cannot recommend simplifying every CNF file before running it.
     %    treengeling-ats1:  1955 100% scheduled jobs  1281.49 seconds, 2468 MB
     %    cmsat5, ling-simplified 1.cnf:     c Total time               : 1201.19
     %    plingeling, ling-simplified 1.cnf:     c 954.7 seconds, 719.9 MB
-    \caption{Runtimes of Testcase~\ref{sec:tcC} after CNF files have been simplified}
+    \caption{Runtimes of Testcase~C after CNF files have been simplified}
     \label{tab:simplification-results}
   \end{center}
 \end{table}
 
-\subsection{Improvements with differential description}
+\subsection{Attacking SHA-256}
 \label{sec:result-diff-desc}
 %
-    \begin{table}[!h]
-      \begin{center}
-        \begin{tabular}{rc|rc}
-          MD4~A: & 254,656 / 48,704 & MD4~A diff-desc: & 374,592 / 48,704 \\
-          MD4~B: & 254,210 / 48,704 & MD4~B diff-desc: & 374,146 / 48,704 \\
-          MD4~C: & 253,984 / 48,704 & MD4~C diff-desc: & 373,920 / 48,704 \\
-          SHA-256 18: & 590,953 / 107,839 & SHA-256 18 diff-desc: & 846,487 / 107,839 \\
-          SHA-256 21: & 636,838 / 116,800 & SHA-256 21 diff-desc: & 911,629 / 116,800 \\
-          SHA-256 23: & 667,438 / 122,774 & SHA-256 23 diff-desc: & 955,067 / 122,774 \\
-          SHA-256 24: & 682,722 / 125,761 & SHA-256 24 diff-desc: & 976,770 / 125,761
-        \end{tabular}
-        \caption{Problem sizes of our SHA-256 testcases (clauses / variables)}
-        \label{tab:problem-sizes}
-      \end{center}
-    \end{table}
-Our next goal was to scale up to a more difficult problem. We considered SHA-256
-which has a much larger internal state (at least by factor 2). So finding a hash
-collision is more difficult and we considered further strategies.
+\index{Differential description}
+While the basic approach works well for MD4, hash algorithm SHA-256 encompasses
+a much larger state making the problem significantly more difficult for the SAT solver.
+Consider Testcases 18, 21, 23 and 24. Those testcases describe
+round-reduced hash collisions on SHA-256 (the testcase number gives
+the number of rounds). Our next approach is called differential description
+as originally described in Section~\ref{sec:enc-diff-desc}. 
+
+\begin{table}[!h]
+  \begin{center}
+    \begin{tabular}{cc|cc}
+        \textbf{testcase} & \textbf{clauses / variables} & \textbf{testcase} & \textbf{clauses / variables} \\
+      \hline
+        18: & 590,953 / 107,839 & 18 diff-desc: & 846,487 / 107,839 \\
+        21: & 636,838 / 116,800 & 21 diff-desc: & 911,629 / 116,800 \\
+        23: & 667,438 / 122,774 & 23 diff-desc: & 955,067 / 122,774 \\
+        24: & 682,722 / 125,761 & 24 diff-desc: & 976,770 / 125,761 \\
+    \end{tabular}
+    \caption{Problem sizes of our SHA-256 testcases (clauses / variables)}
+    \label{tab:problem-sizes}
+  \end{center}
+\end{table}
 
 \begin{prop}
   A differential description encoding (Section~\ref{sec:enc-diff-desc})
   improves the runtime compared to a missing differential description.
 \end{prop}
 
-Consider testcase~C for MD4 (Appendix~\ref{sec:tcA}) and testcases
-testcases~18, 21 and 23 (Appendices~\ref{sec:tc18}, \ref{sec:tc21} and
-\ref{sec:tc23}) for SHA-256. We evaluate the
-runtimes with or without differential description.
+To testing differential description, we looked at MD4's Testcase~C
+and compared it with out SHA-256 testcases. Those testcases
+are described in detail in Appendices~\ref{sec:tc18}, \ref{sec:tc21}
+and \ref{sec:tc23}.
 
 Recall that differential description explicitly encodes
 how differences in arithmetic and bitwise operations propagate in the CNF.
@@ -434,10 +440,15 @@ variant we looked at, but did not list. This 27-rounds testcase
 could not be solved in many cases within our time limit and
 is therefore excluded from our lists.
 
+We evaluated runtimes with and without differential description.
 In Table~\ref{tab:diff-desc-results} we randomly picked SAT solvers
 and we can clearly see a significant improvement of the runtimes.
 
-We continued by trying the influence the guessing strategy.
+We continued by trying to influence the guessing strategy to reflect
+differential cryptanalysis, which generally use the assumption
+that difference variables are assigned first. This strategy
+requires customization of the SAT solver and therefore we
+only considered lingeling, which was adapted for our purposes.
 
 \begin{table}[!h]
   \begin{center}
@@ -445,10 +456,11 @@ We continued by trying the influence the guessing strategy.
                         & \multicolumn{2}{c}{\textbf{CryptoMiniSat~5}} & \multicolumn{2}{c}{\textbf{lingeling-ats1}} \\
       \textbf{testcase} & \textbf{w/o dd} & \textbf{w/ dd} & \textbf{w/o dd} & \textbf{w/ dd} \\
     \hline
-      MD4, C            &       1,064 &        231 &      798 &   \unknown \\
+      MD4, C            &       1,064 &        231 &      798 &         53 \\
       SHA-256, 18       &          37 &         37 &       31 &        160 \\
-      SHA-256, 21       &    \unknown &      7,855 &   28,621 &      5,513 \\
-      SHA-256, 23       &    \unknown &     26,212 &   76,196 &      1,450
+      SHA-256, 21       &    \timeout &      7,855 &   28,621 &      5,513 \\
+      SHA-256, 23       &    \timeout &     26,212 &   76,196 &      1,450 \\
+      SHA-256, 24       &    \timeout &     37,194 &   78,017 &      1,235
     \end{tabular}
     % not contained in folder structure:
     % SHA256-18, lingeling-ats1, with dd
@@ -461,6 +473,11 @@ We continued by trying the influence the guessing strategy.
     %   9364054 conflicts, 6258.6 conflicts/sec
     %   830017204 propagations, 0.6 megaprops/sec
     %   1496.2 seconds, 147.4 MB
+    % MD4-C, lingeling-ats1, w/ dd
+    %   1710883 decisions, 32432.6 decisions/sec
+    %   333050 conflicts, 6313.5 conflicts/sec
+    %   44484852 propagations, 0.8 megaprops/sec
+    %   52.8 seconds, 31.1 MB
     \caption{
       Runtimes for various testcases with or without differential
       description with CryptoMiniSat and lingeling. Testcase~C
@@ -473,12 +490,17 @@ We continued by trying the influence the guessing strategy.
 \subsection{Modifying the guessing strategy}
 \label{sec:results-guessing}
 %
+In differential cryptanalysis the general assumption is made that
+differences should be guessed first. Once they are assigned, we
+can look at the Boolean values in the two hash algorithm instances.
+To model this behavior, we looked at options provided by SAT solvers.
+
 \newcommand\mone[1][-1]{\texttt{-{}-phase=#1}}
 \begin{prop}
   Lingeling option \mone{} improves its runtime for our testcases.
 \end{prop}
 %
-Option \mone{} of lingeling is described as default phase set to
+Option \mone{} of lingeling is described as \enquote{default phase} set to
 $-1$ (negative), $0$ (Jeroslow-Wang strategy~\cite{JeroslowWang})
 or $1$ (positive). Per default a strategy engineered by
 Jeroslow-Wang~\cite{JeroslowWang} is used, but considering
@@ -505,6 +527,11 @@ This can be recognized in Table~\ref{tab:phase-results}.
 \subsection{Evaluating the lightweight approach}
 \label{sec:lightweight-results}
 %
+Though the results of \mone{} was recognizable, we wanted to push it further.
+We got in contact with Armin Biere who provided us an extended lingeling implementation
+which understands the notion of difference variables as a set of variables which needs
+to be assigned first.
+
 \begin{prop}
   Evaluating difference variables first and with Boolean value false improves the runtime.
 \end{prop}
@@ -539,6 +566,13 @@ becomes 0.85~\%) of its original runtime in average.
 \subsection{Using preference variables}
 \label{sec:preference-variables}
 %
+Our last approach uses \emph{preference variables} mentioned in
+Section~\ref{sec:enc-diff-desc-eo}. Under the assumption that
+preference variables $x^*$ and difference variables $\Delta x$
+are assigned first, an additional clauses provides a decision tree
+which assigns difference variables first and once they are all set,
+values for the two hash algorithm instances are assigned.
+
 \begin{prop}
   Adding preference variables lead to a performance improvement.
 \end{prop}
@@ -578,7 +612,17 @@ Table~\ref{tab:pref-vars-results} shows a significant runtime improvement.
   \end{center}
 \end{table}
 
-%\subsection{Combined results}
-%%
-%TODO cmp (basic approach) (diff-first-false with diff-desc)
-
+\section{Summary}
+\label{sec:results-summary}
+%
+In this section we looked at various improvements to improve the runtime, namely
+\begin{enumerate}
+  \item CNF simplification
+  \item differential description
+  \item Lingeling's \mone{} option
+  \item Difference variables first with Boolean false
+  \item Preference variables
+\end{enumerate}
+%
+We evaluated these approaches with several SAT solvers and found significiant
+runtime improvements. We successfully found hash collisions for MD4 and SHA-256.
