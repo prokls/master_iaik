@@ -204,9 +204,9 @@ In the following, a brief overview of MD4 is given.
     First of all, padding is applied. A single bit $1$ is appended to the
     input. As long as the input does not reach a length congruent 448 modulo 512,
     bit $0$ is appended.
-    Afterwards, length appending takes place. Represent the length of the input
-    (without the previous modifications) in binary and take its first
-    64 less significant bits. Append those 64 bits to the input.
+    Afterwards, length appending takes place.
+    Append the first 64 less significant bits of the input length (without the previous modifications)
+    represented in binary.
   \item[Initialization.]
     The message is split into 512-bit blocks (i.e. 16 32-bit words).
     State variables $A_{i}$ with $-4 \leq i < 0$ are initialized with these
@@ -221,20 +221,20 @@ In the following, a brief overview of MD4 is given.
       \end{array}
     \]
   \item[Round function and state variable updates.]
-    The round function is applied in three rounds with 16 iterations.
+    The round function
+    is applied in 3 rounds with 16 iterations.
     In every iteration, values $A_{-1}$, $A_{-2}$ and $A_{-3}$ are taken
     as arguments to function $F$. Function $F$ is \boolf{IF} in round~1,
     followed by \boolf{MAJ} for round~2 and \boolf{XOR} for the final round~3.
     The resulting value is added to $A_{-1}$, current message block $M$
     and constant $X$. Finally, the 32-bit sum will be left-rotated by $p$
     positions. Left rotation is formally defined in Definition~\ref{def:shifts}.
-    The values of $X$ and $p$ are defined as follows:
+    We define $X$ and $p$:
 
     Let $i$ be the iteration counter between $1$ and $16$ and
     $r$ the round between $1$ and $3$. Then $X$ takes the value
     of the $i$-th column and $r$-th row of matrix $C$.
     $p$ takes the value of row $r$ and column $i \bmod{4}$ of matrix $P$.
-
     \[
       C = \left(\begin{array}{cccccccccccccccc}
         0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 \\
@@ -248,18 +248,16 @@ In the following, a brief overview of MD4 is given.
         3 & 9 & 11 & 15
       \end{pmatrix}
     \]
-
     This round function design is visualized in Figure~\ref{fig:md4-round-function}.
 \end{description}
 
-\begin{figure}[ht]
+\begin{figure}[!b]
   \begin{center}
-    \includegraphics{img/md4.pdf}
+    \includegraphics[scale=0.7]{img/md4.pdf}
     \caption{MD4 round function updating state variables}
     \label{fig:md4-round-function}
   \end{center}
 \end{figure}
-
 
 
 
@@ -329,7 +327,7 @@ the XOR function whereas $\boxplus$ denotes 32-bit addition.
 \begin{description}
   \item[Padding and length extension.]
     The padding and length extension scheme of MD4 is used also in SHA-256.
-    Append bit $1$ and followed by a sequence of bit $0$ until the message reaches a length
+    Append bit $1$, followed by a sequence of bit $0$ until the message reaches a length
     of 448 modulo 512 bits. Afterwards the first 64 bits of the binary representation
     of the original input are appended.
   \item[Initialization.]
@@ -374,49 +372,48 @@ the XOR function whereas $\boxplus$ denotes 32-bit addition.
   \item[Round function.]
     For every block of 512~bits, the round function is applied.
     The eight state variables are updated iteratively for $i$ from 0 to 63.
+    $W_i$ and $K_i$ refer to the previously initialized values.
     \begin{align*}
       E_i     &\coloneqq A_{i-4} + E_{i-4} + \SigT(E_{i-1}) + \IF{(E_{i-1}, E_{i-2}, E_{i-3})} + K_i + W_i \\
       A_i     &\coloneqq E_i - A_{i-4} + \SigO(A_{i-1}) + \MAJ{(A_{i-1}, A_{i-2}, A_{i-3})}
     \end{align*}
-    $W_i$ and $K_i$ refer to the previously initialized values.
-  \item[Computation of intermediate hash values.]
-    Intermediate hash values for the Davies-Meyer construction are
-    initialized with the following values:
-    \[
-      \begin{array}{cp{10pt}cp{10pt}cp{10pt}c}
-        H_0^{(0)} \coloneqq A_{-1}  & &  H_1^{(0)} \coloneqq A_{-2}  & &  H_2^{(0)} \coloneqq A_{-3}  & &  H_3^{(0)} \coloneqq A_{-4} \\
-        H_4^{(i)} \coloneqq E_{-1}  & &  H_5^{(i)} \coloneqq E_{-2}  & &  H_6^{(i)} \coloneqq E_{-3}  & &  H_7^{(i)} \coloneqq E_{-4} \\
-      \end{array}
-    \]
-    Every block creates its own $E_{i}$ and $A_{i}$ values for $60 \leq i < 64$.
-    These are used to compute the next intermediate values:
-    \[
-      \begin{array}{lp{10pt}r}
-        H_0^{(j)} \coloneqq A_{63} + H_0^{(i-1)}  & &  H_4^{(j)} \coloneqq E_{63} + H_4^{(i-1)} \\
-        H_1^{(j)} \coloneqq A_{62} + H_1^{(i-1)}  & &  H_5^{(j)} \coloneqq E_{62} + H_5^{(i-1)} \\
-        H_2^{(j)} \coloneqq A_{61} + H_2^{(i-1)}  & &  H_6^{(j)} \coloneqq E_{61} + H_6^{(i-1)} \\
-        H_3^{(j)} \coloneqq A_{60} + H_3^{(i-1)}  & &  H_7^{(j)} \coloneqq E_{60} + H_7^{(i-1)}
-      \end{array}
-    \]
-  \item[Finalization.]
-    The final hash digest of size 256 bits is provided as
-    \[
-      H_0^{(N)} \concat
-      H_1^{(N)} \concat
-      H_2^{(N)} \concat
-      H_3^{(N)} \concat
-      H_4^{(N)} \concat
-      H_5^{(N)} \concat
-      H_6^{(N)} \concat
-      H_7^{(N)}
-    \]
-    where $N$ denotes the index of the last block and operator $\|$ denotes
-    concatenation. Hence $H_0^{(N)}$ are the four least significant bytes of the digest.
+%   \item[Computation of intermediate hash values.]
+%     Intermediate hash values for the Davies-Meyer construction are
+%     initialized with the following values:
+%     \[
+%       \begin{array}{cp{10pt}cp{10pt}cp{10pt}c}
+%         H_0^{(0)} \coloneqq A_{-1}  & &  H_1^{(0)} \coloneqq A_{-2}  & &  H_2^{(0)} \coloneqq A_{-3}  & &  H_3^{(0)} \coloneqq A_{-4} \\
+%         H_4^{(i)} \coloneqq E_{-1}  & &  H_5^{(i)} \coloneqq E_{-2}  & &  H_6^{(i)} \coloneqq E_{-3}  & &  H_7^{(i)} \coloneqq E_{-4} \\
+%       \end{array}
+%     \]
+%     Every block creates its own $E_{i}$ and $A_{i}$ values for $60 \leq i < 64$.
+%     These are used to compute the next intermediate values:
+%     \[
+%       \begin{array}{lp{10pt}r}
+%         H_0^{(j)} \coloneqq A_{63} + H_0^{(i-1)}  & &  H_4^{(j)} \coloneqq E_{63} + H_4^{(i-1)} \\
+%         H_1^{(j)} \coloneqq A_{62} + H_1^{(i-1)}  & &  H_5^{(j)} \coloneqq E_{62} + H_5^{(i-1)} \\
+%         H_2^{(j)} \coloneqq A_{61} + H_2^{(i-1)}  & &  H_6^{(j)} \coloneqq E_{61} + H_6^{(i-1)} \\
+%         H_3^{(j)} \coloneqq A_{60} + H_3^{(i-1)}  & &  H_7^{(j)} \coloneqq E_{60} + H_7^{(i-1)}
+%       \end{array}
+%     \]
+%   \item[Finalization.]
+%     The final hash digest of size 256 bits is provided as
+%     \[
+%       H_0^{(N)} \concat
+%       H_1^{(N)} \concat
+%       H_2^{(N)} \concat
+%       H_3^{(N)} \concat
+%       H_4^{(N)} \concat
+%       H_5^{(N)} \concat
+%       H_6^{(N)} \concat
+%       H_7^{(N)}
+%     \]
+%     where $N$ denotes the index of the last block and operator $\|$ denotes
+%     concatenation. Hence $H_0^{(N)}$ are the four least significant bytes of the digest.
 \end{description}
-
-\begin{figure}[ht]
+\begin{figure}[!ht]
   \begin{center}
-    \includegraphics{img/sha256.pdf}
+    \includegraphics[scale=0.7]{img/sha256.pdf}
     \caption{SHA-256 round function~\cite{analysisSHA256}}
     \label{fig:sha256-round-function}
   \end{center}
