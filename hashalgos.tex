@@ -119,7 +119,7 @@ and padding will be neglected due to this vulnerability.
 The following list describes application examples:
 %
 \begin{description}
-  \item[Digital signatures]
+  \item[Digital signatures.]
     Digital signatures are schemes to guarantee data and origin integrity.
     They are used to verify authenticity of PDF~documents,
     encrypted emails or software distributions. A digital signature
@@ -127,13 +127,13 @@ The following list describes application examples:
     signature process. No third party can forge a digital signature.
     Because the document itself might be too large, only its hash value
     is attached to the hash signature.
-  \item[Storing passwords]
+  \item[Storing passwords.]
     User account data such as passwords are commonly stored in databases.
     Those databases are subject to theft if network breaches take place
     and the passwords are known to the attackers. Hashing and salting
     those passwords with a hash algorithm before storing them in the database
     is a working countermeasure.
-  \item[Commitment schemes]
+  \item[Commitment schemes.]
     Commitment schemes like Zero-Knowledge Proofs use hash algorithms to ensure the
     original message is possessed by a certain party without revealing the document
     itself. Coin-flipping or secure computation also use hash algorithms as
@@ -186,9 +186,9 @@ MD4 uses three auxiliary Boolean functions:
   of arguments with Boolean value true is odd.
 \end{defi}
 
-Using the logical operators $\land$ (AND), $\lor$ (OR) and $\neg$ (NEG)
-we can define them as (see Section~\ref{sec:sat-intro} for a thorough
-discussion of these operators):
+Using the logical operators $\land$ (\boolf{AND}), $\lor$ (\boolf{OR})
+and $\neg$ (\boolf{NEG}) we can define them as (see Section~\ref{sec:sat-intro}
+for a thorough discussion of these operators):
 \begin{align}
   \IF(X,Y,Z) &\coloneqq (X \land Y) \lor (\neg X \land Z) \\
   \MAJ(X,Y,Z) &\coloneqq (X \land Y) \lor (X \land Z) \lor (Y \land Z) \\
@@ -314,7 +314,7 @@ for 38 steps~\cite{mendel2013improving}.
 %
 Besides MD4's \boolf{MAJ} and \boolf{IF},
 another four auxiliary functions are defined. Recognize that $\oplus$ denotes
-the XOR function whereas $\boxplus$ denotes 32-bit addition.
+the \boolf{XOR} function whereas $\boxplus$ denotes 32-bit addition.
 \[
   \begin{array}{rcccccl}
     \Sigma_0(X) &\coloneqq& (X ⋙ 2) &\oplus& (X ⋙ 13) &\oplus& (X ⋙ 22) \\

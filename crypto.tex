@@ -7,7 +7,7 @@
 %
 In Chapter~\ref{ch:hash} we defined two hash functions. In this chapter
 we consider such functions from a differential perspective. Differential
-considerations will turn out to yield successful collision attacks on hash
+cryptanalysis will turn out to yield successful collision attacks on hash
 functions. We introduce a notation to easily represent differential
 characteristics.
 
@@ -20,7 +20,7 @@ Their work is based on preliminary work by Hans Dobbertin~\cite{Dobbertin1998}.
 On an IBM~P690 machine, an MD5 collision can be computed in about one hour using this approach.
 Collisions for HAVAL-128, MD4 and RIPEMD were found as well. Patrick Stach's \texttt{md4coll.c}
 program~\cite{md4coll} implements Wang's approach and can find MD4 collisions in few seconds
-on my Thinkpad~x220 setup specified in \hyperref[app:setup]{Appendix~\ref{app:setup}}.
+on my Thinkpad~x220 setup specified in Appendix~\ref{app:setup}.
 
 Let $n$ denote the digest size, i.e. the size of the hash value $h(x)$ in bits.
 Due to the birthday paradox, a collision attack has a generic complexity of $2^{n/2}$
@@ -38,21 +38,21 @@ ideas to satisfiability approaches.
       \hline \hline
       \multicolumn{4}{c}{Message 1} \\
       \hline
-      4d7a9c83 & \textbf{d6cb927a} & \textbf{29d5a578} & 57a7a5ee \\
-      de748a3c & dcc366b3 & b683a020 & 3b2a5d9f \\
-      c69d71b3 & f9e99198 & d79f805e & a63bb2e8 \\
-      \textbf{45dc8e31} & 97e31fe5 & 2794bf08 & b9e8c3e9 \\
+        4d7a9c83 & \textbf{d6cb927a} & \textbf{29d5a578} & 57a7a5ee \\
+        de748a3c & dcc366b3 & b683a020 & 3b2a5d9f \\
+        c69d71b3 & f9e99198 & d79f805e & a63bb2e8 \\
+        \textbf{45dc8e31} & 97e31fe5 & 2794bf08 & b9e8c3e9 \\
       \hline
       \multicolumn{4}{c}{Message 2} \\
       \hline
-      4d7a9c83 & \textbf{56cb927a} & \textbf{b9d5a578} & 57a7a5ee \\
-      de748a3c & dcc366b3 & b683a020 & 3b2a5d9f \\
-      c69d71b3 & f9e99198 & d79f805e & a63bb2e8 \\
-      \textbf{45dd8e31} & 97e31fe5 & 2794bf08 & b9e8c3e9 \\
+        4d7a9c83 & \textbf{56cb927a} & \textbf{b9d5a578} & 57a7a5ee \\
+        de748a3c & dcc366b3 & b683a020 & 3b2a5d9f \\
+        c69d71b3 & f9e99198 & d79f805e & a63bb2e8 \\
+        \textbf{45dd8e31} & 97e31fe5 & 2794bf08 & b9e8c3e9 \\
       \hline
       \multicolumn{4}{c}{Hash value of Message 1 and Message 2} \\
       \hline
-      5f5c1a0d & 71b36046 & 1b5435da & 9b0d807a \\
+        5f5c1a0d & 71b36046 & 1b5435da & 9b0d807a \\
       \hline \hline
     \end{tabular}
     \caption[Hexadecimal values of one MD4 collisions given in paper~\cite{wang2004}]{
@@ -80,10 +80,10 @@ ideas to satisfiability approaches.
   $h(x_1) = h(x_2)$.
 \end{defi}
 
-\index{Pseudo collision}
+\index{Pseudo-collision}
 Pseudo-collisions are also often considered when attacking hash functions.
-A \emph{pseudo collision} is given if a hash collision can be found for a given
-hash function, but the initial vectors (IV) can be chosen arbitrarily.
+A \emph{pseudo-collision} is given if a hash collision can be found for a given
+hash function, but the initial vectors (IV) can be chosen for each message.
 
 Hash algorithms consume input values as blocks of bits.
 As far as the length of the input must not conform to the block size,
@@ -91,7 +91,7 @@ padding is applied. Now consider such a block of input values
 and another copy of it. We use those two blocks as inputs for two
 hash algorithm instances, but provide slight modifications in few bits.
 Differential cryptanalysis is based on the idea to consider those execution states
-and tracing those difference to learn about the propagation of message differences.
+and trace those differences to learn about the propagation of message differences.
 Compare this setup with Figure~\ref{tab:collision-attack}.
 
 \index{Avalanche effect}
@@ -103,28 +103,26 @@ A small difference in the input should lead to a significant difference
 in the output (i.e. visually recognizable).
 
 Visualizing those differences helps the cryptanalyst to find modifications
-yielding a small number of differences in the evaluation state. The propagation
-of differences in a particular hash algorithm is called \emph{differential
-path}. Empirical results in differential cryptanalysis indicate that spare
-paths are desirable, because it is easier to cancel out few differences in the
+yielding a small number of differences in the evaluation state. Empirical
+results in differential cryptanalysis indicate that sparse characteristics
+are desirable, because it is easier to cancel out few differences in the
 output compared to many differences.
 The cryptanalyst consecutively modifies the input values to eventually
-receive a collision in the output value.
+receive a collision in the output value (i.e. $\Delta C = 0 \iff C = C^*$).
 
 \index{Differential path}
 \index{Differential characteristic}
 \begin{defi}
-  The propagation of differences in a particular function is called
-  \emph{differential path}. The complete differential state during
-  a computation is called \emph{differential characteristic}.
+  The differential state during a computation is called
+  \emph{differential characteristic} (also \emph{differential path}).
 \end{defi}
 
 \begin{theorem}
-  Assuming the number of differences in a differential path is small,
-  this path is expected to result in a hash collision with higher probability.
+  Assuming the number of differences in a differential characteristic is small,
+  this characteristic is expected to result in a hash collision with higher probability.
 \end{theorem}
 
-\begin{figure}[pbt]
+\begin{figure}[bt]
   \begin{center}
     \includegraphics[width=0.55\textwidth]{img/diff_cryptanalysis.pdf}
     \caption[Common attack setting for a collision attack]{
@@ -148,67 +146,11 @@ receive a collision in the output value.
 \index{Differential notation}
 Differential notation helps us to visualize differential characteristics
 by defining so-called \emph{generalized bit conditions}.
-It was introduced by Christian Rechberger and Christophe de Canni\`ere
+It was introduced by Christophe de Canni\`ere and Christian Rechberger
 in 2006~\cite[Section 3.2]{char-2006}, inspired by \emph{signed differences} by
 Wang~et al. and is shown in Table~\ref{tab:diff-notation}.
 
-Consider two hash algorithm instances. Let $x_i$ be some bit
-from the first instance and let $x_i^*$ be the corresponding bit
-from the second instance. Differences are computed using a \boolf{XOR}
-and commonly denoted as $\Delta x = x_i \oplus x_i^*$.
-Bit conditions allow us to encode possible relations between bits $x_i$ and $x_i^*$.
-
-For example, let us take a look at the original Wang et al. hash collision
-in MD4 provided in Table~\ref{tab:wang-md4-collision1}.
-We extract all values with differences and represent them using differential notation.
-This gives us Table~\ref{tab:differential-wang-values}.
-
-The following properties hold for bit conditions:
-\begin{itemize}[noitemsep,topsep=0pt]
-  \item If $x_i = x_i^*$ holds and some value is known, $\set{0,1}$ contains its bit condition.
-  \item If $x_i \neq x_i^*$ holds and some value is known, $\set{u,n}$ contains its bit condition.
-  \item If $x_i = x_i^*$ holds and the values are unknown, its bit condition is $\dnI{-}$.
-  \item If $x_i \neq x_i^*$ holds and the values are unknown, its bit condition is $\dnI{x}$.
-\end{itemize}
-Applying this notation to hash collisions means that arbitrary bit conditions
-(expect for \dnI{\#}) can be specified for the input values. In one of the
-intermediate iterations, we enforce a difference using one of the bit conditions
-$\set{u,n,x}$. This excludes trivial solutions with no differences from the set of
-possible solutions. And the final values need to lack differences thus are
-represented using a dash \dnI{-}.
-
-\begin{table}[bt]
-  \begin{center}
-    \small
-    \begin{tabular}{lll}
-      \hline \hline
-      bit & binary & hexadecimal representation / differential notation \\
-      \hline \hline
-      $x_0$ & \dnI{d6cb927a} & \dnI{11010110110010111001001001111010} \\
-      $x_1$ & \dnI{29d5a578} & \dnI{00101001110101011010010101111000} \\
-      $x_2$ & \dnI{45dc8e31} & \dnI{01000101110111001000111000110001} \\
-      \hline
-      $x_0^*$ & \dnI{56cb927a} & \dnI{01010110110010111001001001111010} \\
-      $x_1^*$ & \dnI{b9d5a578} & \dnI{10111001110101011010010101111000} \\
-      $x_2^*$ & \dnI{45dd8e31} & \dnI{01000101110111011000111000110001} \\
-      \hline
-      $\Delta x$ & & \dnI{u1010110110010111001001001111010} \\
-                 & & \dnI{n01n1001110101011010010101111000} \\
-                 & & \dnI{010001011101110n1000111000110001} \\
-      \hline \hline
-    \end{tabular}
-    \caption[Bit differences in the original Wang et al. hash collision]{
-      The three words different between Message~1 and Message~2 of the original
-      MD4 hash collision by Wang et al. The last three lines show
-      how differences can be
-      written down using bit conditions. As far as 4 symbols are not from the
-      set $\set{0, 1}$ it holds that the messages differ by 4~bits.
-    }
-    \label{tab:differential-wang-values}
-  \end{center}
-\end{table}
-
-\begin{table}[p]
+\begin{table}[!ht]
   \small
   \begin{center}
     \begin{tabular}{|c|cccc|}
@@ -249,7 +191,63 @@ represented using a dash \dnI{-}.
   \end{center}
 \end{table}
 
-\begin{table}[p]
+Consider two hash algorithm instances. Let $x_i$ be some bit
+from the first instance and let $x_i^*$ be the corresponding bit
+from the second instance. Differences are computed using a \boolf{XOR}
+and commonly denoted as $\Delta x = x_i \oplus x_i^*$.
+Bit conditions allow us to encode possible relations between bits $x_i$ and $x_i^*$.
+
+For example, let us take a look at the original Wang et al. hash collision
+in MD4 provided in Table~\ref{tab:wang-md4-collision1}.
+We extract all values with differences and represent them using differential notation.
+This gives us Table~\ref{tab:differential-wang-values}.
+
+\begin{table}[!ht]
+  \begin{center}
+    \small
+    \begin{tabular}{ccl}
+      \hline \hline
+      bit & hexadecimal & binary representation / differential notation \\
+      \hline \hline
+      $x_0$ & \dnI{d6cb927a} & \dnI{11010110110010111001001001111010} \\
+      $x_1$ & \dnI{29d5a578} & \dnI{00101001110101011010010101111000} \\
+      $x_2$ & \dnI{45dc8e31} & \dnI{01000101110111001000111000110001} \\
+      \hline
+      $x_0^*$ & \dnI{56cb927a} & \dnI{01010110110010111001001001111010} \\
+      $x_1^*$ & \dnI{b9d5a578} & \dnI{10111001110101011010010101111000} \\
+      $x_2^*$ & \dnI{45dd8e31} & \dnI{01000101110111011000111000110001} \\
+      \hline
+      $\Delta x$ & & \dnI{u1010110110010111001001001111010} \\
+                 & & \dnI{n01n1001110101011010010101111000} \\
+                 & & \dnI{010001011101110n1000111000110001} \\
+      \hline \hline
+    \end{tabular}
+    \caption[Bit differences in the original Wang et al. hash collision]{
+      The three words different between Message~1 and Message~2 of the original
+      MD4 hash collision by Wang et al. The last three lines show
+      how differences can be
+      written down using bit conditions. As far as 4 symbols are not from the
+      set $\set{0, 1}$ it holds that the messages differ by 4~bits.
+    }
+    \label{tab:differential-wang-values}
+  \end{center}
+\end{table}
+
+The following properties hold for bit conditions:
+\begin{itemize}[noitemsep,topsep=0pt]
+  \item If $x_i = x_i^*$ holds and some value is known, $\set{0,1}$ contains its bit condition.
+  \item If $x_i \neq x_i^*$ holds and some value is known, $\set{u,n}$ contains its bit condition.
+  \item If $x_i = x_i^*$ holds and the values are unknown, its bit condition is $\dnI{-}$.
+  \item If $x_i \neq x_i^*$ holds and the values are unknown, its bit condition is $\dnI{x}$.
+\end{itemize}
+Applying this notation to hash collisions means that arbitrary bit conditions
+(except for \dnI{\#}) can be specified for the input values. In one of the
+intermediate iterations, we enforce a difference using one of the bit conditions
+$\set{u,n,x}$. This excludes trivial solutions with no differences from the set of
+possible solutions. And the final values need to lack differences thus are
+represented using a dash \dnI{-}.
+
+\begin{table}[!ht]
   \begin{center}
     \begin{tabular}{cp{5cm}cl}
       $\Delta x$      & conjunctive normal form &
@@ -293,21 +291,11 @@ represented using a dash \dnI{-}.
 \label{sec:dc-example}
 %
 Using this notation, we can now reason about the behavior of functions on differential values.
-We start with 1-bit addition as most basic exercise to the reader. Consider a matrix with
+We start with 1-bit addition as basic exercise to the reader. Consider a matrix with
 two input rows and one output row. The values of the first two rows are added such that
 the bit difference at the third row is created.
 
-Figure~\ref{tab:1-bit-example} illustrates this example. Remember that symbols such as
-\dnI{-} and \dnI{0} underlie semantics defined in Table~\ref{tab:diff-notation}.
-It is also interesting to see how propagation of values can work. In
-Figure~\ref{tab:1-bit-deduction} we see how an underspecified value \dnI{?} can be
-strengthened once we have checked which values can be taken. Recognize that the
-system is constrained by the function in use and the definition of the differential symbols.
-
-Finally we can extend our testcases to 4~bits and retrieve testcases such as
-Table~\ref{tab:4-bit-addition} and \ref{tab:sigma}.
-
-\begin{table}[p]
+\begin{figure}[!ht]
   \begin{center}
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{-} \\ \dnI{-} \\ \hline \dnI{-} \end{tabular}\end{minipage}
     \hspace{20pt}$\Rightarrow$\hspace{20pt}
@@ -323,14 +311,22 @@ Table~\ref{tab:4-bit-addition} and \ref{tab:sigma}.
       A simple 1-bit addition example:
       On the left the differential characteristic is given.
       Two dashes, by definition, denote a missing difference in both arguments.
-      The result of the addition most neither show a difference.
+      The result of the addition must never show a difference.
       This yields eight possible bit configurations where two values close to each other denote $(M, M^*)$ of Figure~\ref{tab:collision-attack}.
       Due to the behavior of addition, we know that configurations 2, 3, 5 and 8 (from left to right) are invalid.
     }
-    \label{tab:1-bit-example}
+    \label{fig:1-bit-example}
   \end{center}
-\end{table}
-\begin{table}[p]
+\end{figure}
+
+Figure~\ref{fig:1-bit-example} illustrates this example. Remember that symbols such as
+\dnI{-} and \dnI{0} underlie semantics defined in Table~\ref{tab:diff-notation}.
+It is also interesting to see how propagation of values can work. In
+Figure~\ref{fig:1-bit-deduction} we see how an underspecified value \dnI{?} can be
+strengthened once we have checked which values can be taken. Recognize that the
+system is constrained by the function in use and the definition of the differential symbols.
+
+\begin{figure}[!ht]
   \begin{center}
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{-} \\ \dnI{-} \\ \hline \dnI{?} \end{tabular}\end{minipage}
     \hspace{20pt}$\Rightarrow$\hspace{20pt}
@@ -339,17 +335,20 @@ Table~\ref{tab:4-bit-addition} and \ref{tab:sigma}.
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{1}\dnI{1} \\ \dnI{0}\dnI{0} \\ \hline \dnI{1}\dnI{1} \end{tabular}\end{minipage}
     \begin{minipage}{20pt}\begin{tabular}{c} \dnI{1}\dnI{1} \\ \dnI{1}\dnI{1} \\ \hline \dnI{0}\dnI{0} \end{tabular}\end{minipage}
     \caption[Propagation of bit conditions in a differential characteristic]{%
-      Like Figure~\ref{tab:1-bit-example}, but any difference value for the result bit is possible.
+      Like Figure~\ref{fig:1-bit-example}, but any difference value for the result bit is possible.
       As such we consider any possible bit configuration, but eventually recognize that only four bit configurations
       are consistent with the behavior of addition. Because all resulting configurations show no bit difference
       in the output bit, we can strengthen \dnI{?} by replacing it with \dnI{-}. This illustrates how
       knowledge about differential states can be propagated.
     }
-    \label{tab:1-bit-deduction}
+    \label{fig:1-bit-deduction}
   \end{center}
-\end{table}
+\end{figure}
 
-\begin{table}[p]
+Finally, we can extend our testcases to 4~bits and retrieve testcases such as
+Figures~\ref{fig:4-bit-addition} and \ref{fig:sigma}.
+
+\begin{figure}[!ht]
   \begin{center}
     \begin{minipage}{0.23\textwidth}
       \begin{tabular}{rl}
@@ -412,10 +411,10 @@ Table~\ref{tab:4-bit-addition} and \ref{tab:sigma}.
     whereas the lower line show invalid ones for 4-bit addition.
     The rows are conventionally named using capital letters.
   }
-  \label{tab:4-bit-addition}
-\end{table}
+  \label{fig:4-bit-addition}
+\end{figure}
 
-\begin{table}[p]
+\begin{figure}[!ht]
   \begin{center}
     \begin{minipage}{0.23\textwidth}
       \begin{tabular}{rl}
@@ -455,13 +454,13 @@ Table~\ref{tab:4-bit-addition} and \ref{tab:sigma}.
     Differential characteristics for the SHA-2 Sigma function.
     The upper line shows valid states. The lower line shows invalid ones.
   }
-  \label{tab:sigma}
-\end{table}
+  \label{fig:sigma}
+\end{figure}
 
 \section{Differential characteristics in action}
 \label{sec:dc-actual-chars}
 %
-In the previous section we illustrated how propagation with differential values
+In the previous section, we illustrated how propagation with differential values
 works and how differential characteristics are written down. It is always
 important to keep in mind which function the characteristic illustrates,
 because this is not documented with the characteristic.
@@ -477,13 +476,14 @@ and iteratively, values $A_i$ and $E_i$ are computed.
 Those values are structured in differential characteristics illustrated
 in Figure~\ref{img:char-layouts}. Those layouts are used to specify our
 hash collisions we want to evaluate. Table~\ref{tab:wang-collision-propagated}
-is also gives an application of the layout.
+also gives an application of the layout.
 
-\begin{figure}[p]
+\begin{figure}[!ht]
   \begin{center}
     \includegraphics[width=0.4\linewidth]{img/md4_layout.pdf}
+    ~~
     \includegraphics[width=0.5\linewidth]{img/sha256_layout.pdf}
-    \caption{Layout of MD4 and SHA-256 differential characteristics}
+    \caption{Layout of MD4 (left) and SHA-256 (right) differential characteristics}
     \label{img:char-layouts}
   \end{center}
 \end{figure}
@@ -492,7 +492,7 @@ is also gives an application of the layout.
 \texttt{
 \begin{table}[p]
 \begin{center}
-\scalebox{.35}{
+\scalebox{.37}{
 \begin{tabular}{|r|c|c|c|c|}
 \hline
   $i$  &      &  $\nabla{S_{i,0}}$  &  $\nabla{S_{i,1}}$  &  $\nabla{S_{i,2}}$ \\
@@ -622,9 +622,9 @@ is also gives an application of the layout.
   in both instances, but the value itself is unknown.
   However, it turns out the description with missing values in iteration~6
   (message) and iterations 8--19 is complete enough such that missing values
-  can be deduced by other values the description of the algorithm.
-  Therefore the collision They propagates through the intermediate
-  values until the differences cancel out after round~36.
+  can be deduced by other values and the description of the algorithm.
+  A collision is given in the last 4 rounds, because no differences
+  are left as they cancel out after round~36.
 }
 \label{tab:wang-collision-propagated}
 \end{center}

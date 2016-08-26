@@ -9,7 +9,7 @@ Satisfiability is the question for an assignment such that a function
 evaluates to true. Satisfiability problems are solved by SAT~solvers.
 We discuss the basic theory behind satisfiability. Because any computation
 can be represented as satisfiability problem, we are able to verify
-intermediate states of algorithms. In Chapter~\ref{ch:enc}
+whether an algorithm can reach a certain state. In Chapter~\ref{ch:enc},
 we will represent a differential cryptanalysis problem such that it is
 solvable iff the corresponding SAT~problem is satisfiable.
 
@@ -67,7 +67,7 @@ Boolean functions are characterized by their corresponding truth table.
   \raisebox{13.6pt}{%
     \subfloat[\boolf{NOT}]{%
       \begin{tabular}{c|c}
-        $v$ & $f(v)$ \\
+        $x$ & $f(x)$ \\
        \hline
         $1$ & $0$ \\
         $0$ & $1$
@@ -99,7 +99,6 @@ A different definition of the three functions is given the following way:
       to $1$ if the single value of $X$ is $0$.
   \end{itemize}
   All functions return $0$ in the other case.
-
   Those functions are denoted $a_0 \land a_1$, $a_0 \lor a_1$
   and $\neg a_0$ respectively, for input parameters $a_0$ and $a_1$.
 \end{defi}
@@ -191,12 +190,10 @@ Let $n$ be the number of variables of a Boolean function.
 No known algorithm exists to determine satisfiability in polynomial runtime.
 This means no algorithm solves the SAT problem with runtime behavior
 which depends polynomially on the growth of $n$.
-
-This is known as the famous {\cP $\overset{?}{\neq}$ \cNP} problem.
-
+%
 \index{Unit propagation}
-However, SAT solver can take advantage of the problem's description.
-For example consider function $f$ in Display~\ref{eq:3f}.
+However, SAT solvers can take advantage of the problem's description.
+For example, consider function $f$:
 \begin{align} f(x_0, x_1, x_2) &= x_0 \land (\neg x_1 \lor x_2) \label{eq:3f} \end{align}
 Instead of trying all possible 8~cases for 3~Boolean variables,
 we can immediately see that $x_0$ is required to be $1$.
@@ -206,20 +203,20 @@ This particular strategy is called \emph{unit propagation}.
 \subsection{SAT competitions}
 \label{sec:sat-competitions}
 %
-SAT research is heavily concerned with finding good heuristics to find some model
-for a given SAT problem as fast as possible. Biyearly
-\href{http://satcompetition.org/}{SAT competitions} take place to challenge
+SAT research is heavily concerned with finding fast heuristics
+determining (un)satisfiability. Biyearly,
+SAT competitions~\cite{satcomp} take place to challenge
 SAT solvers in a set of benchmarks. The committee evaluates the most successful
 SAT solvers defined by solving the most problems within a given time frame.
 
-In 2014 lingeling by Armin Biere has won first prize in
+In 2014, lingeling by Armin Biere has won first prize in
 the Application benchmarks track and second prize in the Hard Combinatorial benchmarks
-track for SAT and UNSAT instances respectively. Its parallelized sibling plingeling
+track for SAT and UNSAT instances, respectively. Its parallelized sibling plingeling
 and Cube \& Conquer sibling treengeling have won prizes in parallel settings.
 And in the most recent 2016 competition lingeling has won bronze in the Main track
 for SAT+UNSAT instances.
 
-In Chapter~\ref{ch:results} we will look at runtime results shown by (but not limited to)
+In Chapter~\ref{ch:results}, we will discuss runtime results shown by (but not limited to)
 those SAT solvers.
 
 \section{The DIMACS de-facto standard}
@@ -232,18 +229,18 @@ those SAT solvers.
 \index{Negative literal}
 \index{Conjunctive Normal Form}
 \begin{defi}
-  A \emph{conjunction} is a sequence of Boolean functions combined using
-  a logical OR. A \emph{disjunction} is a sequence of Boolean functions
-  combined using a logical AND. A \emph{literal} is a Boolean variable
-  (\emph{positive}) or its negation (\emph{negative}).
-
   A SAT problem is given in \emph{Conjunctive Normal Form} (CNF) if
   the problem is defined as conjunction of disjunctions of literals.
+
+  A \emph{conjunction} is a sequence of Boolean functions combined using
+  a logical \boolf{AND}. A \emph{disjunction} is a sequence of Boolean functions
+  combined using a logical \boolf{OR}. A \emph{literal} is a Boolean variable
+  (\emph{positive}) or its negation (\emph{negative}).
 \end{defi}
 
-A simple example for a SAT problem in CNF is the exclusive OR (XOR).
+A simple example for a SAT problem in CNF is the exclusive \boolf{OR} (\boolf{XOR}).
 It takes two Boolean values $a$ and $b$ as arguments and returns true
-if and only if the two arguments differ.
+if and only if the two arguments differ:
 {
 \setlength{\abovedisplayskip}{5pt}
 \setlength{\belowdisplayskip}{5pt}
@@ -251,7 +248,7 @@ if and only if the two arguments differ.
 \setlength{\belowdisplayshortskip}{0pt}
 \begin{align} (a \lor b) \land (\neg a \lor \neg b) \label{eq:xor}\end{align}
 }
-Display~\ref{eq:xor} shows one conjunction (denoted $\land$) of two disjunctions
+It consists of one conjunction (denoted $\land$) of two disjunctions
 (denoted $\lor$) of literals (denoted $a$ and $b$ where prefix $\neg$ represents
 negation). This structure constitutes a CNF.
 
@@ -286,7 +283,7 @@ This disjunction contains $b_{i,l}$ if $r_{i,l}$ is false.
 The disjunction contains $b_{i,l}$ if $r_{i,l}$ is true.
 
 As far as $f$ is an arbitrary $k$-ary Boolean function, we have proven that
-any function can be represented as CNF.
+any Boolean function can be represented as CNF.
 
 SAT problems are usually represented in the DIMACS de-facto standard.
 Consider a SAT problem in CNF with \emph{nbclauses} clauses and
@@ -295,18 +292,18 @@ file. Lines starting with \enquote{\texttt{c}} are skipped (comment lines).
 The first remaining line has to begin with \enquote{\texttt{p cnf}} followed by
 \emph{nbclauses} and \emph{nbvars} separated by spaces (header line).
 All following non-comment lines are space-separated indices of Boolean variables
-optionally prefixed by a minus symbol. Then one line represents one clause and
-must be terminated with a zero symbol after a space. All lines are conjuncted
+optionally prefixed by a hyphen. Then one line represents one clause and
+must be terminated with a zero character after a space. All lines are conjuncted
 to form a CNF.
 
 Variations of the DIMACS de-facto standard also allow multiline clauses (the
-zero symbol constitutes the end of a clause) or arbitrary whitespace instead of
+zero character constitutes the end of a clause) or arbitrary whitespace instead of
 spaces. Another variant terminates DIMACS files once it encounters a single
 percent sign on a line. The syntactical details are individually published
 on a per competition basis.
 
 \renewcommand{\lstlistingname}{Listing}  % REMARK otherwise it's Japanese, WTF
-\begin{lstlisting}[caption={Display~\ref{eq:xor} represented in DIMACS format}]
+\begin{lstlisting}[caption={CNF of the \boolf{XOR} in Display~\eqref{eq:xor}}]
 p cnf 2 2
 a b
 -a -b
@@ -317,7 +314,7 @@ a b
 %
 Given a conjunctive structure of disjunctions, we can define terms
 related to this structure. Those terms will be used in the SAT features
-we suggest in Section~\ref{sec:features-suggested}.
+we present in Section~\ref{sec:features-suggested}.
 
 \index{Clause}
 \index{$k$-clause}
@@ -328,6 +325,7 @@ we suggest in Section~\ref{sec:features-suggested}.
   A \emph{clause} is a disjunction of literals.
   A $k$-\emph{clause} is a clause consisting of exactly $k$ literals.
   A \emph{unit clause} is a $1$-clause.
+
   A \emph{Horn clause} is a clause with at most one positive literal.
   A \emph{definite clause} is a clause with exactly one positive literal.
   A \emph{goal clause} is a clause with no positive literal.
@@ -339,6 +337,7 @@ we suggest in Section~\ref{sec:features-suggested}.
 \begin{defi}
   Given a literal, its \emph{negated literal} is the literal with its sign negated.
   A literal is \emph{positive}, if its sign is positive. A literal is \emph{negative} if its sign is negative.
+
   An \emph{existential literal} is a literal which occurs exactly once and
   its negation does not occur. A \emph{used variable} is a variable which
   occurs at least once in the CNF.
@@ -354,7 +353,7 @@ we suggest in Section~\ref{sec:features-suggested}.
   A clause is called \emph{tautological} if a literal and its negated literal occurs in it.
 \end{defi}
 
-A few basic properties hold in terms of satisfiability. For example existential literals
+A few basic properties hold in terms of satisfiability. For example, existential literals
 are interesting, because they can be set to true and make one clause immediately satisfied
 without influencing other clauses.
 
@@ -363,8 +362,8 @@ without influencing other clauses.
 %
 \index{Equisatisfiability}
 \begin{defi}
-  Given two CNFs $A$ and $B$, they are called \emph{equisatisfiable} if and only
-  if $A$ is satisfiable if and only if $B$.
+  Given two CNFs $A$ and $B$, they are called \emph{equisatisfiable}
+  iff $A$ is satisfiable iff $B$.
 \end{defi}
 
 \subsection{Boolean constraint propagation (BCP)}
@@ -380,9 +379,9 @@ Let $l$ be the literal of a unit clause in a CNF. Remove any clause containing
 $l$ and replace any occurences of $-l$ from the CNF. It is easy to see, that
 the resulting CNF is equisatisfiable, because due to the unit clause $l$ must
 be true. So any clause containing $l$ is satisfied and $-l$ yields false,
-where $A \lor \bot$ is equivalent to $A$ for any Boolean function $A$.
+where ($A \lor $ false) is equivalent to $(A)$ for any Boolean function $A$.
 
-\subsection{Watched literals}
+\subsection{Watched Literals}
 \label{sec:sat-wl}
 %
 \index{Watched Literals}
@@ -394,9 +393,9 @@ In each clause two unassigned literals are declared to be \enquote{watched}.
 Structurally it is implemented the other way around:
 A clauses watch list is maintained per literal.
 Now as long as at least two literals are unassigned, the clause cannot become
-false (recognize that a clause is false if all literals are false).
-Therefore the clause does not need to be visited as long as at least
-unassigned literals exist. This implies the following decision procedure:
+false (recognize that a clause is false iff all literals are false).
+Therefore the clause does not need to be visited as long as at least one
+unassigned literal exist. This implies the following decision procedure:
 \begin{itemize}
   \item If all but one literal is false, propagate the remaining literal to be true.
   \item If all literals are false, report UNSAT.
@@ -413,12 +412,12 @@ solvers~\cite{moskewicz2001chaff} and has proven useful in various variants.
 \subsection{Remark}
 \label{sec:sat-remark}
 %
-The previous two techniques shall illustrate basic approaches, but actual SAT
+The previous two techniques illustrate basic approaches, but actual SAT
 solving research requires decades of development to tune individual SAT solvers.
 Memory models and concurrency strategies lead to fundamentally different runtime
 behaviors of SAT solvers.
 
-As such an initial idea to initiate an individual SAT solver specifically designed for
+As such, an initial idea to initiate an individual SAT solver specifically designed for
 solving problems in differential cryptanalysis was dropped, because development time
 is expected too long for a master thesis to be fruitful. As such we focused on popular
 and established SAT solvers of the SAT community.
@@ -427,12 +426,12 @@ and established SAT solvers of the SAT community.
 \label{sec:sat-solvers}
 %
 \index{lingeling}
-In this thesis we consider the several SAT solvers.
+In this thesis we considered several SAT solvers.
 They have been selected either by their popularity
 or their good results at previous SAT competitions:
 \begin{itemize}
   \item MiniSat 2.2.0
-  \item CryptoMiniSat in versions 4.5.3 and~5
+  \item CryptoMiniSat versions 4.5.3 and~5
   \item treengeling, lingeling and plingeling, in versions:
     \begin{itemize}
       \item lingeling ats1
@@ -441,69 +440,75 @@ or their good results at previous SAT competitions:
       \item lingeling ats1o4
       \item lingeling baz
     \end{itemize}
-  \item glucose 4.0
-  \item glucose syrup 4.0
+  \item glucose version 4.0 and glucose syrup version 4.0
 \end{itemize}
 
-Specifically this means the hash collision attacks we looked have run with
-these SAT solvers. The results are discussed in Section~\ref{ch:results}
-and provided in Appendix~\ref{app:runtimes}.
+This means the hash collision attacks we implemented have run with
+these SAT solvers. The results are discussed in Chapter~\ref{ch:results}
+and a more comprehensive list is provided in Appendix~\ref{app:runtimes}.
 
 MiniSat is known as \enquote{Swiss army knife of SAT solving} meaning that
 it includes many well-established techniques that can be built upon.
 SAT competitions 2009, 2011, 2013 and 2014 included a special MiniSat
-hack track where participants are asked to modify MiniSat to prove the
+\enquote{hack track} where participants are asked to modify MiniSat to prove the
 best performance with as little change to the MiniSat codebase as possible.
 Even though is not one of the fastest SAT solvers today, it provides
 a nice codebase to experiment with.
 
 CryptoMiniSat is a derivative of MiniSat, which was originally modified
-for cryptographic problems. It famously features XOR clauses meaning that
+for cryptographic problems. It features XOR clauses meaning that
 binary clauses of structure $a \oplus b$ could be added and will be resolved
-using Gaussian elimination. Temporarily development has been given up
-but most recently it was added again. Please recognize that our encoding
+using Gaussian elimination.
+%Temporarily development has been given up but most recently it was added again.
+Please recognize that our encoding
 introduced in Section~\ref{sec:enc-algotocnf} uses equivalence to model
 assignment and as such only clauses of structure $r = a \oplus b$ emerge
 rendering this feature impractical to use.
 
-glucose was the gold winner 2011 in the SAT+UNSAT application track.
+Glucose was the gold winner 2011 in the SAT+UNSAT application track.
 Modifications of glucose also ranked high throughout the years of SAT competition.
-glucose is a sequential SAT solver whereas glucose syrup is its parallelized
+Glucose is a sequential SAT solver whereas glucose syrup is its parallelized
 version.
 
-lingeling is SAT solver developed by Armin Biere. Lingeling has been the
-winner of several tracks in the SAT competitions 2011 to 2016. For example
+Lingeling is SAT solver developed by Armin Biere. Lingeling has been the
+winner of several tracks in the SAT competitions 2011 to 2016. For example,
 it has won gold in the SAT+UNSAT application track in 2014.
-lingeling has two siblings: plingeling and treengeling. plingeling is a
+Lingeling has two siblings: plingeling and treengeling. plingeling is a
 parallelized version of lingeling. As such it executes in multiple threads
 and shares units and equivalences between those instances. treengeling
 is a Cube \& Conquer solver meaning it partitions the problem into many
 subproblems and solves them individually.
 
-lingeling releases ats1o1, ats1o2 and ats1o4 are non-public releases of lingeling.
+Lingeling releases ats1o1, ats1o2 and ats1o4 are non-public, experimental
+releases of lingeling.
 They have been developed in private communication with Armin Biere.
 Our main goal was to achieve a separation between two sets of variables.
-First all variables of the first need to be assigned in the best possible
-way. Afterwards the second set of variables is considered.
+First, all variables of the first need to be assigned in the best possible
+way. Afterwards, the second set of variables is considered.
 Specifically variables modelling the differences between the two hash
-algorithm instances should constitute the first set.
+algorithm instances should constitute the first set as discussed in
+Chapter~\ref{ch:enc}.
 
-ats1o1 implements that difference variables are guessed with false first and
+Lingeling~ats1o1 implements the strategy to guess difference variables first (with Boolean value false) and
 usual heuristics apply for all other variables.
 Our intermediate results with incomplete CNF files showed a high number of restarts.
 Therefore ats1o2 disables backjumping and therefore skips decisions for important variables.
 Finally ats1o4 is not expected to distinguish from ats1o2. It only provides further debugging information.
 
-The SAT solvers have generally been run without any special options, except
+The SAT solvers have generally been run without any special options
+and several times, except for
 \begin{itemize}
   \item MiniSat was run with \texttt{\textendash{}\textendash{}pre=once} as it is generally recommended to run with the builtin preprocessor.
-  \item Lingeling has been generally run with \texttt{\textendash{}\textendash{}phase=-1} to prefer false as initial assignment to literals.
+  \item Lingeling has been generally run with
+    \texttt{\textendash{}\textendash{}phase=0} per default and
+    \texttt{\textendash{}\textendash{}phase=-1} to prefer false as initial assignment to literals.
     However, lingeling ats1o1 implements this with a more forceful strategy.
 \end{itemize}
 
-Testcases with lingeling have all been run 5 times with various seeds (for reference, the default seed is 0).
-Only the mean runtime value is displayed in the results in Chapter~\ref{ch:results}.
+%Testcases with lingeling have all been run 5 times with various seeds (for reference, the default seed is 0).
+%Only the mean runtime value is displayed in the results in Chapter~\ref{ch:results}.
 
 Preprocessing is a difficult topic on its own. Sometimes preprocessing can provide a speedup,
 before actually solving the problem, but mostly SAT solvers implement preprocessing strategies
-themselves and run them repeatedly when solving the problem.
+themselves and run them repeatedly when solving the problem. Chapter~\ref{ch:results}
+presents runtime results for that issue.
