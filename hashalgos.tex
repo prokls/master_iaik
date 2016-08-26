@@ -80,6 +80,7 @@ This motivates thorough research of collisions in compression functions.
 The design was found independently by Ralph C. Merkle and Ivan B. Damg\aa{}rd.
 It was described by Merkle in his PhD thesis~\cite[p. 13--15]{merkle1979secrecy}
 and used in popular hash functions such as MD4, MD5 and the SHA2 hash function family.
+
 The single-pipe design works as follows:
 \begin{enumerate}\itemsep0pt
 \item Split the input into blocks of uniform block size.
@@ -116,34 +117,36 @@ and padding will be neglected due to this vulnerability.
 \label{sec:hash-usage}
 %
 The following list describes application examples:
-
+%
 \begin{description}
   \item[Digital signatures]
-    Under the assumption that a private key can be kept secret, asymmetric cryptography
-    enables users to sign documents with a digital signature. A digital signature
-    can be verified, showing that a particular user was involved in the signature process.
-    No third party can forge a digital signature. Because the document itself might be
-    too large, only its hash value is attached to the hash signature.
+    Digital signatures are schemes to guarantee data and origin integrity.
+    They are used to verify authenticity of PDF~documents,
+    encrypted emails or software distributions. A digital signature
+    can be verified, showing that a particular user was involved in the
+    signature process. No third party can forge a digital signature.
+    Because the document itself might be too large, only its hash value
+    is attached to the hash signature.
   \item[Storing passwords]
     User account data such as passwords are commonly stored in databases.
-    Those databases are subject to theft if network breaches take place.
-    If the passwords are stored in plain-text, user accounts will be taken
-    over quickly after publication of the database. Hashing and salting
+    Those databases are subject to theft if network breaches take place
+    and the passwords are known to the attackers. Hashing and salting
     those passwords with a hash algorithm before storing them in the database
     is a working countermeasure.
   \item[Commitment schemes]
     Commitment schemes like Zero-Knowledge Proofs use hash algorithms to ensure the
     original message is possessed by a certain party without revealing the document
-    itself.
+    itself. Coin-flipping or secure computation also use hash algorithms as
+    cryptographic building blocks.
 \end{description}
 
-One example showing the use of hash functions as primitives are JSON Web Tokens (JWT)
-specified in RFC~7519~\cite{rfc7519}. Its application allows web developers to
-represent claims to be transferred between two parties.
-
-Section~8 defines implementation requirements and refers to RFC~7518~\cite{rfc7518},
-which specifies cryptographic algorithms such as \enquote{HMAC SHA-256} to be
-implemented. It is (besides \enquote{none}) the only required signature and MAC algorithm.
+% One example showing the use of hash functions as primitives are JSON Web Tokens (JWT)
+% specified in RFC~7519~\cite{rfc7519}. Its application allows web developers to
+% represent claims to be transferred between two parties.
+%
+% Section~8 defines implementation requirements and refers to RFC~7518~\cite{rfc7518},
+% which specifies cryptographic algorithms such as \enquote{HMAC SHA-256} to be
+% implemented. It is (besides \enquote{none}) the only required signature and MAC algorithm.
 
 \section{MD4}
 \label{sec:dc-md4}
@@ -152,8 +155,8 @@ implemented. It is (besides \enquote{none}) the only required signature and MAC 
 MD4 is a cryptographic hash function originally described in RFC~1186~\cite{rfc1186},
 updated in RFC~1320~\cite{rfc1320} and declared obsolete by RFC~6150~\cite{rfc6150}. It was
 invented by Ronald Rivest in 1990 with properties given in Table~\ref{tab:md4}.
-In 1995~\cite{Dobbertin1998} successful full-round attacks have been found to break collision resistance.
-Three years later, preimage and second-preimage resistance in MD4 have been broken as well.
+In 1995~\cite{Dobbertin1998}, successful full-round attacks have been found to break collision resistance.
+Three years later, preimage and second-preimage resistance in MD4 got broken as well.
 Some of those attacks are described in~\cite{md4-2007} and \cite{cryptoeprint:2005:151}.
 We derived a Python~3 implementation based on a Python~2 implementation
 and made it available on github~\cite{md4-py3k}.
@@ -219,7 +222,7 @@ In the following, a brief overview of MD4 is given.
     \]
   \item[Round function and state variable updates.]
     The round function is applied in three rounds with 16 iterations.
-    In every iteration values $A_{-1}$, $A_{-2}$ and $A_{-3}$ are taken
+    In every iteration, values $A_{-1}$, $A_{-2}$ and $A_{-3}$ are taken
     as arguments to function $F$. Function $F$ is \boolf{IF} in round~1,
     followed by \boolf{MAJ} for round~2 and \boolf{XOR} for the final round~3.
     The resulting value is added to $A_{-1}$, current message block $M$
