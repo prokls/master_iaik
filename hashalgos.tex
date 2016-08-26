@@ -115,6 +115,28 @@ and padding will be neglected due to this vulnerability.
 \subsection{Example usage}
 \label{sec:hash-usage}
 %
+The following list describes application examples:
+
+\begin{description}
+  \item[Digital signatures]
+    Under the assumption that a private key can be kept secret, asymmetric cryptography
+    enables users to sign documents with a digital signature. A digital signature
+    can be verified, showing that a particular user was involved in the signature process.
+    No third party can forge a digital signature. Because the document itself might be
+    too large, only its hash value is attached to the hash signature.
+  \item[Storing passwords]
+    User account data such as passwords are commonly stored in databases.
+    Those databases are subject to theft if network breaches take place.
+    If the passwords are stored in plain-text, user accounts will be taken
+    over quickly after publication of the database. Hashing and salting
+    those passwords with a hash algorithm before storing them in the database
+    is a working countermeasure.
+  \item[Commitment schemes]
+    Commitment schemes like Zero-Knowledge Proofs use hash algorithms to ensure the
+    original message is possessed by a certain party without revealing the document
+    itself.
+\end{description}
+
 One example showing the use of hash functions as primitives are JSON Web Tokens (JWT)
 specified in RFC~7519~\cite{rfc7519}. Its application allows web developers to
 represent claims to be transferred between two parties.
@@ -391,7 +413,7 @@ the XOR function whereas $\boxplus$ denotes 32-bit addition.
 
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[width=\textwidth]{img/sha256.pdf}
+    \includegraphics{img/sha256.pdf}
     \caption{SHA-256 round function~\cite{analysisSHA256}}
     \label{fig:sha256-round-function}
   \end{center}
