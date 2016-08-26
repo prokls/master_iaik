@@ -5,14 +5,14 @@
 \chapter{Hash algorithms}
 \label{ch:hash}
 
-In this chapter we will define hash functions and their desired security
-properties. Followingly we look at SHA-256 and MD4 as established hash functions.
-MD4 unlike SHA-256 is practically broken but has a comparably small internal state.
+In this chapter, we will define hash functions and their desired security
+properties. In the following, we look at SHA-256 and MD4 as established hash functions.
+MD4 unlike SHA-256 is practically broken, but has a comparably small internal state.
 It therefore allows a good starting point to devise our attacks.
-In a next step we scaled up to SHA-256 which has an internal state size
+In a next step, we scaled up to SHA-256 which has an internal state size
 at least twice as large.
-In Chapter~\ref{ch:enc} we will represent them with Boolean algebra to make
-it possible to reason about states in those hash functions using SAT solvers.
+In Chapter~\ref{ch:enc}, we will represent them with Boolean algebra to allow
+to reason about states in those hash functions using SAT solvers.
 
 \section{Preliminaries Redux}
 \label{sec:hash-prelim}
@@ -79,7 +79,7 @@ following security guarantee:
 This motivates thorough research of collisions in compression functions.
 The design was found independently by Ralph C. Merkle and Ivan B. Damg\aa{}rd.
 It was described by Merkle in his PhD thesis~\cite[p. 13--15]{merkle1979secrecy}
-and followingly used in popular hash functions such as MD4, MD5 and the SHA2 hash function family.
+and used in popular hash functions such as MD4, MD5 and the SHA2 hash function family.
 The single-pipe design works as follows:
 \begin{enumerate}\itemsep0pt
 \item Split the input into blocks of uniform block size.
@@ -108,7 +108,7 @@ Hence $(x_0 \,\|\, p, x_1 \,\|\, p)$ is a collision as well.
 As far as $F_0$ is applied recursively to every block, $p$ can be of arbitrary size
 and $(x_0, x_1)$ can be of arbitrary uniform size.
 
-Because of this vulnerability, cryptanalysts only need to find a collision
+Because of this vulnerability, cryptanalysts focus on finding a collision
 in compression functions. In our tests will only consider input of one block
 and padding will be neglected due to this vulnerability.
 
@@ -131,7 +131,7 @@ MD4 is a cryptographic hash function originally described in RFC~1186~\cite{rfc1
 updated in RFC~1320~\cite{rfc1320} and declared obsolete by RFC~6150~\cite{rfc6150}. It was
 invented by Ronald Rivest in 1990 with properties given in Table~\ref{tab:md4}.
 In 1995~\cite{Dobbertin1998} successful full-round attacks have been found to break collision resistance.
-Followingly preimage and second-preimage resistance in MD4 have been broken as well.
+Three years later, preimage and second-preimage resistance in MD4 have been broken as well.
 Some of those attacks are described in~\cite{md4-2007} and \cite{cryptoeprint:2005:151}.
 We derived a Python~3 implementation based on a Python~2 implementation
 and made it available on github~\cite{md4-py3k}.
@@ -156,9 +156,9 @@ MD4 uses three auxiliary Boolean functions:
   Otherwise the third argument is returned.
 
   The Boolean \boolf{MAJ} function returns true if the number
-  of Boolean values true in arguments is at least $2$.
+  of arguments with Boolean value true is in the majority.
   The Boolean \boolf{XOR} function returns true if the number
-  of Boolean values true in arguments is odd.
+  of arguments with Boolean value true is odd.
 \end{defi}
 
 Using the logical operators $\land$ (AND), $\lor$ (OR) and $\neg$ (NEG)
@@ -172,34 +172,36 @@ discussion of these operators):
               &\coloneqq (X \oplus Y \oplus Z)
 \end{align}
 
-In the following, a brief overview over MD4's design is given.
+In the following, a brief overview of MD4 is given.
 
 \begin{description}
   \item[Padding and length extension.]
     First of all, padding is applied. A single bit $1$ is appended to the
     input. As long as the input does not reach a length congruent 448 modulo 512,
     bit $0$ is appended.
-    Followingly, length appending takes place. Represent the length of the input
+    Afterwards, length appending takes place. Represent the length of the input
     (without the previous modifications) in binary and take its first
     64 less significant bits. Append those 64 bits to the input.
   \item[Initialization.]
     The message is split into 512-bit blocks (i.e. 16 32-bit words).
-    Four state variables $A_{i}$ with $-4 \leq i < 0$ are initialized with these
+    State variables $A_{i}$ with $-4 \leq i < 0$ are initialized with these
     hexadecimal values:
     % remark: A_{-4} := A, A_{-1} := B, A_{-2} := C, A_{-3} := D on Wikipedia
     \[
-      \mathtt{[A_{-4}]}\; \texttt{01234567} \quad
-      \mathtt{[A_{-1}]}\; \texttt{89abcdef} \quad
-      \mathtt{[A_{-2}]}\; \texttt{fedcba98} \quad
-      \mathtt{[A_{-3}]}\; \texttt{76543210}
+      \begin{array}{cccc}
+        A_{-4} = \texttt{01234567} &
+        A_{-1} = \texttt{89abcdef} &
+        A_{-2} = \texttt{fedcba98} &
+        A_{-3} = \texttt{76543210}
+      \end{array}
     \]
-  \item[Round function with state variable updates.]
+  \item[Round function and state variable updates.]
     The round function is applied in three rounds with 16 iterations.
     In every iteration values $A_{-1}$, $A_{-2}$ and $A_{-3}$ are taken
     as arguments to function $F$. Function $F$ is \boolf{IF} in round~1,
     followed by \boolf{MAJ} for round~2 and \boolf{XOR} for the final round~3.
     The resulting value is added to $A_{-1}$, current message block $M$
-    and constant $X$. Finally the 32-bit sum will be left-rotated by $p$
+    and constant $X$. Finally, the 32-bit sum will be left-rotated by $p$
     positions. Left rotation is formally defined in Definition~\ref{def:shifts}.
     The values of $X$ and $p$ are defined as follows:
 
@@ -207,7 +209,7 @@ In the following, a brief overview over MD4's design is given.
     $r$ the round between $1$ and $3$. Then $X$ takes the value
     of the $i$-th column and $r$-th row of matrix $C$.
     $p$ takes the value of row $r$ and column $i \bmod{4}$ of matrix $P$.
-    
+
     \[
       C = \left(\begin{array}{cccccccccccccccc}
         0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 \\
@@ -225,20 +227,14 @@ In the following, a brief overview over MD4's design is given.
     This round function design is visualized in Figure~\ref{fig:md4-round-function}.
 \end{description}
 
-\begin{figure}[p]
+\begin{figure}[ht]
   \begin{center}
     \includegraphics{img/md4.pdf}
     \caption{MD4 round function updating state variables}
     \label{fig:md4-round-function}
   \end{center}
-%\end{figure}
-%\begin{figure}[p]
-  \begin{center}
-    \includegraphics[width=\textwidth]{img/sha256.pdf}
-    \caption{SHA-256 round function as characterized in~\cite{analysisSHA256}}
-    \label{fig:sha256-round-function}
-  \end{center}
 \end{figure}
+
 
 
 
@@ -254,11 +250,13 @@ In the following, a brief overview over MD4's design is given.
 %
 \index{SHA-256}
 SHA-256 is a hash function from the SHA-2 family designed by the National Security Agency (NSA)
-and published in 2001~\cite{fips-pub-180-4}. It uses a Merkle-Damg\aa{}rd construction
-with a Davies-Meyer compression function. The best known preimage attack was found in 2011
+and published as FIPS PUB 180-4 (originally 2001)~\cite{fips-pub-180-4}.
+It uses a Merkle-Damg\aa{}rd construction with a Davies-Meyer compression function.
+The best known preimage attack was found in 2011
 and breaks preimage resistance for 52~rounds~\cite{bicliques}. The best known collision attack
 breaks collision resistance for 31~rounds of SHA-256~\cite{improving} and pseudo-collision
-resistance for 46~rounds~\cite{high2011}.
+resistance for 46~rounds~\cite{high2011}. The best practical attack is a pseudo-collision
+for 38 steps~\cite{mendel2013improving}.
 
 \begin{table}[!hb]
   \begin{center}
@@ -390,3 +388,11 @@ the XOR function whereas $\boxplus$ denotes 32-bit addition.
     where $N$ denotes the index of the last block and operator $\|$ denotes
     concatenation. Hence $H_0^{(N)}$ are the four least significant bytes of the digest.
 \end{description}
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[width=\textwidth]{img/sha256.pdf}
+    \caption{SHA-256 round function~\cite{analysisSHA256}}
+    \label{fig:sha256-round-function}
+  \end{center}
+\end{figure}

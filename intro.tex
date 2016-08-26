@@ -13,23 +13,23 @@ are considered as byte strings in a particular encoding.
 The hash value is of fixed length and satisfies several properties which make it useful
 in a variety of applications.
 
-In this thesis we will consider the hash algorithms MD4 and SHA-256.
-They use basic arithmetic functions like addition and bit-level functions
-such as XOR to transform an input to a hash value. We use a bit vector
+In this thesis, we will consider the hash algorithms MD4 and SHA-256.
+They use basic arithmetic functions like addition and bitwise functions
+such as \boolf{XOR} to transform an input message to a hash value. We use a bit vector
 as input to this implementation and all operations applied to this bit vector
-will be represented as clauses of a SAT problem. Additionally we represent
-differential characteristics of hash collisions as SAT problem. If and only if
+will be represented as clauses of a SAT problem. Additionally, we represent
+differential characteristics for hash collisions as SAT problem. If and only if
 satisfiability is given, the particular differential state is achievable
 using two different inputs leading to the same output. As far as SAT solvers
-return an actual model satisfying that state, we get an actual hash collision
+return an actual model satisfying that state, we get an actual hash collision,
 which can be verified and visualized.
 If the internal state of the hash algorithm is too large, the attack can be
 computationally simplified by modelling only a subset of steps of the hash algorithm
 or changing the modelled differential path.
 
-Based on experience with these kind of problems with previous non-SAT-based tools
+Based on experience with these kind of problems with previous heuristic search tools
 we aim to apply best practices to a satisfiability setting.
-We will discuss which SAT techniques lead to best performance characteristics
+We will discuss, which SAT techniques lead to best performance characteristics
 for our MD4 and SHA-256 testcases.
 
 \section{Thesis Outline}
@@ -38,35 +38,35 @@ for our MD4 and SHA-256 testcases.
 This thesis is organized as follows:
 
 \begin{description}
-\item[In Chapter~\ref{ch:intro}] we briefly introduce basic subjects of this
+\item[In Chapter~\ref{ch:intro},] we briefly introduce basic subjects of this
   thesis. We explain our high-level goal involving hash functions and SAT solvers.
 
-\item[In Chapter~\ref{ch:hash}] we introduce the MD4 and SHA-256 hash functions.
+\item[In Chapter~\ref{ch:hash},] we introduce the MD4 and SHA-256 hash functions.
   Certain design decisions imply certain properties which can be used in differential
   cryptanalysis. We discuss those decisions in this chapter after a formal definition
   of the function itself. Beginning with this chapter we develop a theoretical notion
   of our tools.
 
-\item[In Chapter~\ref{ch:dc}] we discuss approaches of differential cryptanalysis.
-  We start off with work done by Wang, et al. and followingly introduce differential
+\item[In Chapter~\ref{ch:dc},] we discuss approaches of differential cryptanalysis.
+  We start with work done by Wang, et al. and followingly introduce differential
   notation to simplify representation of differential states. This way we can easily dump
   hash collisions.
 
-\item[In Chapter~\ref{ch:sat}] we discuss SAT solving. We give a brief overview
-  over used SAT solvers and discuss how we can speed up SAT solvers for cryptographic
-  problems.
+\item[In Chapter~\ref{ch:sat},] we discuss SAT solving techniques. We discuss how
+  the problem needs to be encoded and give a brief overview over used SAT solvers.
+  This includes a customized lingeling version by Armin Biere for our purposes.
 
-\item[In Chapter~\ref{ch:features}] we define SAT features which help us to
+\item[In Chapter~\ref{ch:features},] we define SAT features which help us to
   classify SAT problems. This is a small subproject we did to look at properties
   of resulting DIMACS~CNF files.
 
-\item[In Chapter~\ref{ch:enc}] we discuss how we represent a problem (i.e. the hash
+\item[In Chapter~\ref{ch:enc},] we discuss how we represent a problem (i.e. the hash
   function and a differential characteristic) as SAT~problem. This ultimatively
   allows us to solve the problem using a SAT solver.
 
-\item[In Chapter~\ref{ch:results}] we show data as result of our work.
-  Runtimes are the main part of this chapter, but also results of the SAT~features
-  project are presented.
+\item[In Chapter~\ref{ch:results},] we present the result of our work.
+  Runtimes are the main part of this chapter, but also results of Chapter~\ref{ch:features}
+  are presented.
 
-\item[In Chapter~\ref{ch:summary}] we suggest future work based on our results.
+\item[In Chapter~\ref{ch:summary},] we conclude and discuss future work based on our results.
 \end{description}

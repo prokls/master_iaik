@@ -680,7 +680,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.3975"
      inkscape:cx="300"
-     inkscape:cy="28.264758"
+     inkscape:cy="200"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -854,14 +854,7 @@
          id="flowPara13481-7-0-7"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25px;font-family:'Linux Libertine Display O';-inkscape-font-specification:'Linux Libertine Display O';text-align:center;text-anchor:middle;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none">A<flowSpan
    style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:64.99999762%;font-family:'Linux Libertine Display O';-inkscape-font-specification:'Linux Libertine Display O';baseline-shift:sub;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
-   id="flowSpan4625">i-4</flowSpan></flowPara></flowRoot>    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="rect8065-9"
-       width="40.476189"
-       height="50.0564"
-       x="547.6405"
-       y="795.97699" />
-    <flowRoot
+   id="flowSpan4625">i-4</flowSpan></flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot13475-5"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:125%;font-family:'Linux Libertine Display O';-inkscape-font-specification:'Linux Libertine Display O';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -1343,13 +1336,6 @@
        id="path10179-0-4-8"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="rect8065-9-3"
-       width="40.476189"
-       height="50.0564"
-       x="547.6405"
-       y="883.01898" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot13475-5-5"
