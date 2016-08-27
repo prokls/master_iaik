@@ -4,20 +4,21 @@
 \chapter{Problem encoding}
 \label{ch:enc}
 
-We already discussed how SAT solvers work and which input they take.
-We also sketched how hash algorithm properties got broken using
-differential cryptanalysis. In this section we combine those
-subjects and describe how we designed an attack setting.
+In Chapter~\ref{ch:sat}, we already discussed how SAT solvers
+work and which input they take. We also sketched how hash algorithm
+properties got broken using differential cryptanalysis
+(Chapter~\ref{ch:dc}). In this chapter, we combine those
+subjects and describe how we run SAT solvers to find hash collisions.
 
-We designed a basic prototype with the STP SMT solver. Followingly
+We developed a basic prototype with the STP SMT solver. In the following,
 we wanted to tweak the CNF used by the SAT solver and wrote
-our own library \emph{algotocnf} to generate CNFs for differential
-purposes; as illustrated in Section~\ref{ch:dc}.
-There we distinguished 5 different tweaks. We evaluate
-the performance of those tweaks in Chapter~\ref{ch:results}.
+our own library \emph{algotocnf} to generate CNFs modelling
+variable differences and their logic; as illustrated in Section~\ref{ch:dc}.
+In the referred section, we distinguished 5 different approach. We evaluate
+the performance of those approaches in Chapter~\ref{ch:results}.
 
 Every section represents a major approach whereas subsections
-represent derivatives of this approach with minor tweaks.
+represent derivatives of this approach with minor changes.
 
 \section{Basic approach}
 \label{sec:enc-stp}
@@ -34,7 +35,7 @@ STP is recommendable as a tool to model arithmetic and bitwise functions.
 
 First we wrote an implementation using the CVC language to model the MD4 hash algorithm.
 We provide a bitvector to the hash algorithm instance. When applying the corresponding
-arithmetic operations we generate expressions such as \texttt{ASSERT(y = 0bin00000101);}
+bitwise operations we generate expressions such as \texttt{ASSERT(y = 0bin00000101)}
 to model the assignment of a constant. Here the desired constant is assigned variable
 \texttt{y}, because of equivalence. \texttt{y} is required to have the constant
 after this expression as value. Whereas we generate the \texttt{ASSERT} statement,
@@ -47,13 +48,16 @@ We claim \texttt{ASSERT(diff = BVXOR(bv1, bv2))} to ensure that \texttt{diff}
 represents the difference between \texttt{bv1} and \texttt{bv2}. Given the bitconditions
 for a bitvector from a differential characteristic, we require \texttt{diff} to enforce
 those particular differences. This corresponds to the idea of differential cryptanalysis
-introduces in Chapter~\ref{ch:dc}.
+introduced in Chapter~\ref{ch:dc}.
 
-It is now trivial to consider a differential characteristic such as Testcase~\ref{fig:tcA}
-and generate the corresponding CVC~input for STP. STP solves this particular problem within
-a second. Testcase~\ref{fig:tcB} already provides a more complex example taking
-40 minutes to solve. We used minisat as SAT solver in the backend, even though STP
-allows to exchange it for CryptoMiniSat which is a more modern and versatile SAT solver.
+It is now trivial to consider a differential characteristic of MD4 such as Testcase~A (see
+Section~\ref{sec:tcA}), where all differences are set, but the individual values in both
+instances need to be assigned. We generated the corresponding CVC~input for STP.
+STP solves this particular problem within a second. Testcase~B (compare with
+Section~\ref{sec:tcB}) already provides a more complex example taking
+40 minutes to solve, because not all differences are set.
+We used minisat as SAT solver in the backend, even though STP
+allows to replace it for CryptoMiniSat which is a more modern and versatile SAT solver.
 
 Even though STP allows to come to useful results pretty quickly,
 it seems cumbersome to model all hash algorithms in the CVC language.
@@ -66,17 +70,19 @@ characteristic.
 This interface switch introduces no significant performance difference.
 
 As a next step, we wanted to improve the evaluation performance to tackle more difficult
-problems. We considered this design as a working prototype of a basic approach to be
+problems such as SHA-256. We considered this design as a working prototype of a basic approach to be
 improved upon.
 
-STP was not fruitful for our next goal, because we wanted to tweak the SAT design generated
-for the SAT solver and needed good control over the SAT encoding
-which we expected to have a major influence on the performance.
+STP seems not suited for our next goal, because we wanted to modify
+the particular CNF generated for the SAT solver and needed good control
+over the SAT encoding which we expected to have a major influence
+on the performance.
 
 \section{algotocnf}
 \label{sec:enc-algotocnf}
 %
-We implemented our own library \emph{algotocnf} to achieve greater flexibility in SAT design.
+We implemented our own library \emph{algotocnf} to achieve greater
+flexibility in our SAT encoding.
 
 \subsection{Two instances and its difference}
 \label{sec:enc-original}
@@ -85,39 +91,41 @@ We implemented our own library \emph{algotocnf} to achieve greater flexibility i
 Similar to STP, algotocnf generates a CNF for a given hash algorithm implementation.
 Besides modelling bitvectors, it also implements differential bitvectors which
 inherently handle the difference bitvectors \texttt{diff} which contain difference
-variables. It can also directly operate with differential characteristics.
-Similarly to STP, it implements arithmetic and bitwise operations.
+variables. It can also directly takes differential characteristics (such as
+Table~\ref{tab:wang-collision-propagated}, specified in Chapter~\ref{ch:dc})
+as input. Similarly to STP, it implements arithmetic and bitwise operations.
 
-We think \emph{algotocnf} mainly differs from other SMT tools like STP
+We think \emph{algotocnf} mainly differs from other SMT tools like STP,
 because of its implementation of differential logic.
 
 To model our CNF \emph{algotocnf} implements the following strategy:
 \begin{enumerate}
   \item Take a differential characteristic and the hash algorithm as input.
-  \item Every bit is therefore represented as a Boolean variable.
+  \item Every bit gets represented as a Boolean variable.
     If you apply addition, operator overloading in python will ensure
     that clauses are generated to describe the addition consisting of
     \boolf{XOR}s and \boolf{MAJ}s. Every operation is modelled as assignment.
-    Hence an operation operating on a few Boolean variables is equivalent
+    Hence, an operation using a few Boolean variables is equivalent
     to a single variable which represents the result.
-    Equivalently other operations related to integers are implemented as well.
+    Similarly other operations related to integers are implemented as well.
   \item Constants used in the implementation are automatically converted
     to bitvectors with unit clauses.
   \item After running the hash algorithm with bitvectors per instance,
     all constraints related to the hash algorithm are added.
-  \item Followingly the differential characteristic is read. Values such as $A_i$
+  \item Afterwards, the differential characteristic is read. Values such as $A_i$
     represent intermediate states of bitvectors. Therefore the corresponding bitvectors
     are looked up and equivalences with temporary bitvectors are added.
     Those temporary bitvectors are initialized with all constraints resulting from
-    the bit conditions of this bitvector.
-    In conclusion all constraints resulting from the differential characteristic are added.
-  \item Finally the SAT solver is called. The CNF was mostly solved on a cluster
+    the bit conditions of this bitvector (please refer to Chapters~\ref{ch:hash}
+    and \ref{ch:dc} for details).
+    In conclusion, all constraints resulting from the differential characteristic are added.
+  \item Finally, the SAT solver is called. The CNF was mostly solved on a cluster
     specified in Appendix~\ref{app:setup}.
   \item Afterwards the program is run again to
-    create the exactly same problem instance and the solver's solution replaces
+    create the exact same problem instance and the solver's solution replaces
     symbolic values with actual Boolean values. The resulting differential
-    characteristic is parsed backed and printed out as differential characteristic
-    where expectedly many bit conditions have been strengthened.
+    characteristic is parsed backed and printed as differential characteristic
+    where all bits have been determined (i.e. a hash collision has been found).
 \end{enumerate}
 
 When adding clauses resulting from
@@ -127,45 +135,48 @@ but bit conditions tell constraints such as \enquote{a difference is given,
 but the actual value is unknown}.
 
 It seemed trivial to add a \emph{difference variable} for every pair of Boolean
-values representing a bit in the two instances. Furthermore the difference
+values representing a bit in the two instances. Furthermore, the difference
 variable $\Delta x$ is connected by a \boolf{XOR} with the variables of the pair $(x, x')$.
 \[ \Delta x = x \oplus x' \]
-Therefore it should be trivial for a preprocessor to simplify the formula
-appropriately or actually we don't expect runtime differences for the larger
+Therefore, it is trivial for a preprocessor to simplify the formula
+appropriately. Hence, we don't expect runtime differences for the larger
 amount of variables.
 
 And finally we expect the CNF to inherit a property of hash functions.
 Inputs are provided into the hash algorithm and strongly intermingled
-with other values. This should result in a high diffusion and almost every
+with other values. This results in a high diffusion and almost every
 variable is expected to share a clause with another variable.
 
 The difference variables design corresponds to \texttt{diff} bit vectors
-in the STP and therefore designs the difference described in Chapter~\ref{ch:dc}.
+in the STP and therefore models the difference variables described
+in Chapter~\ref{ch:dc}.
 The design decisions of this encoding are fundamental to the resulting
-runtime discussed in Chapter~\ref{ch:results}.
+runtime as discussed in Chapter~\ref{ch:results}.
 
 \subsection{Adding the differential description}
 \label{sec:enc-diff-desc}
 %
 Using the approach in the previous section, we were able to find actual MD4 collisions
 using a SAT solver (please refer to Section~\ref{sec:results-md4}).
-A SHA256 implementation followed which obviously lead to worse
+We used a reused our implementation of MD4 for SHA-256 and replaced the hash algorithm
+implementation. This implementation obviously presented worse
 runtime results, because the internal state of SHA-256 is much larger
 (by a factor of at least 2). Can we further improve the runtime of the SAT solver?
 
-Because we work with bitvectors and apply high-level operations like \boolf{MAJ} or addition,
+Since we work with bitvectors and apply high-level operations like \boolf{MAJ} or addition,
 we can additionally implement how differences in those operations propagate.
 Magnus Daum's thesis on \enquote{Cryptanalysis of Hash Functions of the
 MD4-Family}~\cite[Table 4.4]{daum2005cryptanalysis} discusses how differences propagate in
-Boolean functions. Trivially, \boolf{XOR}s propagate differences the way they are~\footnote{
+Boolean functions. Trivially, \boolf{XOR}s propagate differences the way they are\footnote{
 A difference in the arguments of two \boolf{XOR} instances remains the same difference
-after applying \boolf{XOR} to each instance}. Another example is \boolf{MAJ}:
-Let $a$, $b$ and $c$ be difference variables and \boolf{MAJ} is applied to both corresponding
+after applying \boolf{XOR} to each instance}. Another example is \boolf{IF}:
+Let $a$, $b$ and $c$ be difference variables and \boolf{IF} is applied to both corresponding
 hash algorithm instances. $r$ is the difference variable of the result.
 Then its differential behavior states that
 \[ (0, 1, 1) \implies 1 \qquad (0, 0, 0) \implies 0 \]
-where $(\text{IN}) \implies \text{OUT}$ denotes an input-output relation.
-Because of this behavior we add clauses to explicit describe this behavior:
+where $(\text{IN}) \implies \text{OUT}$ denotes an input-output relation
+and in all other cases, the difference can be either 1 or 0.
+Because of this behavior we add clauses to explicitly describe this behavior:
 \[ (\neg a \land b \land c) \implies r \quad \iff \quad a \lor \neg b \lor \neg c \lor r \]
 We also model the second behavior:
 \[ (\neg a \land \neg b \land \neg c) \implies \neg r \quad \iff \quad a \lor b \lor c \lor \neg r \]
@@ -175,28 +186,33 @@ by the SAT solver itself based on the clauses we added before.
 However, this lead to a major speedup which can be observed in the runtime results
 of Chapter~\ref{ch:results}.
 
-\newpage
-\subsection{Evaluating difference variables first}
+\subsection{Difference variables first}
 \label{sec:enc-diff-desc-ocnf}
 %
+In this approach we reduce the number of evaluated differences by guessing
+Boolean value false first for difference variables.
+
 \begin{prop}
   Deriving difference values first, followed by actual bit values for the two instances,
   leads to a speedup.
 \end{prop}
 
 This proposed principle is fundamental to differential cryptanalysis. A previous tool
-at our department implements propagation of hash algorithm values without a SAT solver
+at IAIK (TU Graz) implements propagation of hash algorithm values without a SAT solver
 and this strategy is essential to good performance. This strategy was introduced
 in the very early days of differential cryptanalysis and was also used by Wang et
 al.~\cite{wang2004} to find their hash collisions.
 
-So basically in terms of SAT solvers we want to guess values for difference variables
-first and once all have been assigned, we try to find actual values for the two
-hash algorithm instances.
+For our SAT solver, we want to establish the following strategy:
+Take some CNF which includes difference variables. We assign a Boolean value
+to every difference variable unless a contradiction is found. For all the
+remaining variables we try to find a satisfiable assignment. If none can be found,
+we consecutively toggle the Boolean value of difference variables to cover all
+possible assignments and find a satisfiable one. 
 
 It is important to point out that DIMACS does not specify a way to annotate Boolean
 variables. As such that SAT solver cannot distinguish between difference variables
-and variables of the instances. Therefore implementing this approach requires a custom
+and variables of the instances. Therefore, implementing this approach requires a custom
 SAT solver which is given with lingeling~ats1o1.
 
 Another claim is important for this approach:
@@ -207,16 +223,16 @@ Another claim is important for this approach:
   should solve hash collision problems faster.
 \end{prop}
 
-This claim is justified by the desire to find as little differences as possible
-in a hash collision to increase the probability of values cancelling each other out
+This claim is justified by the desire to find sparse characteristics with few differences
+in intermediate variables to increase the probability of values cancelling each other out
 in the later rounds.
 
 \subsection{A lightweight approach}
 \label{sec:enc-lightweight}
 %
-In this tweak we made a step back and considered the ideas of the previous
-section but neglected the differential description. This approach was interesting
-to recognize the effect introduced by adding the differential description.
+In this approach we made a step back and considered the ideas of the previous
+section, but neglected the differential description. This approach was interesting
+to quantify the effect introduced by adding the differential description.
 
 \subsection{Influencing the evaluation order}
 \label{sec:enc-diff-desc-eo}
@@ -231,5 +247,7 @@ and explicitly tell the SAT solver to guess on $x^*$ before guessing on $\Delta 
 
 The SAT solver will assign $x'=0$ first, because of the evaluation order. So either $\Delta x$
 or $x$ must be false. $\Delta x$ is assigned false, because as difference variable it has a higher
-priority over $x$. Equivalently for $x'=1$ we have $\Delta x$ needs to be true. So we actually
+priority over $x$. Equivalently for $x'=1$, $\Delta x$ needs to be true. So we actually
 achieve an early guess on the difference variable.
+
+In Chapter~\ref{ch:results} we evaluated the performance of this approach.
