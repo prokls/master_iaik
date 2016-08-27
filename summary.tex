@@ -6,64 +6,45 @@
 \section{Related work}
 \label{sec:results-related}
 %
-In my bachelor thesis~\cite{bach} we tried to integrate a SAT solver into
-our department's existing tool which encodes propagation explicitly. This approach
-was not very successful as restarts between hash algorithm rounds implied that
-intermediate results by the SAT solver got lost. This was our motivation
-for this master thesis: We represent all details in CNF.
+Already in my bachelor thesis~\cite{bach} we tried to integrate a SAT solver into
+a dedicated, automated tool finding collisions in hash functions using differential
+cryptanalysis. This approach was not very successful as restarts between hash
+algorithm rounds implied that intermediate results by the SAT solver got lost.
+This was one motivation for this master thesis: We represent all details in CNF.
 
 Research was already done by Ilya Mironov and Lintao Zhang~\cite{mironov2006applications}
-to apply SAT solvers to differential cryptanalysis specifically to find hash collision
-in MD4. However whereas their basic approach seems to correspond to our approach described
-in Section~\ref{sec:enc-original}, our implementation uses additional SAT design tweaks
-to improve our results. Also because 10 years have gone since publication, SAT technology
-has progressed and modern SAT solvers on modern hardware provide better results.
+to apply SAT solvers to differential cryptanalysis specifically to find hash collisions
+in MD4. Their approach corresponds to our basic approach applied to Testcase~A
+(compare with Section~\ref{sec:tcA}), where all differences are assigned.
+Therefore our results in Table~\ref{tab:tcA-results} within one minute are
+comparable with their evaluations within ten minutes.
+We can clearly see how SAT technology and CPU performance
+has progressed over 10 years since publication of this paper.
+
+Finding hash collisions in Testcases~B, C, 21, 23 and 24 seems
+to be a novel result of this master thesis and has not been found
+in related work.
 
 \section{Conclusion}
 \label{sec:conclusion}
 %
 We successfully found full-round hash collisions for MD4
 using SAT solvers mentioned in Section~\ref{sec:sat-solvers}.
-We applied tweaks to the lingeling SAT solver to improve our
+We modified the lingeling SAT solver to improve our
 runtime results further and found 24-round hash collisions
 for SHA-256. Our attack starting points for MD4 ---
 Testcases~\ref{fig:tcA}, \ref{fig:tcB} and \ref{fig:tcC} ---
-were found by Yusuke Naito, Yu Sasaki, Noboru Kunihiro and
+are based on the work by Yusuke Naito, Yu Sasaki, Noboru Kunihiro and
 Kazuo Ohta~\cite{sasaki2007new}. Our starting points for SHA-256
 --- Testcases~\ref{fig:tc18}, \ref{fig:tc21}, \ref{fig:tc23}
-and \ref{fig:tc24} --- were found by Ivica Nikoli{\'c} and
-Alex Biryukov~\cite{nikolic2008collisions}.
-
-\section{Future work}
-\label{sec:future}
-%
-Future work might want to consider our design decisions made in
-chapter~\ref{ch:enc}.
-
-In general, it would be interesting to generate our testcase for a broader
-set of differential characteristics. Probably we can come up with empirical
-results showing a relation between the size of unspecified areas in the
-differential characteristics and the evaluated runtime.
-
-Furthermore, many SAT-related effort could be put to thoroughly discuss
-why differential description provides such a dramatic performance improvement.
-This necessarily means the SAT solver is generally not capable of deriving
-the useful clauses, differential description provides. The resulting
-numbers of restarts could also be subject of further research.
-
-As far as cnf-analysis is concerned, the project aims to extend to
-a larger set of SAT features. Furthermore benchmarks should be aggregated
-from more sources, but Armin Biere pointed out in private conversation
-that not all benchmarks of SAT competitions become publicly available.
-This avoids machine learning hacks where submitted SAT solvers perform
-exceptionally well on known benchmarks. Our main contribution is a search
-interface to search for SAT features given the cnfhash of a CNF file.
-We hope to get in touch with new SAT feature ideas and SAT benchmark files.
+and \ref{fig:tc24} --- are based on the work by Ivica Nikoli{\'c}
+and Alex Biryukov~\cite{nikolic2008collisions}.
 
 \section{Contributions}
 \label{sec:contributions}
 %
-To strengthen Reproducible Research, the source code and data resulting from this thesis is available online.
+To encourage future work, the source code and data resulting from this
+thesis is available online.
 It allows the reader to run the experiments again and verify our claims.
 We did our best to describe our hardware setup as accurately as possible.
 At the following website, any results part of this project are collected:
@@ -72,19 +53,47 @@ At the following website, any results part of this project are collected:
   \url{http://lukas-prokop.at/proj/megosat/}
 \end{quote}
 
-Several subprojects are part of this master thesis:
-\begin{description}
-\item[algotocnf]\hfill{} \\
-  A python library implementing the encoding described in Chapter~\ref{ch:enc}. \\[4pt]
-  \textbf{Python3 library and program:} \url{https://github.com/prokls/algotocnf}
-\item[cnf-hash]\hfill{} \\
-  A standardized way to produce a unique hash for CNF files \\[4pt]
-  \textbf{Go implementation:} \url{https://github.com/prokls/cnf-hash-go} \\
-  \textbf{Python3 implementation:} \url{https://github.com/prokls/cnf-hash-py} \\
-  \textbf{Testsuite:} \url{https://github.com/prokls/cnf-hash-tests2}
-\item[cnf-analysis]\hfill{} \\
-  Evaluate SAT features for a given CNF file. \\[4pt]
-  \textbf{Go implementation:} \url{https://github.com/prokls/cnf-analysis-go} \\
-  \textbf{Python3 implementation:} \url{https://github.com/prokls/cnf-analysis-py} \\
-  \textbf{Testsuite:} \url{https://github.com/prokls/cnf-analysis-tests}
-\end{description}
+% \noindent
+% Several subprojects are part of this master thesis:
+% \begin{description}
+% \item[algotocnf]\hfill{} \\
+%   A python library implementing the encoding described in Chapter~\ref{ch:enc}. \\[4pt]
+%   \textbf{Python3 library and program:} \url{https://github.com/prokls/algotocnf}
+% \item[cnf-hash]\hfill{} \\
+%   A standardized way to produce a hash value for CNF files \\[4pt]
+%   \textbf{Go implementation:} \url{https://github.com/prokls/cnf-hash-go} \\
+%   \textbf{Python3 implementation:} \url{https://github.com/prokls/cnf-hash-py} \\
+%   \textbf{Testsuite:} \url{https://github.com/prokls/cnf-hash-tests2}
+% \item[cnf-analysis]\hfill{} \\
+%   Evaluate SAT features for a given CNF file. \\[4pt]
+%   \textbf{Go implementation:} \url{https://github.com/prokls/cnf-analysis-go} \\
+%   \textbf{Python3 implementation:} \url{https://github.com/prokls/cnf-analysis-py} \\
+%   \textbf{Testsuite:} \url{https://github.com/prokls/cnf-analysis-tests}
+% \end{description}
+
+\section{Future work}
+\label{sec:future}
+%
+Future work might want to consider our design decisions made in
+Chapter~\ref{ch:enc}.
+
+In general, it would be interesting to generate our testcase for a broader
+set of differential characteristics. Probably we can come up with empirical
+results showing a relation between the size of unspecified areas in the
+differential characteristic and the evaluated runtimes.
+
+Furthermore, many SAT-related effort could be put to thoroughly discuss
+why differential description provides such a significant performance improvement.
+This necessarily means the SAT solver is generally not capable of deriving
+the useful clauses, differential description provides. The resulting
+numbers of restarts could also be subject of further research.
+
+Lingeling ats1o1 was experimentally modified to define a separate set of
+variables to be evaluated first. This approach seemed promising and
+should be subject to future SAT research.
+
+As far as cnf-analysis is concerned, the project aims to extend to
+a larger set of SAT features and feedback by SAT solver developers
+is appreciated. Our main contribution is a search
+interface to search for SAT features given the cnfhash of a CNF file.
+We hope to get in touch with new SAT feature ideas and SAT benchmark files.
