@@ -4,16 +4,17 @@
 \chapter{SAT features}
 \label{ch:features}
 %
-At the very beginning I was very intrigued by the question
+At the very beginning, I was very intrigued by the question
 \enquote{What is an \enquote{average} SAT problem?}. Answers to this
-question can help to optimize SAT solver memory layouts.
-Specifically for this thesis I wanted to find out whether
+question can help to optimize SAT solver memory layouts and
+find distinctive properties of CNFs.
+Specifically for this thesis, I wanted to find out whether
 our problems distinguish from \enquote{average} problems in any
 way such that we can use this distinction for runtime optimization.
 
 I came up with 8 questions related to basic properties of SAT problems
 we will discuss in depth in this section. We will characterize an
-average SAT problem at Section~\ref{sec:features-average}:
+average SAT problem in Section~\ref{sec:features-average}:
 \begin{enumerate}
 \item Given an arbitrary literal. What is the percentage it is positive?
 \item What is the clauses / variables ratio?
@@ -42,52 +43,49 @@ of a given SAT problem. This SAT feature is stored in the CNF header of a SAT
 problem encoded in the DIMACS format.
 
 The general goal is to write a tool which evaluates several SAT features at the same
-time and retrieve them for comparison with other problems. Therefore it should be
+time and retrieves them for comparison with other problems. Therefore it should be
 computationally easy to evaluate SAT features of a given SAT problem. A suggested
 computational limit is given with polynomial complexity in terms of number of
-variables and number of clauses for memory as well as runtime for evaluation algorithms.
+variables and number of clauses for memory as well as runtime.
 Sticking to this convention implies that evaluation of satisfiability must not be
-necessary to evaluate a SAT feature under the assumption that \cPneqNP. Hence the
-number of valid models cannot be a SAT feature as far as satisfiability needs to
-be determined. But no actual hard computational limit is defined.
+necessary to evaluate a SAT feature as long as no polynomial algorithm to determine
+satisfiability can be found. Hence the number of valid models cannot be a SAT feature
+as far as satisfiability needs to be determined.
+But no actual hard computational limit is defined.
 
 \section{Related work}
 \label{sec:features-related}
 %
-The most similar resource I found looking at SAT features was the
-SATzilla project~\cite{satzilla2004,satzilla2008} in 2012. The authors systematically defined
-138 SAT~features categorized in 12 groups. Some features are only evaluated conditionally.
-The features themselves are not defined formally, but an implementation is provided bundled
-with example data. The following list provides an excerpt of the features:
+The most similar resource I found---looking at SAT features---was the
+SATzilla project~\cite{satzilla2004,satzilla2008} in 2012. The authors used
+91~SAT features categorized in 9 groups, originally described by Nudelman,
+et al.~\cite{nudelman2004understanding}. Some features are only evaluated
+if they can be evaluated within a given time frame (e.g. 20~seconds).
+
+The following list provides an excerpt of the features:
 
 \begin{description}
 \item[\satfeature{nvarsOrig}] number of variables defined in the CNF header
 \item[\satfeature{nvars}] number of active variables
-\item[\satfeature{reducedVars}] \satfeature{nvarsOrig} - \satfeature{nvars}, divided by \satfeature{nvars}
-\item[\satfeature{vars-clauses-ratio}] nvars divided by number of active clauses
-\item[\satfeature{POSNEG-RATIO-CLAUSE-mean}] mean of $2 \cdot \left\| 0.5 - {\text{pos}}/{\text{length}}\right\|$ where $\text{pos}$ is the number of positive literals and $\text{length}$ clause length of a specific clause
-\item[\satfeature{POSNEG-RATIO-CLAUSE-entropy}] like \satfeature{POSNEG-RATIO-CLAUSE-mean} but entropy
+\item[\satfeature{reducedVars}] \satfeature{nvarsOrig} reduced by \satfeature{nvars}, divided by \satfeature{nvars}
+\item[\satfeature{vars-clauses-ratio}] nvars divided by the number of active clauses
+\item[\satfeature{POSNEG-RATIO-CLAUSE-mean}] clause mean of $2 \cdot \left\| 0.5 - {\text{pos}}/{\text{length}}\right\|$ where $\text{pos}$ is the number of positive literals and $\text{length}$ its clause length
+\item[\satfeature{POSNEG-RATIO-CLAUSE-entropy}] like \satfeature{POSNEG-RATIO-CLAUSE-mean} but its Shannon entropy
 \item[\satfeature{TRINARY+}] number of clauses with clause length 1, 2 or 3 divided by number of active clauses
 \item[\satfeature{HORNY-VAR-min}] minimum number of times a variable occurs in a Horn clause
 \item[\satfeature{cluster-coeff-mean}]
    let neighbors of a clause be all clauses containing any literal negated
    and let clauses $c_1$ and $c_2$ be conflicting if $c_1$ contains literal $l$ and $c_2$ contains $-l$,
-   then return the mean of $2$ times the number of conflicting neighbors of a clause $c$
-   divided by the number of unordered pairs of neighbors,
+   then return the mean of two times the number of conflicting neighbors of a clause $c$
+   divided by the number of unordered pairs of neighbors;
    returned iff computable within 20 seconds for all clauses
 \end{description}
 
 Please recognize that active clauses are the unsatisfied clauses after BCP has been applied.
 Equivalently active variables are remaining variables after application of BCP.
 
-Many SAT solvers collect feature values to improve algorithm selection,
-restart strategies and estimate problem sizes. Recent trends to apply Machine
-Learning to SAT solving imply feature evaluation. SAT features and the resulting
-satisfiability runtime are used as training data for Machine Learning. One example
-using SAT features for algorithm selection is ASlib~\cite{aslib}.
-
-The SAT solvers of Section~\ref{sec:sat-solvers} we use also compute features they use
-when computing a solution. For example, CryptoMiniSat 4.5.3 prints the following lines
+The SAT solvers we use (Section~\ref{sec:sat-solvers}), also compute features they use
+when computing a solution. For example, CryptoMiniSat 4.5.3 prints lines such as:
 
 \begin{verbatim}
 c [features] numVars 56118, numClauses 358991, var_cl_ratio 0.156,
@@ -103,16 +101,23 @@ many are actually related to the current state of evaluation like decisions
 per conflicts. We consider this as a property of the evaluation and not the
 SAT problem itself.
 
-\section{Statistical features}
+Many SAT solvers collect feature values to improve algorithm selection,
+restart strategies and estimate problem sizes. Recent trends to apply Machine
+Learning to SAT solving imply feature evaluation. SAT features and the resulting
+satisfiability runtimes are used as training data for Machine Learning.
+Another SAT solver using SAT features heavily for algorithm selection
+besides SATzilla is ASlib~\cite{aslib}.
+
+\section{Statistical properties}
 \label{sec:features-stats}
 %
 For our SAT~features we need to define some basic statistical terminology.
-Let $x_1, x_2, \ldots, x_n$ be a finite sequence of numbers ($n \in \mathbb N$).
+Let $x_1, x_2, \ldots, x_n$ be a sequence of real numbers ($n \in \mathbb N$).
 \begin{description}
-  \item[Arithmetic mean] (or short: mean)
+  \item[Arithmetic mean] (or mean for short)
     is defined as
     \[ \overline{x} = \frac1n \sum_{i=1}^n x_i \]
-  \item[Standard deviation] (or short: sd)
+  \item[Standard deviation] (or sd for short)
     with mean $\overline{x}$ is defined as
     \[ \sigma(x) = \sqrt{\frac1n \sum_{i=1}^n (x_i - \overline{x})} \]
   \item[Median]
@@ -120,7 +125,7 @@ Let $x_1, x_2, \ldots, x_n$ be a finite sequence of numbers ($n \in \mathbb N$).
     (i.e. sorted ascendingly) is defined as
     \[
        m = \begin{cases}
-         x_{\lceil \text{mid}\rceil} & \text{if } n \text{ odd} \\
+         x_{|\text{mid}|+1} & \text{if } n \text{ odd} \\
          \frac{x_{\text{mid}} + x_{\text{mid} + 1}}{2} & \text{if } n \text{ even}
        \end{cases}
        \quad\text{ with } \text{mid} = \frac{n}{2}
@@ -170,7 +175,7 @@ A summary of our suggested SAT features is given:
   let $n_l$ be the literal frequency of literal $l$,
   count the number of $n_l$ satisfying $\frac{k}{100} \leq n_l < \frac{k+5}{100}$
   where $k$ is a variable in $\{0,5,10,\ldots,90,95\}$ and $k=95$ counts
-  $\frac{k}{100} \leq n_l \leq \frac{k+5}{100}$.
+  $\frac{k}{100} \leq n_l$.
 \item[\satfeature{literals\_frequency\_(largest, smallest, mean, median, sd)\_entropy}] \hfill{} \\
   statistics related to literal frequencies
 \item[\satfeature{literals\_occurence\_one\_count}] \hfill{} \\
@@ -215,14 +220,14 @@ The resource requirements of those features have been classified:
 %
 Memory and runtime is always considered in comparison with the filesize.
 
-This classification should support future considerations regarding feature evaluation tools.
+This classification should support computational considerations regarding feature evaluation tools.
 The suggested SAT features above have been explicitly selected to avoid Type 4 implementations to limit the time to compute features.
-Furthermore tools evaluating only a subset of features (like Type~2 features) with better performance characteristics.
+Furthermore tools evaluating only a subset of features (like Type~2 features) can achieve better performance characteristics than general-purpose tools. For example, we wrote a dedicated tool to evaluate the maximum clause length of CNF files, which was much faster (175 GB, 1.5 hours).
 
 The Python implementation triggered MemoryErrors on a computer with 4~GB RAM for a 770~MB CNF file.
 Followingly a much more efficient Go implementation was implemented which requires much less memory and is much faster.
-\texttt{bench\_573.smt2.cnf} took 1 second in Go instead of 2 minutes in Python.
-However, the data evaluated is less accurate compared to Python, because Python unlike Go provides a nice implementation of statistical tools in the standard library. Go algorithms were written on our own.
+\texttt{bench\_573.smt2.cnf} (1.6~MB filesize) took 1 second in Go instead of 2 minutes in Python.
+However, the data evaluated is less accurate compared to Python in terms of floating point precision, because Python unlike Go provides a nice implementation of statistical tools in the standard library. Go algorithms were written on our own.
 
 In the following section, we define the dataset we consider.
 
@@ -254,7 +259,7 @@ The following CNF file collections have been considered:
       \item SAT Competition 2014
       \item SAT-Race 2015
       \item SAT Competition 2016
-      \item SATlib
+      \item SATlib~\cite{satlib}
     \end{itemize}
   \end{minipage}
 \end{center}
@@ -265,9 +270,10 @@ for specific problems in a selectable problem size; such as CNFgen~\cite{cnfgen}
 Massimo Lauria.
 
 Some files turned out to be problematic. In SATlib, 3 gzipped files couldn't be decompressed and several files
-contain empty clauses. Empty clauses are assumed to immediately falsify the CNF and are therefore pointless.
+contain empty clauses. Empty clauses are assumed to immediately falsify the CNF.
+We removed empty clauses and evaluated the remaining CNF.
 I removed trailing zeros in CNFs. Variants of the DIMACS standard also expect lines with a percent symbol to
-terminate the CNF. Besides those minor issues documented as part of the cnf-analysis project,
+terminate the CNF. Beside those minor issues documented as part of the cnf-analysis project,
 175 gigabytes of CNF files have been evaluated with a total of 68,069 CNF files (62,251 unique CNF files).
 
 \section{The average SAT problem}
@@ -287,39 +293,17 @@ we proceeded with this dataset.
 
 According to my results, an average SAT problem consists of:
 \begin{itemize}
-  \item 83,542 clauses in average ranging from 21 to 53,616,734 (median $= 430$, $\sigma = 848388$)
+  \item 83,542 clauses in average ranging from 21 to 53,616,734 (median = 430, $\sigma$ = 848,388)
   \item The longest clause we found had 61,473~literals, but the longest clause of an average CNF covers 20 literals.
-  \item The number of total literals in a CNF ranges from 60 up to 150,609,758.
-  \item The clause-variables ratio lies between 1.22 and 27,720 with mean $= 9.54$ and $\sigma = 139$.
+  \item The total number of literals in a CNF ranges from 60 up to 150,609,758.
+  \item The clause-variables ratio lies between 1.22 and 27,720 with mean = 9.54 and $\sigma$ = 139.
   \item The average length of a clause is expected to be 3. The largest clause length mean we found was 19.58 compared to 2.83 as the smallest clause length mean.
-  \item Surprisingly, in average a CNF file has 205 connected literal components and 53 connected variable components. However both corresponding medians are $1$ meaning that at least have of the problems still have only one component.
-  \item In average 32,787 clauses are definite clauses and 35,094 clauses are goal clauses.
-  \item In average a literal occurs in 1.4~\% of the clauses of the CNF.
+  \item Surprisingly, in average a CNF file has 205 connected literal components and 53 connected variable components. However both corresponding medians are $1$ meaning that at least have of the problems still have only one component. Component sizes have not been evaluated.
+  \item In average, 32,787 clauses are definite and 35,094 clauses are goal clauses.
+  \item In average, a literal occurs in 1.4~\% of the clauses of the CNF.
   \item 47~\% of literals in a clause are positive.
   \item The arithmetic mean tells 124 unit clauses per CNF file can be expected, but the median tells it is mostly 0.
   \item The largest variable found was 13,842,706 and 13,829,558~variables were used at most.
   \item Exactly one CNF file was true-trivial (namely \texttt{dubois/dubois100.cnf} of SATlib)
     whereas 13 CNF files were false-trivial (of SAT competition 2014 and SAT-Race 2015).
 \end{itemize}
-
-\section{Benford's law in CNF files}
-\label{sec:benford}
-%
-Given this huge set of CNF files and therefore integers, we evaluated whether Benford's law holds.
-
-A paper by Theodore P. Hill~\cite{hill1998first} characterizes Benford's Law
-as the following conjecture:
-\begin{theorem}
-  Consider arbitrary data from tables, listings or other sources in publications, newspaper
-  and so on and so forth, the digit $1$ occurs in about 30~\% of the time.
-  The first digit is $1$ about $30$~percent of the time
-  and $9$ only about $4.6$~percent of the time.
-\end{theorem}
-We evaluated that the leading digits 1 to 9 occur with probabilities
-28.76~\%, 19.09~\%, 13.56~\%, 10.97~\%, 7.48~\%, 5.76~\%, 5.12~\%, 4.79~\%
-and 4.46~\% respectively. We concluded that:
-\begin{quote}
-  Considering a deviation of 1.34~\% for digit $1$ (expected $30.1$, actual $28.76$) and
-  0.12~\% for digit $9$ (expected $4.58$, actual $4.46$),
-  we claimed the CNF~files considered satisfy Benford's law.
-\end{quote}
