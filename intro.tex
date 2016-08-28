@@ -13,19 +13,18 @@ are considered as byte strings in a particular encoding.
 The hash value is of fixed length and satisfies several properties which make it useful
 in a variety of applications.
 
-In this thesis, we will consider the hash algorithms MD4 and SHA-256.
-They use basic arithmetic functions like addition and bitwise functions
-such as \boolf{XOR} to transform an input message to a hash value. We use a bit vector
-as input to this implementation and all operations applied to this bit vector
-will be represented as clauses of a SAT problem. Additionally, we represent
-differential characteristics for hash collisions as SAT problem. If and only if
-satisfiability is given, the particular differential state is achievable
-using two different inputs leading to the same output. As far as SAT solvers
-return an actual model satisfying that state, we get an actual hash collision,
-which can be verified and visualized.
-If the internal state of the hash algorithm is too large, the attack can be
-computationally simplified by modelling only a subset of steps of the hash algorithm
-or changing the modelled differential path.
+In this thesis, we consider the hash algorithms MD4 and SHA-256.
+Our goal is to find hash collisions using differential cryptanalysis.
+We define differences between two messages and determine actual bits
+such that the two messages result in the same hash value. \\
+This whole equation system will be modelled as a satisfiability problem.
+A SAT solver reports satisfiability if and only if the particular
+differences can be resolved and an actual hash collision is found.
+We introduce a bit condition notation which allows us to visualize
+such differential states. Verification is done by several SAT solvers
+and we compare their runtime. Because the Boolean functions modelled in
+a CNF have a major influence on the runtime, we investigate several
+approaches and compare them.
 
 Based on experience with these kind of problems with previous heuristic search tools
 we aim to apply best practices to a satisfiability setting.
@@ -58,7 +57,7 @@ This thesis is organized as follows:
 
 \item[In Chapter~\ref{ch:features},] we define SAT features which help us to
   classify SAT problems. This is a small subproject we did to look at properties
-  of resulting DIMACS~CNF files.
+  of resulting DIMACS CNF files.
 
 \item[In Chapter~\ref{ch:enc},] we discuss how we represent a problem (i.e. the hash
   function and a differential characteristic) as SAT~problem. This ultimatively

@@ -7,8 +7,8 @@
 In Chapter~\ref{ch:sat}, we discussed Boolean algebra; in particular we looked at
 satisfiability which is practically covered by SAT solvers. SAT solvers take
 Boolean functions in Conjunctive Normal Form and determine satisfiability.
-In Chapter~\ref{ch:dc}, we looked at how we can analyze algorithms by looking
-at the progression of differences between algorithm instances. In particular,
+In Chapter~\ref{ch:dc}, we discussed how we can analyze algorithms by observing
+progression of differences between algorithm instances. In particular,
 we looked at hash algorithms introduced in Chapter~\ref{ch:hash}.
 
 With this background, we designed an attack setting in Chapter~\ref{ch:enc}
@@ -19,7 +19,7 @@ Therefore, we designed several approaches to improve our runtime results.
 
 In this section, we will evaluate those approaches. Furthermore, we briefly
 discuss claims we made about average SAT problems. In Section~\ref{ch:features},
-we looked at SAT features which to some extent characterize a SAT problem.
+we defined SAT features which to some extent characterize a SAT problem.
 
 \section{Evaluating SAT features}
 \label{sec:results-features}
@@ -189,7 +189,7 @@ Do average SAT problems distinguish from \emph{our} CNF testcases?
     of the CNF and is therefore smaller, the larger the problem is.
 \end{itemize}
 
-In general we were not able to identify features allowing us to solve
+In general, we were not able to identify features allowing us to solve
 differential cryptanalysis problems more efficiently compared to
 general-purpose SAT problems. We concluded writing your own SAT solver
 dedicated to solving differential cryptanalysis problems is not worth
@@ -200,7 +200,7 @@ the effort.
 %
 In this section, we look at our runtime results of testcases provided in
 Appendix~\ref{app:tc}. We make various claims and substantiate them
-with runtime results. Runtimes are always provided in seconds. Therefore
+with runtime results. Runtimes are always provided in seconds. Therefore,
 smaller runtimes are better. \timeout{} denotes a timeout (solving took
 more than 1 day) and \unknown{} denotes unavailable data.
 
@@ -238,13 +238,7 @@ result in unsatisfiability for satisfiable testcases or runtime results are
 unexpected because the SAT solver could not take advantage of our SAT design
 improvements. This particular testcase can be solved easily with all major
 SAT solvers as can be seen in Table~\ref{tab:tcA-results}.
-
-We end up with the result, that the hash collision given in Testcase~C
-can be solved by the majority of modern SAT solvers. Of course the cryptanalyst
-needs to figure out good starting points for the hash collision and encode them
-in the differential characteristic, but this task is still considered practical,
-because this task can be easily automated.
-
+%
 \begin{table}[!h]
   \begin{center}
     \begin{tabular}{cccccc}
@@ -263,6 +257,12 @@ because this task can be easily automated.
     \label{tab:tcA-results}
   \end{center}
 \end{table}
+%
+We end up with the result, that the hash collision given in Testcase~C
+can be solved by the majority of modern SAT solvers. Of course the cryptanalyst
+needs to figure out good starting points for the hash collision and encode them
+in the differential characteristic, but this task is still considered practical,
+because it can be easily automated.
 
 \subsection{Evaluating simplification}
 \label{sec:results-simplification}
@@ -305,7 +305,7 @@ Consider for example Testcase~C (Appendix \ref{sec:tcC}) in the basic encoding
 introduced in Section~\ref{sec:enc-original}. Then simplification will reduce the problem
 size down to 42.9~\% or more of its original size (as illustrated in Table~\ref{tab:simpl-size}).
 We verified these data for all simplified files and got similar results.
-Therefore the claim holds considering the problem size gets reduced to
+Therefore, the claim holds considering the problem size gets reduced to
 approximately half of its size.
 
 \begin{table}[!h]
@@ -340,6 +340,7 @@ CNF, and the simplifier used. A small number of variables or clauses does
 not necessarily lead to better performance. But an equisatisfiable encoding
 of the same problem is worth considering.
 
+\newpage
 Table~\ref{tab:simplification-results} lists runtimes depending
 on the simplification used.
 
@@ -347,7 +348,7 @@ on the simplification used.
 \item[none]
   refers to the unsimplified CNF
 \item[cmsat]
-  refers to simplification applied with Cryptominisat version~5: \\
+  refers to simplification applied with CryptoMiniSat version~5: \\
   \texttt{./cryptominisat5 -p1 file.cnf simplified.cnf}
 \item[lingeling]
   refers to simplification with lingeling version ats1: \\
@@ -361,11 +362,11 @@ on the simplification used.
 \end{description}
 
 It is worth pointing out that simplification time is not part of the runtime
-listed. Simplification can take very long. Especially simplifications with
+listed. Simplification can take very long. Especially, simplifications with
 lingeling have sometimes taken several hours without result.
 
 In conclusion, simplification leads to a slight improvement of the runtime,
-but in general we cannot recommend simplifying every CNF file before running it.
+but in general we cannot recommend simplifying every CNF file.
 Because technically speaking, SAT solvers internally apply simplification
 algorithms on their own.
 
@@ -432,22 +433,14 @@ and \ref{sec:tc23}.
 
 Recall that differential description explicitly encodes
 how differences in arithmetic and bitwise operations propagate in the CNF.
-We discussed \boolf{XOR} and \boolf{MAJ} in Section~\ref{sec:enc-diff-desc}.
+We discussed \boolf{XOR} and \boolf{IF} in Section~\ref{sec:enc-diff-desc}.
+These clauses should be deducible by the SAT solver itself and
+do not narrow the search space. Therefore we expected equivalent
+runtime results for both cases (with or without differential description).
+However, the resulting data indicates the opposite.
 
-The data corresponds to even larger testcases, namely a 27-rounds
-variant we looked at, but did not list. This 27-rounds testcase
-could not be solved in many cases within our time limit and
-is therefore excluded from our lists.
-
-We evaluated runtimes with and without differential description.
-In Table~\ref{tab:diff-desc-results} we randomly picked SAT solvers
-and we can clearly see a significant improvement of the runtimes.
-
-We continued by trying to influence the guessing strategy to reflect
-differential cryptanalysis, which generally use the assumption
-that difference variables are assigned first. This strategy
-requires customization of the SAT solver and therefore we
-only considered lingeling, which was adapted for our purposes.
+In Table~\ref{tab:diff-desc-results} we picked two SAT solvers lingeling
+and CryptoMiniSat and we can clearly see a significant improvement of the runtimes.
 
 \begin{table}[!h]
   \begin{center}
@@ -488,6 +481,12 @@ only considered lingeling, which was adapted for our purposes.
     \label{tab:diff-desc-results}
   \end{center}
 \end{table}
+
+We continued by modifying the guessing strategy to reflect
+differential cryptanalysis, which generally use the assumption
+that difference variables are assigned first. This strategy
+requires customization of the SAT solver and therefore we
+only considered lingeling, which was adapted for our purposes.
 
 \subsection{Modifying the guessing strategy}
 \label{sec:results-guessing}
@@ -531,8 +530,8 @@ This can be recognized in Table~\ref{tab:phase-results}.
 %
 Though the results of \mone{} was recognizable, we wanted to push it further.
 We got in contact with Armin Biere who provided us an extended lingeling implementation
-which understands the notion of difference variables as a set of variables which needs
-to be assigned first.
+which distinguishes two sets of variables; namely a set of differences variables
+which needs to be assigned first.
 
 \begin{prop}
   Evaluating difference variables first and with Boolean value false improves the runtime.
@@ -540,7 +539,8 @@ to be assigned first.
 %
 The lightweight approach mentioned in Section~\ref{sec:enc-lightweight}
 evaluates difference variables first with Boolean value false,
-but neglects the differential description.
+but does not add a differential description. Hence, differential behavior is
+not modelled explicitly.
 This approach is justified by the assumption that a low number of differences,
 leading to a sparse differential path, is more likely to cancel out differences
 ending in a hash collision.
@@ -598,8 +598,7 @@ description and difference variables first.
 
 Table~\ref{tab:pref-vars-results} shows results for MD4 and SHA-256 testcases.
 The data indicates that for very small runtimes, the runtime improved.
-But for the more meaningful SHA-256 testcases runtimes have worsened
-extraordinary.
+Unfortunately, for the SHA-256 testcases runtimes have worsened extraordinary.
 
 \begin{table}[!h]
   \begin{center}
@@ -630,4 +629,5 @@ In this section we looked at various improvements to improve the runtime, namely
 \end{enumerate}
 %
 We evaluated these approaches with several SAT solvers and found some significiant
-runtime improvements. We successfully found hash collisions for MD4 and SHA-256.
+runtime improvements. We successfully found hash collisions for MD4 and SHA-256,
+where the latter has been reduced to 18, 21, 23 and 24 steps.
