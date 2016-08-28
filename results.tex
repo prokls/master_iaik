@@ -576,7 +576,7 @@ which assigns difference variables first and once they are all set,
 values for the two hash algorithm instances are assigned.
 
 \begin{prop}
-  Adding preference variables lead to a performance improvement.
+  Adding preference variables dramatically worsens performance.
 \end{prop}
 %
 Section~\ref{sec:enc-diff-desc-eo} introduces preference variables
@@ -596,15 +596,18 @@ the equation system. This justifies why our encoding with preference
 variables should be compared to an instance with differential
 description and difference variables first.
 
-Table~\ref{tab:pref-vars-results} shows a significant runtime improvement.
+Table~\ref{tab:pref-vars-results} shows results for MD4 and SHA-256 testcases.
+The data indicates that for very small runtimes, the runtime improved.
+But for the more meaningful SHA-256 testcases runtimes have worsened
+extraordinary.
 
 \begin{table}[!h]
   \begin{center}
-    \begin{tabular}{c|ccc}
-      \textbf{testcase}                                & \textbf{A} &  \textbf{B} &  \textbf{C} \\
+    \begin{tabular}{c|ccccccc}
+      \textbf{testcase}                                & \textbf{A} &  \textbf{B} &  \textbf{C} & \textbf{18} & \textbf{21} & \textbf{23} & \textbf{24} \\
     \hline
-      \textbf{CNF with differential description}       &         11 &         133 &       155 \\
-      \textbf{additionally with preference variables}  &          8 &          50 &        62 \\
+      \textbf{CNF with diff-desc}                      &         11 &         133 &         155 &          49 &       2,282 &       1,314 &       2,632 \\
+      \textbf{preference variables added}              &          8 &          50 &          62 &    \timeout &    \timeout &    \timeout &    \timeout \\
     \end{tabular}
     \caption{
       lingeling-ats1o1 testcases comparing an approach
@@ -626,5 +629,5 @@ In this section we looked at various improvements to improve the runtime, namely
   \item Preference variables
 \end{enumerate}
 %
-We evaluated these approaches with several SAT solvers and found significiant
+We evaluated these approaches with several SAT solvers and found some significiant
 runtime improvements. We successfully found hash collisions for MD4 and SHA-256.
