@@ -112,16 +112,16 @@
 
 \captionsetup[figure]{labelfont=bf}
 
-\definecolor{linkcolor}{cmyk}{0.68,0.00,0.71,0.39}
-\definecolor{citecolor}{cmyk}{0.60,0.00,0.75,0.51}
-\definecolor{urlcolor}{cmyk}{0.59,0.00,0.76,0.44}
+\definecolor{linkcolor}{cmyk}{0.0,0.0,0.0,0.65}
+\definecolor{citecolor}{cmyk}{0.0,0.0,0.0,0.82}
+\definecolor{urlcolor}{cmyk}{0.0,0.0,0.0,0.60}
 
 \definecolor{gray}{rgb}{0.7,0.7,0.7}
 \newcommand{\dnW}[1][A]{\texttt{#1}}
 \newcommand{\dnI}[1]{\texttt{#1}}
-\newcommand{\dnCx}{\texttt{\color{red}{x}}}
-\newcommand{\dnCu}{\texttt{\color{red}{u}}}
-\newcommand{\dnCn}{\texttt{\color{red}{n}}}
+\newcommand{\dnCx}{\texttt{\color{darkgray}{x}}}
+\newcommand{\dnCu}{\texttt{\color{darkgray}{u}}}
+\newcommand{\dnCn}{\texttt{\color{darkgray}{n}}}
 \newcommand{\dnCz}{\texttt{\color{black}{0}}}
 \newcommand{\dnCo}{\texttt{\color{black}{1}}}
 \newcommand{\dnCq}{\texttt{\color{black}{?}}}
@@ -217,7 +217,8 @@
     \begin{minipage}[t]{0.4\textwidth}
       \begin{flushleft} \large
         \emph{Author:}\\[3pt]
-        \href{mailto:\authormail}{\theauthor}
+        %\href{mailto:\authormail}
+        {\theauthor}
       \end{flushleft}
     \end{minipage}
     \begin{minipage}[t]{0.4\textwidth}
